@@ -9,29 +9,38 @@
     %y_error: root mean squared error in the y component
 function [r_com,u_1,y_error] = PCA_regression(x,y)
 
-    %get the mean and std and sample size of the data
-    x_bar = mean(x);
-    y_bar = mean(y);
-    r_com = [x_bar;y_bar];
-    std_x = std(x,1);
-    std_y = std(y,1);
-    n = numel(x);
+    %check the parameters x and y, they are column vectors with the same length
+    if ~iscolumn(x)
+        error('x must be a column vector');
+    elseif ~iscolumn(y)
+        error('y must be a column vector');
+    elseif (numel(x)~=numel(y))
+        error('x and y must be the same length');
+    end
+    
+    %get the mean and std(divisor n) and sample size of the data
+    x_bar = mean(x); %mean
+    y_bar = mean(y); %mean
+    r_com = [x_bar;y_bar]; %center of mass
+    std_x = std(x,1); %std divisor n
+    std_y = std(y,1); %std divisor n
+    n = numel(x); %sample size
 
     %normalize the data
     x = (x - x_bar)/std_x;
     y = (y - y_bar)/std_y;
 
-    %estimate the covariance matrix
+    %put x and y in a design matrix
     X = [x,y];
-    covariance = X'*X/n;
-    %get the eigenvector with the largest eigenvalue
-    [eigenvectors,eigenvalues] = eig(covariance);
+    
+    %get the eigenvalues and eigenvectors of the covariance matrix
+    [eigenvectors,eigenvalues] = eig(cov(X,1));
     eigenvalues = diag(eigenvalues); %covert diagonal matrix into vector
-    u_1 = eigenvectors(:,max(eigenvalues)==eigenvalues); %select eigenvector
+    u_1 = eigenvectors(:,max(eigenvalues)==eigenvalues); %select eigenvector with biggest eigenvalue
     
     %if want y_error
     if nargout == 3
-        u_2 = eigenvectors(:,min(eigenvalues)==eigenvalues); %select eigenvector
+        u_2 = eigenvectors(:,min(eigenvalues)==eigenvalues); %select 2nd eigenvector
         %get perpendicular distance of each point to the line
         d = X*u_2;
         %get the root mean squared error of the perpendicular distance
