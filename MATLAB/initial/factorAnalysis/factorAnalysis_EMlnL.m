@@ -2,27 +2,26 @@ clc;
 clear all;
 close all;
 
+%TO BE RUN ON A SERVER: n_run cores
+
+%USER DEFINED
 %number of factors
 k_max = 4;
 %number of EM steps
 n_EM = 8;
+%number of initial values
 n_run = 12;
 
 %array of images
 length = 100;
 area = length^2;
-stack = zeros(length,length,100);
+n = 100;
+stack = zeros(length,length,n);
 
 %LOAD VARIABLES
 
 %for each image, save the pixel values
-n = 100;
 for i = 1:n
-%     if i<=10
-%         stack(:,:,i) = imread(strcat('/data/tinamou/sip/block_images/stack_100/compress_block_images_stack00',num2str(i-1),'.tif'));
-%     else
-%         stack(:,:,i) = imread(strcat('/data/tinamou/sip/block_images/stack_100/compress_block_images_stack0',num2str(i-1),'.tif'));
-%     end
     if i<=10
         stack(:,:,i) = imread(strcat('/data/greypartridge/not-backed-up/oxwasp/oxwasp15/sip/stack_100/compress_block_images_stack00',num2str(i-1),'.tif'));
     else
@@ -46,6 +45,8 @@ cov_x = cov(X);
 %declare array of log likelihoods
 lnL_array = zeros(n_EM,n_run,k_max);
 
+%EM ALGORITHM
+
 %for factors 1,2,3,...,k_max
 for k = 1:k_max
     %n_run times in parallel
@@ -68,19 +69,25 @@ for k = 1:k_max
     end
 end
 
-%plot it
-plot_array = [];
+%PLOT
+
+%plot the log likelihoods
+plot_array = []; %array of plots
 figure;
-colour = hsv;
+colour = hsv; %select colour of the lines from hsv
+%for each k
 for j = 1:k_max
+    %plot the lnL and save the plot in plot_array
     plot_array(j,:) = plot(lnL_array(:,:,j),'Color',colour(floor(j*64/k_max),:));
     hold on;
 end
+%set limits and labels
 xlim([1,n_EM]);
 xlabel('Number of EM steps');
 ylabel('lnL (nat)');
 hold off;
+%plot the legend using plot_array
 legend(plot_array(:,1),'k=1','k=2','k=3','k=4');
 
 %save the variables
-save('EMlnL.mat','lnL_array');
+save('/data/greypartridge/not-backed-up/oxwasp/oxwasp15/sip/EMlnL.mat','lnL_array');

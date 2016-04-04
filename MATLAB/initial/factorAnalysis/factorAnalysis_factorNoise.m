@@ -2,6 +2,9 @@ clc;
 clear all;
 close all;
 
+%TO BE RUN LOCALLY
+
+%USER DEFINE VARIABLES
 %number of factors
 k_max = 4;
 %number of EM steps
@@ -10,12 +13,12 @@ n_EM = 50;
 %array of images
 length = 100;
 area = length^2;
-stack = zeros(length,length,100);
+n = 100;
+stack = zeros(length,length,n);
 
 %LOAD VARIABLES
 
 %for each image, save the pixel values
-n = 100;
 for i = 1:n
     if i<=10
         stack(:,:,i) = imread(strcat('/data/tinamou/sip/block_images/stack_100/compress_block_images_stack00',num2str(i-1),'.tif'));
@@ -41,6 +44,8 @@ cov_x = cov(X);
 factor_noise_array = zeros(length,length,4);
 intrinsic_noise_array = zeros(length,length,4);
 
+%EM ALGORITHM
+
 %for factors 1,2,3,...,k_max
 parfor k = 1:k_max
 
@@ -62,18 +67,16 @@ parfor k = 1:k_max
     intrinsic_noise_array(:,:,k) = reshape(noise_vector,length,length);
 end
 
-% factor_max = max(max(max(factor_noise_array)));
-% factor_min = min(min(min(factor_noise_array)));
-% 
-% intrinsic_max = max(max(max(intrinsic_noise_array)));
-% intrinsic_min = min(min(min(intrinsic_noise_array)));
-
+%PLOTTING factor and intrinsic noise
 figure;
-for j = 1:k_max
-    %plot the factor and intrinsic noise
-    subplot(k_max,2,2*j-1) %factor
+for j = 1:k_max %for each factor
+    
+    %plot factor noise
+    subplot(k_max,2,2*j-1) %define subplot
+    %heatmap
     imagesc(factor_noise_array(:,:,j));
     colorbar;
+    %put the type of noise at the top
     if (j==1)
         title('Factor noise');
     end
@@ -81,9 +84,12 @@ for j = 1:k_max
     set(gca,'xtick',[]);
     set(gca,'ytick',[]);
     
-    subplot(k_max,2,2*j); %intrinsic
+    %plot intrinsic noise
+    subplot(k_max,2,2*j);
+    %heatmap
     imagesc(intrinsic_noise_array(:,:,j));
     colorbar;
+    %put the type of noise at the top
     if (j==1)
         title('Intrinsic noise');
     end

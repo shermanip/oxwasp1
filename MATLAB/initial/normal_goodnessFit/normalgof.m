@@ -8,7 +8,7 @@ close all;
 length = 1996; %length of the data
 area = length^2; %area of the data
 n = 100; %sample size
-stack = zeros(length,length,100);
+stack = zeros(length,length,n);
 
 %for each image, save the pixel values
 for i = 1:n
