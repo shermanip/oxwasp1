@@ -50,7 +50,7 @@ intrinsic_noise_array = zeros(length,length,4);
 parfor k = 1:k_max
 
     %declare the loading matrix and the noise
-    loading = normrnd(0,30,area,k);
+    loading = normrnd(0,1E3,area,k);
     noise_vector = gamrnd(1,1E3,area,1); %vector of noise
 
     %repeat n_EM times

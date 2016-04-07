@@ -52,7 +52,7 @@ for k = 1:k_max
     %n_run times in parallel
     parfor i = 1:n_run
         %declare the loading matrix and the noise
-        loading = normrnd(0,30,area,k);
+        loading = normrnd(0,1E3,area,k);
         noise_vector = gamrnd(1,1E3,area,1); %vector of noise
 
         %repeat n_EM times
