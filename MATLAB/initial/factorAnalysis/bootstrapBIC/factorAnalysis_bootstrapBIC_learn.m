@@ -57,8 +57,7 @@ function factorAnalysis_bootstrapBIC_learn()
         %for n_run times
         for j = 1:n_run
             %declare the loading matrix and the noise randomly
-            loading = normrnd(0,1E3,area,k); %loading
-            noise_vector = gamrnd(1,1E3,area,1); %vector of noise
+            [loading,noise_vector] = factorAnalysis_EM_initalize(area,k);
             %for n_EM times
             for i = 1:n_EM
                 %E STEP
