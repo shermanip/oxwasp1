@@ -1,0 +1,91 @@
+\documentclass[12pt]{report}
+%\usepackage[a4paper, total={8.27in, 11.69in}]{geometry}
+
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{natbib}
+\usepackage{url}
+\usepackage[nottoc]{tocbibind}
+
+\DeclareMathOperator{\expfamily}{ExpFamily}
+\DeclareMathOperator{\expectation}{E}
+\DeclareMathOperator{\variance}{Var}
+\DeclareMathOperator{\cov}{Cov}
+\DeclareMathOperator{\corr}{Corr}
+\DeclareMathOperator{\bernoulli}{Bernoulli}
+\DeclareMathOperator{\betaDist}{Beta}
+\DeclareMathOperator{\dirichlet}{Dir}
+\DeclareMathOperator{\bin}{Bin}
+\DeclareMathOperator{\MN}{Multinomial}
+\DeclareMathOperator{\prob}{P}
+\DeclareMathOperator{\trace}{Tr}
+
+\newcommand{\RSS}{\mathrm{RSS}}
+\newcommand{\euler}{\mathrm{e}}
+\newcommand{\diff}{\mathrm{d}}
+\newcommand{\T}{^\textup{T}}
+\newcommand{\dotdotdot}{_{\phantom{.}\cdots}}
+
+\newcommand{\vect}[1]{\mathbf{#1}}
+\newcommand{\vectGreek}[1]{\boldsymbol{#1}}
+\newcommand{\matr}[1]{\mathsf{#1}}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{algorithm}{Algorithm}
+
+
+\begin{document}
+
+%=====TITLE PAGE======
+\begin{titlepage}
+\centering
+\vspace*{1cm}
+        
+        \Large
+        \textbf{Inside-Out: Characterisation of Computed Tomography Noise in Projection and Image Space with Applications to 3D Printing}
+        
+		\large        
+        
+        \vspace{1cm}
+        {OxWaSP 2015 Warwick Cohort - Mini-project 1}
+        
+        \vspace{1cm}
+        {Sherman Ip}
+
+
+        \vspace{1cm}
+        {Supervisor: Dr.~J.~Brettchnider (Statistics, Warwick)}
+        
+        \vspace{1cm}
+        {Supervisor: Prof.~T.~Nichols (Statistics, Warwick)}
+        
+        \vspace{1cm}
+        {10th June 2016}
+\end{titlepage}
+
+%======ABSTRACT=========
+\begin{abstract}
+abstract goes here
+\end{abstract}
+
+%=====FRONT MATTER=====
+\tableofcontents
+%\listoffigures
+%\listoftables
+
+%======INTRODUCTION========
+\chapter{Introduction}
+And so begins
+\chapter{Literature Review}
+\chapter{Exploratory Data Analysis}
+\section{Summary Statistics}
+\section{Principal Component Analysis}
+\section{Factor Analysis}
+\chapter{Mean and Variance Relationship}
+
+
+\bibliographystyle{unsrt}
+\bibliography{bib}
+\end{document}
