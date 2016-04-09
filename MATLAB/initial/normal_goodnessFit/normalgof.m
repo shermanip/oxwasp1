@@ -40,6 +40,9 @@ save('/data/greypartridge/not-backed-up/oxwasp/oxwasp15/sip/p_values.mat','p_val
 figure;
 imagesc(p_value_array,[0,1]); %set scale from 0 to 1
 colorbar; %add color bar
+set(gca, 'XTick', []);
+set(gca, 'YTick', []);
+
 
 %plot the log 10 scale
 log_p = log10(p_value_array); %log10
@@ -52,6 +55,8 @@ hold on; %in addition, find [row,col] significant pixels at 10% level
 %plot circles on significant pixels (x,y)
 scatter(column_array,row_array);
 hold off;
+set(gca, 'XTick', []);
+set(gca, 'YTick', []);
 
 %print the quantile of the p values
 p_quantile = quantile(reshape(p_value_array,[],1),[0.05,0.5,0.95]);
