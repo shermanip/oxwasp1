@@ -7,6 +7,7 @@
 \usepackage{graphicx}
 \usepackage{natbib}
 \usepackage{url}
+\usepackage{subcaption}
 \usepackage[nottoc]{tocbibind}
 
 \DeclareMathOperator{\expfamily}{ExpFamily}
@@ -87,7 +88,7 @@ Figure \ref{fig:x_ray_ct} shows a diagram on how CT scanning works. A 2D image i
 \begin{figure}
 \centering
 \includegraphics[width=0.7\textwidth]{figures/x_ray_ct.png}
-\caption{X-ray computed tomography reconstructs the sample by firing X-ray photons onto a rotating sample. The photon are then detected by the detector. \emph{Source: http://www.phoenix-xray.com/}}
+\caption{X-ray computed tomography reconstructs the sample by projecting X-ray photons onto a rotating sample. The photon are then detected by the detector. \emph{Source: http://www.phoenix-xray.com/}}
 \label{fig:x_ray_ct}
 \end{figure}
 
@@ -107,7 +108,7 @@ X-ray photons in CT scanning are produced in an X-ray tube. In an X-ray tube, a 
 \label{fig:x_ray_tube}
 \end{figure}
 
-Bremsstrahlung radiation is the result of projectile electrons deaccelerating due to the electrostatic field produced by nucleus of the target. The kinetic energy of the projectile electrons are then converted to electromagnetic radiation to produce X-ray photons. As a result, the photon energies in Bremsstrahlung is continuous spectrum and can range up to the maximum kinetic energy of the projectile electrons \cite{michael2001x}.
+Bremsstrahlung radiation is the result of projectile electrons deaccelerating due to the electrostatic field produced by nucleus of the target. The kinetic energy of the projectile electrons is then converted to electromagnetic radiation to produce X-ray radiation. As a result, the photon energies in bremsstrahlung radiation is  a continuous spectrum and can range up to the maximum kinetic energy of the projectile electrons \cite{michael2001x}.
 
 Characteristic radiation is due to projectile electrons colliding with electrons in the target atom and ionizing them. This produce vacancies in the electron shell and emits X-ray photons when the electrons in the target atom drops down back to the ground state. The energy of the emitted radiation is monoenergetic and depends on the binding energy of the target's atoms \cite{michael2001x}.
 
@@ -120,7 +121,7 @@ A typical energy spectrum of X-ray photons emitted from an X-ray tube is as show
 \label{fig:x_ray_spectrum}
 \end{figure}
 
-The voltage, the energy per charge, and current, the rate of charge, can the varied in the X-ray tube to produce different energy spectrum and rate of X-ray emission. This can vary the results produced when collecting CT data \cite{cantatore2011introduction}. Another important factor is the focal spot size because smaller spot sizes produce sharper edges. Larger spot sizes produce unsharp results and this is know as the penumbra effect, as shown in Figure \ref{fig:x_ray_penumbra}. However spot sizes too small can produce concentrated heat \cite{welkenhuyzen2009industrial}.
+The voltage, the energy per charge, and current, the rate of charge, can be varied in the X-ray tube to produce different energy spectrums and rate of X-ray emittion. This can vary the results produced when collecting CT data \cite{cantatore2011introduction}. Another important factor is the focal spot size because smaller spot sizes produce sharper edges. Larger spot sizes produce unsharp results and this is know as the penumbra effect, as shown in Figure \ref{fig:x_ray_penumbra}. However spot sizes too small can produce concentrated heat \cite{welkenhuyzen2009industrial}.
 
 \begin{figure}
 \centering
@@ -130,9 +131,9 @@ The voltage, the energy per charge, and current, the rate of charge, can the var
 \end{figure}
 
 \section{X-Ray Interactions}
-X-ray photons emitted by the X-ray tube are fired onto the sample and interacts with it in a number of ways \cite{cantatore2011introduction}.
+X-ray radiation emitted by the X-ray tube are projected onto the sample and interacts with it in a number of ways \cite{cantatore2011introduction}.
 
-The sample can effectively absorb X-ray photons via the photoelectric effect or pair production \cite{cantatore2011introduction}. In the photoelectric effect, the X-ray photons transfers its energy to a bounded electron and ejects it from the atom \cite{millikan1916direct}. In pair production, the X-ray photons converts into an electron-position pair by interacting with the Coulomb field of the sample's atomic nucleus \cite{hubbell2006electron}.
+The sample can effectively absorb X-ray radiation via the photoelectric effect or pair production \cite{cantatore2011introduction}. In the photoelectric effect, the X-ray photons transfers all its energy to a bounded electron and ejects it from the atom \cite{millikan1916direct}. In pair production, the X-ray photons converts into an electron-position pair by interacting with the Coulomb field of the sample's atomic nucleus \cite{hubbell2006electron}.
 
 X-ray photons can be scattered by the sample. This happens when X-ray photons collide inelastically with and transfers it's energy to the sample's electrons. This process is know as Compton scattering \cite{compton1923quantum}.
 
@@ -143,13 +144,93 @@ I_1 = I_0\euler^{-\mu x}
 where it was assumed the X-ray photons are monoenergetic \cite{michael2001x}. This can be extended to a continuous spectrum of X-ray energies by making $\mu$ dependent on the energy of the X-ray photons \cite{cantatore2011introduction}. In general low energy photons are more likely to be absorbed than high energy photons, this increases the average energy of the attenuated photons and can be a source of error in CT scanning. This is referred to beam hardening \cite{michael2001x}. This can be reduced by placing a thin sheet of filter to absorb low energy photons \cite{welkenhuyzen2009industrial} or by correcting it in the data analysis stage \cite{michael2001x}.
 
 \section{Detector}
-Most X-ray detectors are scintillator-photodiode detectors. The photons interact with the scintiallator material and produces visible light. The visible light is then detected by photodiodes and covert into electric current \cite{michael2001x}. The detectors used in CT scanning are flat bed scanner which consist of an array of panels of photodiodes \cite{cantatore2011introduction}.
+Most X-ray detectors are scintillator-photodiode detectors. The X-ray photons interact with the scintiallator material and produces visible light. The visible light is then detected by photodiodes and coverts it into electricical current \cite{michael2001x}. The detectors used in CT scanning are flat bed scanner which consist of an array of panels of photodiodes \cite{cantatore2011introduction}.
 
 \section{Reconstruction}
 The scale of the 2D images are calibrated with the use of reference standards \cite{bartscher2007enhancement}. The method used to reconstruct the 3D geometry of the sample is called the filtered back-projection \cite{michael2001x}. The mathematics can be reviewed in \cite{brooks1976principles}.
 
 \chapter{Exploratory Data Analysis}
 \section{Summary Statistics}
+A dataset was given for this project. It consists of 100 realizations of an X-ray image of a cuboid with its vertices in the middle, taken using an X-ray detector. These images were 1996$\times$1996 pixels in size and have a colour depth of 16 bits. A sample of them can be viewed in Figure \ref{fig:block_montage}.
+
+\begin{figure}
+\centering
+\includegraphics[width=1\textwidth]{figures/block_montage.jpg}
+\caption{The 1st, 50th and 99th image in the dataset of an X-ray image of a cuboid.} 
+\label{fig:block_montage}
+\end{figure}
+
+The distribution of the grey values of all the pixels in the data set is shown in Figure \ref{fig:block_histogram}. It was observed that there were 3 distinct peaks in the histogram at $\sim2\times10^4$, $\sim4\times10^4$ and $\sim5\times10^4$. By doing a threshold, as shown in Figure \ref{fig:block_histogram}, it was clear that the main 3 sources of the grey values were the sample, the background and the foam holder at the bottom of the image.
+
+\begin{figure}
+\centering
+\includegraphics[width=0.5\textwidth]{figures/block_histogram.png}
+\caption{Histogram of the grey values of all the pixels in the 100 images in the dataset. The grey values range from 18286 to 60045.}
+\label{fig:block_histogram}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\begin{subfigure}[b]{0.45\textwidth}
+		\includegraphics[width=\textwidth]{figures/block_threshold.png}
+		\caption{Threshold pixels}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.45\textwidth}
+		\includegraphics[]{figures/block_threshold_histogram.png}
+		\caption{Histogram}	
+	\end{subfigure}
+	\caption{A threshold was selected to highlight pixels with different grey values. Blue: grey values less than 34765. Green: grey values more than 40269.}
+	\label{fig:block_threshold}
+\end{figure}
+
+The mean and standard error of the grey values for each of the 100 images were taken and plotted as a time series as shown in Figure \ref{fig:timeSeries}. There was evidence of dependence between samples by looking the sample autocorrelation plots as shown in Figure \ref{fig:timeSeries_acf_pacf}. Because there was a peak at lag 1 in the sample partial autocorrelation plot, the time series could be modelled using an autoregressive model with one parameter.
+
+\begin{figure}
+	\centering
+	\includegraphics[width=0.75\textwidth]{figures/initial_timeSeries.eps}
+	\caption{The mean and standard error of all the pixel grey values for each image.}
+	\label{fig:timeSeries}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\begin{subfigure}[b]{0.45\textwidth}
+		\includegraphics[width=1\textwidth]{figures/initial_acf.eps}
+		\caption{Sample autocorrelation}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.45\textwidth}
+		\includegraphics[width=1\textwidth]{figures/initial_pacf.eps}
+		\caption{Sample partial autocorrelation}
+	\end{subfigure}
+	\caption{Sample autocorrelation and partial autocorrelation of the mean grey values time series.}
+	\label{fig:timeSeries_acf_pacf}
+\end{figure}
+
+The mean and standard deviation for each pixel's grey value was estimated and as shown in Figure \ref{fig:initial_mean_std}. Both supervised and unsupervised learning can be used to model the mean and variance relationship of the grey values.
+
+\begin{figure}
+	\centering
+	\includegraphics[width=0.9\textwidth]{figures/initial_mean_std.eps}
+	\caption{Frequency density of the $1996^2$ pixel's grey values mean and standard deviation.}
+	\label{fig:initial_mean_std}
+\end{figure}
+
+A Normal distribution was fitted on each pixel's grey values and the $\chi^2$ goodness of fit test was conducted, as shown in Figure \ref{fig:initial_fit_normal_test}. When considering the Bonferoni correction for multiple hypothesis testing, the Normal distribution appeared to be a good fit because only 9 pixels have $p$ values less than 10\%. In addition, these significant pixels did not seem to cluster and appear random in space. When ignoring the Bonferoni correction, there was a suspicious patch of low $p$ values on the bottom right.
+
+\begin{figure}
+\centering
+	\begin{subfigure}[b]{0.75\textwidth}
+		\includegraphics[width=1\textwidth]{figures/initial_p.eps}
+		\caption{$p$ values}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.75\textwidth}
+		\includegraphics[width=1\textwidth]{figures/initial_p_log10.eps}
+		\caption{$\log_{10} p$ values}
+	\end{subfigure}
+	\caption{$p$ values from the $\chi^2$ goodness of fit test on fitting the Normal distribution on the grey values for each pixel. In b) circled are pixels with $p$ values less than 10\%, corrected for multiple hypothesis testing using the Bonferroni correction.}
+	\label{fig:initial_fit_normal_test}
+\end{figure}
+
 \section{Principal Component Analysis}
 \subsection{Theory}
 \subsection{Methods}
