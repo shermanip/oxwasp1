@@ -2,7 +2,7 @@ clc;
 clear all;
 close all;
 
-%TO BE RUN ON A SERVER, SET NUMBER OF CORES = 12
+%TO BE RUN ON A SERVER, SET NUMBER OF CORES = 16
 
 %user define
 n_bootstrap = 100;
@@ -99,11 +99,11 @@ xlabel('Eigenvalue number');
 ylabel('Eigenvalue (AU)');
 
 %for each eigenvector, plot the non-bootstrap eigenimage
-figure;
+figure('Position', [100, 100, 800, 400]);
 for i = 1:6
     subplot(2,3,i);
-    colormap gray; %set colour
-    imagesc((reshape((S(:,i))',length,length)));
+    imagesc(((reshape((S(:,i))',length,length))).^2);
+    colorbar;
     set(gca,'xtick',[]); %remove x tick
     set(gca,'ytick',[]); %remove y tick
     title(strcat('PC',num2str(i))); %put title
