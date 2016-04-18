@@ -70,6 +70,12 @@
 I did this. This happened. I should of done that.
 \end{abstract}
 
+%======ACKNOWLEDGEMENT=========
+\renewcommand{\abstractname}{Acknowledgements}
+\begin{abstract}
+None
+\end{abstract}
+
 %=====FRONT MATTER=====
 \tableofcontents
 %\listoffigures
@@ -151,7 +157,7 @@ The scale of the 2D images are calibrated with the use of reference standards \c
 
 \chapter{Exploratory Data Analysis}
 \section{Summary Statistics}
-A dataset was given for this project. It consists of 100 realizations of an X-ray image of a cuboid with its vertices in the middle, taken using an X-ray detector. These images were 1996$\times$1996 pixels in size and have a colour depth of 16 bits. A sample of them can be viewed in Figure \ref{fig:block_montage}.
+A dataset was given for this project. It consists of 100 realizations of an X-ray image of a cuboid with its vertices in the middle, taken using an X-ray detector. These images were 1\,996$\times$1\,996 pixels in size and have a colour depth of 16 bits. A sample of them can be viewed in Figure \ref{fig:block_montage}.
 
 \begin{figure}
 \centering
@@ -160,12 +166,13 @@ A dataset was given for this project. It consists of 100 realizations of an X-ra
 \label{fig:block_montage}
 \end{figure}
 
+\subsection{Histogram}
 The distribution of the grey values of all the pixels in the data set is shown in Figure \ref{fig:block_histogram}. It was observed that there were 3 distinct peaks in the histogram at $\sim2\times10^4$, $\sim4\times10^4$ and $\sim5\times10^4$. By doing a threshold, as shown in Figure \ref{fig:block_histogram}, it was clear that the main 3 sources of the grey values were the sample, the background and the foam holder at the bottom of the image.
 
 \begin{figure}
 \centering
 \includegraphics[width=0.5\textwidth]{figures/block_histogram.png}
-\caption{Histogram of the grey values of all the pixels in the 100 images in the dataset. The grey values range from 18286 to 60045.}
+\caption{Histogram of the grey values of all the pixels in the 100 images in the dataset. The grey values range from 18\,286 to 60\,045.}
 \label{fig:block_histogram}
 \end{figure}
 
@@ -179,10 +186,11 @@ The distribution of the grey values of all the pixels in the data set is shown i
 		\includegraphics[]{figures/block_threshold_histogram.png}
 		\caption{Histogram}	
 	\end{subfigure}
-	\caption{A threshold was selected to highlight pixels with different grey values. Blue: grey values less than 34765. Green: grey values more than 40269.}
+	\caption{A threshold was selected to highlight pixels with different grey values. Blue: grey values less than 34\,765. Green: grey values more than 40\,269.}
 	\label{fig:block_threshold}
 \end{figure}
 
+\subsection{Time Series}
 The mean and standard error of the grey values for each of the 100 images were taken and plotted as a time series as shown in Figure \ref{fig:timeSeries}. There was evidence of dependence between samples by looking the sample autocorrelation plots as shown in Figure \ref{fig:timeSeries_acf_pacf}. Because there was a peak at lag 1 in the sample partial autocorrelation plot, the time series could be modelled using an autoregressive model with one parameter.
 
 \begin{figure}
@@ -206,16 +214,17 @@ The mean and standard error of the grey values for each of the 100 images were t
 	\label{fig:timeSeries_acf_pacf}
 \end{figure}
 
+\subsection{Distribution of Individual Pixels}
 The mean and standard deviation for each pixel's grey value was estimated and as shown in Figure \ref{fig:initial_mean_std}. Both supervised and unsupervised learning can be used to model the mean and variance relationship of the grey values.
 
 \begin{figure}
 	\centering
 	\includegraphics[width=0.9\textwidth]{figures/initial_mean_std.eps}
-	\caption{Frequency density of the $1996^2$ pixel's grey values mean and standard deviation.}
+	\caption{Frequency density of the $1\,996^2$ pixel's grey values mean and standard deviation.}
 	\label{fig:initial_mean_std}
 \end{figure}
 
-A Normal distribution was fitted on each pixel's grey values and the $\chi^2$ goodness of fit test was conducted, as shown in Figure \ref{fig:initial_fit_normal_test}. When considering the Bonferoni correction for multiple hypothesis testing, the Normal distribution appeared to be a good fit because only 9 pixels have $p$ values less than 10\%. In addition, these significant pixels did not seem to cluster and appear random in space. When ignoring the Bonferoni correction, there was a suspicious patch of low $p$ values on the bottom right.
+A Normal distribution was fitted on each pixel's grey values and the $\chi^2$ goodness of fit test was conducted, as shown in Figure \ref{fig:initial_fit_normal_test}. When considering the Bonferoni correction \cite{weisstein2004bonferroni} for multiple hypothesis testing, the Normal distribution appeared to be a good fit because only 9 pixels have $p$ values less than 10\%. In addition, these significant pixels did not seem to cluster and appear random in space. When ignoring the Bonferoni correction, there was a suspicious patch of low $p$ values on the bottom right.
 
 \begin{figure}
 \centering
@@ -232,9 +241,112 @@ A Normal distribution was fitted on each pixel's grey values and the $\chi^2$ go
 \end{figure}
 
 \section{Principal Component Analysis}
+By estimating the covariance matrix of the individual pixel's grey values, sources of (orthgonal) variance can be estimated. This can be done investigating eigendecomposition representation of the sample covariance matrix. A lot of the linear algebra can be reviewed in undergraudate maths text book such as \cite{riley2006mathematical}.
+
 \subsection{Theory}
+Suppose the $p\times p$ covariance matrix $\matr{\Sigma}$ has eigenvalues $\lambda_i$ and eigenvector $\vectGreek{\phi}_i$ for $i=1,2,\dotdotdot,p$. Then the eigenvectors and eigenvalues are related by
+\begin{equation}
+\matr{\Sigma}\vectGreek{\phi}_i = \lambda_i\vectGreek{\phi}_i \ .
+\label{eq:eigenvector_eigenvalue_forCovariance}
+\end{equation}
+A closure can be form by pre-multiplying both sides by $\vectGreek{\phi}_j\T$ so that
+\begin{align*}
+\vectGreek{\phi}_j\T \matr{\Sigma}\vectGreek{\phi}_i &= \lambda_i\vectGreek{\phi}_j\T\vectGreek{\phi}_i \\
+\left(\matr{\Sigma}\T \vectGreek{\phi}_j \right)\T\vectGreek{\phi}_i &= \lambda_i\vectGreek{\phi}_j\T\vectGreek{\phi}_i \ .
+\end{align*}
+But given the covariance matrix is symmetric, $\matr{\Sigma}=\matr{\Sigma}\T$, and $\lambda_j$ is the corresponding eigenvalue of the eigenvector $\vectGreek{\phi}_j$, then
+\begin{align*}
+\left(\lambda_j\vectGreek{\phi}_j \right)\T\vectGreek{\phi}_i &= \lambda_i\vectGreek{\phi}_j\T\vectGreek{\phi}_i \\
+\lambda_j\vectGreek{\phi}_j\T\vectGreek{\phi}_i &= \lambda_i\vectGreek{\phi}_j\T\vectGreek{\phi}_i \ .
+\end{align*}
+As long as $\lambda_i\neq\lambda_j$ for $i\neq j$, then $\vectGreek{\phi}_j\T\vectGreek{\phi}_i=0$. Therefore all eigenvalues in the covariance matrix are orthogonal to each other.
+
+Equation \eqref{eq:eigenvector_eigenvalue_forCovariance} can be extended to include all eigenvectors and eigenvalues such that
+\begin{equation}
+\matr{\Sigma}
+	\begin{pmatrix}
+		\uparrow & \uparrow & & \uparrow \\
+		\vectGreek{\phi}_1 & \vectGreek{\phi}_2 &\cdots& \vectGreek{\phi}_p \\
+		\downarrow & \downarrow & & \downarrow \\
+	\end{pmatrix}
+=
+	\begin{pmatrix}
+		\uparrow & \uparrow & & \uparrow \\
+		\lambda_1\vectGreek{\phi}_1 & \lambda_2\vectGreek{\phi}_2 &\cdots& \lambda_p\vectGreek{\phi}_p \\
+		\downarrow & \downarrow & & \downarrow \\
+	\end{pmatrix} \ .
+\end{equation}
+Transposing both sides
+\begin{equation*}
+\begin{pmatrix}
+	\leftarrow\vectGreek{\phi}_1\rightarrow \\
+	\leftarrow\vectGreek{\phi}_2\rightarrow \\
+	\vdots \\
+	\leftarrow\vectGreek{\phi}_p\rightarrow
+\end{pmatrix}
+\matr{\Sigma}
+=
+\begin{pmatrix}
+	\lambda_1 & 0 & \cdots 0 \\
+	0 & \lambda_2 & \cdots 0 \\
+	\vdots & \vdots & \ddots \\
+	0 & 0 & \cdots \lambda_p \\
+\end{pmatrix}
+\begin{pmatrix}
+	\leftarrow\vectGreek{\phi}_1\rightarrow \\
+	\leftarrow\vectGreek{\phi}_2\rightarrow \\
+	\vdots \\
+	\leftarrow\vectGreek{\phi}_p\rightarrow
+\end{pmatrix}
+\end{equation*}
+but because all eigenvectors are orthogonal
+\begin{equation*}
+\matr{\Sigma}
+=
+\begin{pmatrix}
+		\uparrow & \uparrow & & \uparrow \\
+		\vectGreek{\phi}_1 & \vectGreek{\phi}_2 &\cdots& \vectGreek{\phi}_p \\
+		\downarrow & \downarrow & & \downarrow \\
+\end{pmatrix}
+\begin{pmatrix}
+	\lambda_1 & 0 & \cdots 0 \\
+	0 & \lambda_2 & \cdots 0 \\
+	\vdots & \vdots & \ddots \\
+	0 & 0 & \cdots \lambda_p \\
+\end{pmatrix}
+\begin{pmatrix}
+	\leftarrow\vectGreek{\phi}_1\rightarrow \\
+	\leftarrow\vectGreek{\phi}_2\rightarrow \\
+	\vdots \\
+	\leftarrow\vectGreek{\phi}_p\rightarrow
+\end{pmatrix} \ .
+\end{equation*}
+This is just a weighted sum of the outer products of the eigenvectors, therefore the eigendecomposition is
+\begin{equation}
+\matr{\Sigma} = \sum_{i=1}^{p} \lambda_i \vectGreek{\phi}_i \vectGreek{\phi}_i\T \ .
+\end{equation}
+Because this is a weighted sum, the eigenvectors with the biggest eigenvalue will be most responsible for the covariance matrix. $\vectGreek{\phi_i}$ are called the principle components.
+
 \subsection{Methods}
+The 100 images were shrunk with averaging to a size of $100\times100$ pixels using ImageJ. The sample covariance matrix, of the pixel's grey values, was calculated using the maximum likelihood estimator so that the 6 eigenvectors with the biggest eigenvalues can be obtained. Using 1\,600 bootstrap samples, the sampling distribution of the 6 eigenvalues were sampled.
+
 \subsection{Results}
+Figure \ref{fig:initial_PC_eigenvalues} shows the first 6 of the diagonal of the outer product of the individual principle components, they represent the normalised main sources of variance. It was observed that on the first and second principle components, there are sources of variance in the bottom right and top right of the image. This could imply that the sources of variance are not uniformly distributed in the background.
+
+The sampling distribution of the eigenvalues are shown in Figure \ref{fig:initial_PC_eigenvalues}. Quite clearly there were 2 significant sources of variance because the eigenvalues of the first 2 principle components were much larger than zero when comparing it with its interquartile range.
+
+\begin{figure}
+	\includegraphics[width=\textwidth]{figures/initial_PCvariance.eps}
+	\caption{Normalised variance due to the principle components (1 to 6). The values of all the pixels in the figures equal to 1.}
+	\label{fig:initial_PCvariance}
+\end{figure}
+\begin{figure}
+	\centering
+	\includegraphics[width=0.7\textwidth]{figures/initial_PC_eigenvalues.eps}
+	\caption{Eigenvalues of the sample covariance matrix. 1\,600 bootstrap samples were used.}
+	\label{fig:initial_PC_eigenvalues}
+\end{figure}
+
 \section{Factor Analysis}
 \subsection{Theory}
 \subsection{Methods}
