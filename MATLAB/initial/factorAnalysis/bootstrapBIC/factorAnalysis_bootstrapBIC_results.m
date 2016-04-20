@@ -32,8 +32,9 @@ function factorAnalysis_bootstrapBIC_results
     %set display to scientific notation
     format longE;
     %display the 95% confidence interval of optimial k
-    disp('95% confidence interval of optimial k');
+    disp(strcat(num2str(n_bootstrap),' bootstraps done'));
+    disp('mean and std of optimial k');
     disp(mean(k_optimal));
     disp('+/-');
-    disp(norminv(0.975,0,1)*std(k_optimal)/sqrt(n_bootstrap));
+    disp(std(k_optimal));
 end
