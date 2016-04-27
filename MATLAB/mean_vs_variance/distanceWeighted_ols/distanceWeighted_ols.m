@@ -3,7 +3,9 @@ clear all;
 close all;
 
 %SCRIPT: (multiple) gaussian weighted regression
+    %the regressions are centered according to kmeans on the means
     %plot gradient vs gaussian width
+    %plot weighted mse vs gaussian width
     %plot the weighted regression for different widths
 
 %USER DEFINED VARIBLES
@@ -53,6 +55,8 @@ k_means = (k_means - mean_X)/std_X;
     %dim 1: for each gaussian width
     %dim 2: estimate, standard error
 gradient_array = zeros(numel(width_array),2);
+%declare array to store the mse for each guassian width
+mse_array = zeros(numel(width_array),1);
 %for each entroid
 for k = 1:K
     %for each width to be investigated
@@ -60,11 +64,13 @@ for k = 1:K
         %get the normalized width
         width = (10^(width_array(i)))/std_X;
         %do weighted least squares, get the estimate and covariance matrix
-        [beta,beta_cov] = gaussianWeighted_ols(X,Y,k_means(k),width);
+        [beta,beta_cov,mse] = gaussianWeighted_ols(X,Y,k_means(k),width);
         %save the estimate of the gradient
         gradient_array(i,1) = beta(2);
         %save the estimate of the standard error of the gradient
         gradient_array(i,2) = sqrt(beta_cov(2,2));
+        %save the estimate of the mse
+        mse_array(i) = mse;
     end
     
     %un-normalise the gradient and the standard error
@@ -74,8 +80,14 @@ for k = 1:K
     figure;
     errorbar(width_array,gradient_array(:,1),gradient_array(:,2));
     xlim([min(width_array)-0.05,max(width_array)+0.05]);
-    xlabel('log_{10} Gaussian weight (log_{10}AU)');
+    xlabel('log_{10} Gaussian width (log_{10}AU)');
     ylabel('Gradient (AU)');
+    
+    %plot width vs mse
+    figure;
+    plot(width_array,mse_array);
+    xlabel('log_{10} Gaussian width (log_{10}AU)');
+    ylabel('Weighted MSE (AU^{2})');
 end
 
 %put the mean-variance pairs in bins
