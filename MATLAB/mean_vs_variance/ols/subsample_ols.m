@@ -5,19 +5,10 @@ close all;
 %SCRIPT: linear regression on subsample of SAMPLE, BACKGROUND and FOAM
 %plots the lienar regressions
 
+folder_location = '/data/tinamou/sip/block_images/orginial'; %location of the data
+
 %array of images
-length = 1996; %length of the images
-area = length^2; %area of the images
-n = 100; %number of images
-
-%define matrices of images
-stack = zeros(length,length,n);
-%for each image, save the pixel values
-for i = 1:n
-    slice = imread(strcat('/data/tinamou/sip/block_images/orginial/block_',num2str(i),'.tif'));
-    stack(:,:,i) = slice;
-end
-
+[stack,length,area,n] = load_stack(folder_location);
 %work out the sample mean
 sample_mean = reshape(mean(stack,3),[],1);
 %work out the sample std
@@ -44,18 +35,8 @@ ylim([0.05E6,2.5E5]); %adjust the y axis of this histogram
 % fcdf(F,n_1+n_2+n_3-1,n_1+n_2+n_3-6,'upper');
 
 %for all data, bin the data
-nbin = 3000;
-[N,c] = hist3([sample_var,sample_mean],[nbin,nbin]);
-%plot heatmap histogram
-figure;
-%normalize N so that the colormap is the frequency density
-imagesc(cell2mat(c(2)),cell2mat(c(1)),N/( (c{2}(2)-c{2}(1))*(c{1}(2)-c{1}(1)) ) );
+plotHistogramHeatmap(sample_mean,sample_var);
 hold on;
-axis xy; %switch the y axis
-ylim([0.05E6,0.4E6]); %set the y limit
-colorbar; %display the colour bar
-xlabel('Sample grey value mean (AU)');
-ylabel('Sample grey value variance (AU^{2})');
 
 %plot linear regression of SAMPLE
 x_min = range_1(1);

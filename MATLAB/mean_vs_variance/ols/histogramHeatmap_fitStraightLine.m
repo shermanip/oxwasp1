@@ -1,9 +1,17 @@
 %FUNCTION: PLOT HISTOGRAM HEAT MAP AND FIT LINEAR REGRESSION
 %PARAMETERS:
-    %stack: an array of images in matrix form
-    %nbin: number of bins to bin the data in
+    %stack: an array of images in matrix form (3 dimensions)
+    %nbin: number of bins to bin the data in (scalar)
+%RETURN:
+    %coefficients: [mdl.Coefficients.Estimate,mdl.Coefficients.SE]
+    %n: sample size
+    %mdl: model object
+    %mean_range: [min(sample_mean),max(sample_mean)]
 function [coefficients,n,mdl,mean_range] = histogramHeatmap_fitStraightLine(stack,nbin)
     
+    %check the parameters
+    checkParameters(stack,nbin);
+
     %work out the sample mean
     sample_mean = reshape(mean(stack,3),[],1);
     %work out the sample std
@@ -45,5 +53,17 @@ function [coefficients,n,mdl,mean_range] = histogramHeatmap_fitStraightLine(stac
     n = area;
     %return the min and max of the means
     mean_range = [min(sample_mean),max(sample_mean)];
+    
+    %NESTED FUNCTION: check the parameters are of the correct tye
+    function checkParameters(stack,nbin)
+        %check stack is an array of matrices
+        if ndims(stack)~=3
+            error('Error in histogramHeatmap_fitStraightLine(stack,nbin), stack is not an array of matrices');
+        end
+        %check nbin is a scalar
+        if ~isscalar(nbin)
+            error('Error in histogramHeatmap_fitStraightLine(stack,nbin), nbin is not a scalar');
+        end
+    end
 end
 

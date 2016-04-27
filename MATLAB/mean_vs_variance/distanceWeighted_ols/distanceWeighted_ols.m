@@ -9,30 +9,15 @@ close all;
     %plot the weighted regression for different widths
 
 %USER DEFINED VARIBLES
-nbin = 3000; %number of bins for histogram
+rng(118055149); %set random seed
 K = 3; %number of regressions
+folder_location = '/data/tinamou/sip/block_images/orginial'; %location of the data
 width_array = 2:0.1:6; %gaussian widths to investigate
 width_select = 10.^[2,3,4,5]; %gaussian widths to plot
 
 %PROGRAM STARTS
-
-%array of images
-length = 1996; %length of the images
-area = length^2; %area of the images
-n = 100; %number of images
-
-%define array of images
-stack = zeros(length,length,n);
-%for each image, save the pixel values
-for i = 1:n
-    slice = imread(strcat('/data/tinamou/sip/block_images/orginial/block_',num2str(i),'.tif'));
-    stack(:,:,i) = slice;
-end
-
-%work out the sample mean
-sample_mean = reshape(mean(stack,3),[],1);
-%work out the sample std
-sample_var = reshape(var(stack,0,3),[],1);
+%load the mean-variance pair data
+[sample_mean,sample_var,area] = load_meanVariance(folder_location);
 
 %normalize the data, estimate the mean and std of the mean and variance
 mean_Y = mean(sample_var); %mean of the variances
@@ -90,9 +75,6 @@ for k = 1:K
     ylabel('Weighted MSE (AU^{2})');
 end
 
-%put the mean-variance pairs in bins
-[N,c] = hist3([sample_var,sample_mean],[nbin,nbin]);
-
 %declare column matrix for storing regression parameters for each cluster
 beta_array = zeros(2,K);
 %declare array of matrices storing the covariance matrix
@@ -130,19 +112,11 @@ for j = 1:numel(width_select)
     beta_array(2,:) = beta_array(2,:)*std_Y/std_X;
 
     %plot heatmap of the histogram
-    figure;
-    %normalize N so that the colormap is the frequency density
-    imagesc(cell2mat(c(2)),cell2mat(c(1)),N/( (c{2}(2)-c{2}(1))*(c{1}(2)-c{1}(1)) ) );
+    plotHistogramHeatmap(sample_mean,sample_var);
     hold on;
-    axis xy; %switch the y axis
-    ylim([0.05E6,4E5]); %set the y limit
-    colorbar; %display the colour bar
-    xlabel('Sample grey value mean (AU)');
-    ylabel('Sample grey value variance (AU^{2})');
 
     %for each model
     for i = 1:K
-        
         %set the range of x to plot for a given centroid
         x_min = k_means(i)-0.5E4;
         x_max = k_means(i)+0.5E4;
@@ -164,7 +138,6 @@ for j = 1:numel(width_select)
         %plot the centroid of the sample mean on the prediction mean
         scatter(k_means(i),[1,k_means(i)]*beta_array(:,i),'r');
     end
-    
     hold off;
     
     %normalise the k_means so it can be used next for loop
