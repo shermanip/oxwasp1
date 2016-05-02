@@ -3,12 +3,14 @@
 %PARAMETERS:
     %sample_mean: n vector of the sample mean grey values
     %sample_var: n vector of the sample variance grey values
-function plotHistogramHeatmap(sample_mean,sample_var)
+function plotHistogramHeatmap(sample_mean,sample_var,nbin)
 
     checkParameters(sample_mean,sample_var);
 
     %number of marginal bins to bin the data into
-    nbin = 3000;
+    if nargin==2
+        nbin = 3000;
+    end
     %bin the data
     [N,c] = hist3([sample_var,sample_mean],[nbin,nbin]);
     
