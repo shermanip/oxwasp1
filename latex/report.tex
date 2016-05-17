@@ -1057,7 +1057,7 @@ Consider photons emitted from an X-ray tube. These photons have a board energy s
 
 In order to model the number of photons detected in some exposure time as a Poisson process, the rate of photons emitted is an important variable. However it is nonsense to talk about the rate of photons with energy exactly $E$. This is because energy is a continuous variable and cannot be modelled discretely. Instead the rate of photons with energy $E_1<E<E_2$ should be considered.
 
-To take into consideration the continuous nature of energy, the histogram of photon energies should be normalised in such a way that the area of the histogram is the rate of photons, with any energy, detected. This will produce an approximation to the rate density function $\lambda(E)$. The rate density function has units of $\textup{s}^{-1}.\textup{keV}^{-1}$.
+To take into consideration the continuous nature of energy, the histogram of photon energies should be normalised in such a way that the area of the histogram is the rate of photons, with any energy, detected. This will produce an approximation to the rate density function $\lambda(E)$. The rate density function has units of $\textup{s}^{-1}\cdot\textup{keV}^{-1}$.
 
 The rate density function has the following properties.
 \begin{equation}
@@ -1069,7 +1069,7 @@ The rate density function has the following properties.
 \int_{0}^{\infty}\lambda(E)\diff E
 \end{equation}
 
-The expected energy can be calculated by splitting the rate density function into $n$ equal intervals, of size $\Delta E$, $E_1,E_2,\dotdotdot,E_n$. For each interval, a weighted mean can be used to estimate the expected energy
+The expected energy can be calculated by splitting the rate density function into $n$ equal intervals, of size $\Delta E$, $E_1,E_2,\dotdotdot,E_n$. A weighted mean can be used to estimate the expected energy
 \begin{equation}
 \expectation[E]=\frac{\sum_{i=1}^nE_i\lambda(E_i)\Delta E}{\sum_{i=1}^n\lambda(E_i)\Delta E} \ .
 \end{equation}
@@ -1125,7 +1125,7 @@ Unfortunately Beer's law only seem to capture the shift in expectation. It would
 
 It is given that the attenuation varies with different photon energies. To consider this, the attenuation should be a function of energy, that is $\mu=\mu(E)$. By splitting the rate density function into $n$ equal intervals, the intensity of the transmitted beam is
 \begin{equation}
-I_1=\frac{1}{A}\sum_{i=1}^n\euler^{-\mu(E_i)L}E_i\lambda_0(E_i)\Delta E_i \ .
+I_1=\frac{1}{A}\sum_{i=1}^n\euler^{-\mu(E_i)L}E_i\lambda_0(E_i)\Delta E \ .
 \end{equation}
 Taking the limit $\Delta E\rightarrow0$ and $n\rightarrow\infty$, the sum becomes an integral and can be generalised to
 \begin{equation}
@@ -1138,7 +1138,7 @@ I_1=\frac{1}{A}\int_0^{\infty}\lambda_0(E)\diff E \times \expectation\left[E_0\e
 Such a relationship is considerably more complicated.
 
 \section{Intensity}
-Let $U_i$ be the energy of photon $i$. Let $T$ be the sum of all the $N$ photon's energies detected after some exposure time $t$. These can be modelled as
+Let $U_i$ be the energy of photon $i$. Let $T$ be the sum of all the $N$ photons' energy detected after some exposure time $t$. These can be modelled as
 \begin{equation}
 N\sim\poisson\left(t\int_0^{\infty}\lambda_1(E)\diff E\right)
 \end{equation}
@@ -1185,6 +1185,149 @@ The variance of $I_1$ is
 \begin{equation}
 \variance[I_1] = \frac{\alpha^2}{t}\left(\mu_U^2+\sigma_U^2\right)\int_0^{\infty}\lambda_1(E)\diff E+\beta^2 \ .
 \end{equation}
+
+\section{Hierarchical Model}
+Suppose $n$ images have been obtained and each image has $p$ pixels. Each pixel has a corresponding intensity $X_i$ for $i=1,2,\dotdotdot,p$. The following hierarchical model was proposed to model the intensity of each pixel where $\alpha$ and $\tau$ are known constants.
+\begin{equation}
+Y_i\sim\poisson(\nu_i \tau)
+\end{equation}
+\begin{equation}
+U_i|Y_i\sim\normal\left(
+Y_i\mu_i,Y_i\sigma_i^2
+\right)
+\end{equation}
+\begin{equation}
+X_i|U_i\sim\normal\left(
+\frac{\alpha}{\tau}U_i,\beta_i^2
+\right)
+\end{equation}
+The full joint probability density function is
+\begin{equation}
+p_{X_i,U_i,Y_i}\left(x_i,u_i,y_i\right)=
+p_{X_i|U_i}(x_i|u_i)p_{U_i|Y_i}(u_i|y_i)\prob(Y_i=y_i)
+\end{equation}
+\begin{multline}
+p_{X_i,U_i,Y_i}\left(x_i,u_i,y_i\right)=
+\frac{1}{\sqrt{2\pi}\beta_i}\exp\left[-\frac{1}{2}\left(\frac{x_i-\alpha u_i /\tau}{\beta_i}\right)^2\right]
+\\
+\frac{1}{\sqrt{2\pi}\sqrt{y_i\sigma_i^2}}\exp\left[-\frac{1}{2}\left(\frac{u_i-y_i\mu_i}{\sqrt{y_i\sigma_i^2}}\right)^2\right]
+\euler^{-\nu_i\tau}\frac{(\nu_i\tau)^{y_i}}{y_i!} \ .
+\end{multline}
+
+By marginalising out $U_i$, a one layer latent variable model can be obtained and the unknown parameters $\nu_i,\mu_i,\sigma_i^2,\beta_i^2$ can be estimated using the EM algorithm. This can be shown by integrating the full joint probability density function with respect to $u_i$
+\begin{multline}
+p_{X_i,Y_i}\left(x_i,y_i\right)=\int_{u_i=-\infty}^{u_i=\infty}
+\frac{1}{\sqrt{2\pi}\beta_i}\exp\left[-\frac{1}{2}\left(\frac{x_i-\alpha u_i /\tau}{\beta_i}\right)^2\right]
+\\
+\frac{1}{\sqrt{2\pi}\sqrt{y_i\sigma_i^2}}\exp\left[-\frac{1}{2}\left(\frac{u_i-y_i\mu_i}{\sqrt{y_i\sigma_i^2}}\right)^2\right]
+\euler^{-\nu_i\tau}\frac{(\nu_i\tau)^{y_i}}{y_i!} \diff u_i
+\end{multline}
+to get
+\begin{multline}
+p_{X_i,Y_i}\left(x_i,y_i\right)=
+\frac{\euler^{\nu_i\tau}(\nu_i\tau)^{y_i}}{y_i!}
+\\
+\frac{1}{\sqrt{2\pi}\sqrt{\beta_i^2+\alpha^2y_i\sigma_i^2/\tau^2}}
+\exp\left[-\frac{1}{2}\left(\frac{x_i-y_i\mu_i\alpha/\tau}{\sqrt{\beta_i^2+\alpha^2y_i\sigma_i^2/\tau^2}}\right)^2\right] \ .
+\end{multline}
+By inspection the one layer latent model is
+\begin{equation}
+Y_i\sim\poisson(\nu_i\tau)
+\end{equation}
+\begin{equation}
+X_i|Y_i\sim\normal\left(
+\frac{\alpha\mu_i}{\tau}Y_i,\frac{\alpha^2\sigma_i^2}{\tau^2}Y_i+\beta_i^2
+\right) \ .
+\end{equation}
+
+For the E step, $Y_i$ is estimated given all the parameters using the conditional expectation $\expectation\left[Y_i|X_i=x_i\right]$. The conditional probability mass function can be obtained
+\begin{equation}
+\prob\left(Y_i=y_i|X_i=x_i\right)=\frac{p_{X_i,Y_i}\left(x_i,y_i\right)}{p_{X_i}(x_i)}
+\end{equation}
+\begin{multline}
+\prob\left(Y_i=y_i|X_i=x_i\right)=\frac{1}{Z_i}
+\frac{(\nu_i\tau)^{y_i}}{y_i!}
+\\
+\frac{1}{\sqrt{\beta_i^2+\alpha^2y_i\sigma_i^2/\tau^2}}
+\exp\left[-\frac{1}{2}\left(\frac{x_i-y_i\mu_i\alpha/\tau}{\sqrt{\beta_i^2+\alpha^2y_i\sigma_i^2/\tau^2}}\right)^2\right]
+\end{multline}
+where $Z_i$ is the partition function
+\begin{multline}
+Z_i=\sum_{y_i=0}^{\infty}
+\frac{(\nu_i\tau)^{y_i}}{y_i!}
+\frac{1}{\sqrt{\beta_i^2+\alpha^2y_i\sigma_i^2/\tau^2}}
+\exp\left[-\frac{1}{2}\left(\frac{x_i-y_i\mu_i\alpha/\tau}{\sqrt{\beta_i^2+\alpha^2y_i\sigma_i^2/\tau^2}}\right)^2\right] \ .
+\end{multline}
+Unfortunately such a sum cannot be simplified, thus the conditional probability mass function is only known up to a constant. One way to obtain the conditional expectation is to use the sample mean from samples of the conditional.
+
+Because the conditional probability mass function is known up to a constant, rejection sampling can be used to draw conditional samples. Rejection sampling samples exactly but a proposal is needed and this influences the rejection rate. Approximate Bayesian computation (ABC) can be used instead because $Y_i$ and $X_i|Y_i$ can be simulated. ABC draws approximate samples without a proposal but can suffer from high rejection rates.
+
+In the M step the parameters $\nu_i,\mu_i,\sigma_i^2,\beta_i^2$ are estimated given the latent variables. This is done by maximising the conditional expectation of the log likelihood function, that is
+\begin{equation}
+H_i=\sum_{j=1}^n\expectation_{Y_i|X_i}\left[\ln p_{X_i,Y_i}\left(x_i^{(j)},Y_i^{(j)}\right)\right]
+\end{equation}
+\begin{multline}
+H_i=\sum_{j=1}^n\expectation_{Y_i|X_i}\left[
+-\nu\tau+Y_i^{(j)}\ln(\nu_i\tau)-\frac{1}{2}\ln\left(\beta_i^2+\frac{\alpha^2\sigma_i^2}{\tau^2}Y_i^{(j)}\right)
+\right.
+\\
+\left.
+-\frac{1}{2}\left(\frac{x_i^{(j)}-Y_i^{(j)}\mu_i\alpha/\tau}{\sqrt{\beta_i^2+\alpha^2Y_i^{(j)}\sigma_i^2/\tau^2}}\right)^2
+\right] + c_1 \ .
+\end{multline}
+Let $\expectation_{Y_i|X_i}\left[Y_i^{(j)}\right]=y_i^{(j)}$ which was obtained from from the E step. Using the 1st order approximation for the expectation
+\begin{multline}
+H_i=\sum_{j=1}^n\left[
+-\nu\tau+y_i^{(j)}\ln(\nu_i\tau)-\frac{1}{2}\ln\left(\beta_i^2+\frac{\alpha^2\sigma_i^2}{\tau^2}y_i^{(j)}\right)
+\right.
+\\
+\left.
+-\frac{1}{2}\left(\frac{x_i^{(j)}-y_i^{(j)}\mu_i\alpha/\tau}{\sqrt{\beta_i^2+\alpha^2y_i^{(j)}\sigma_i^2/\tau^2}}\right)^2
+\right]
+ + c_1 \ .
+\end{multline}
+By setting $\beta_i^2=0$ and the partial differentials to zero with respect to $\mu_i$, $\sigma_i^2$ and $\nu_i$ to zero, then the following M step estimators can be obtained:
+\begin{equation}
+\mu_i=\frac{\tau\sum_{j=1}^nx_i^{(j)}}{\alpha\sum_{j=1}^ny_i^{(j)}}
+\end{equation}
+\begin{equation}
+\sigma_i^2=\frac{\tau^2}{\alpha^2n}\sum_{j=1}^n\frac{\left(x_i^{(j)}-y_i^{(j)}\mu_j\alpha/\tau\right)^2}{y_i^{(j)}}
+\end{equation}
+\begin{equation}
+\nu_i=\frac{\sum_{j=1}^ny_i^{(j)}}{n\tau} \ .
+\end{equation}
+By setting $\beta_i^2=0$, the joint distribution is in the exponential family and the estimators are done through the sufficient statistics.
+
+The constant $\alpha$ only sets the scale of $\mu_i$ and $\sigma_i^2$ but can be calibrated so that it has units of keV. The following properties of the X-ray tube follows (\textbf{NO UNCERTAINTY CALCULATIONS SO FAR}):
+\begin{itemize}
+	\item Voltage = $V$ = 100 kV
+	\item Power = $P$ = 33.0 W
+	\item Exposure time = $\tau$ = 500 s (I assume)
+	\item Target material is tungsten.
+\end{itemize}
+The efficiency $\eta$ of photon production is given as
+\begin{equation}
+\eta = aVZ
+\end{equation}
+where $a=1.1\times10^{-9}\text{ V}^{-1}$ and $Z$ is the atomic number of the target material. For tungsten, $Z=74$. Thus $\eta=8.1\times10^{-3}$.
+
+Assume the X-ray spreads out and targets the detector with $1996^2$ pixels only and nothing else, then the total energy detected in one pixel is
+\begin{equation}
+U=\frac{\eta P\tau}{1996^2}=2.1\times10^{11}\text{ keV}\cdot\text{pixel}^{-1} \ .
+\end{equation}
+Assuming the air has attenuation coefficient of zero, then $\alpha$ can be crudely estimated by
+\begin{equation}
+\alpha = \frac{60\,000 \tau}{U} = 1.4\times10^{-4}\text{ s}\cdot\text{keV}^{-1}\cdot\text{pixel} \ .
+\end{equation}
+
+Other parameters for air such as the rate and energy of photons can be calculated.
+\begin{equation}
+\nu = \eta \frac{\diff N}{\diff Q} \frac{\diff Q}{\diff t}=\frac{\eta P}{V e}=1.7\times10^{13}\text{ s}^{-1}
+\end{equation}
+\begin{equation}
+\frac{\diff E}{\diff N} = \frac{\diff E}{\diff Q} \frac{\diff Q}{\diff N} = Ve = 1.0\times10^{2}\text{ keV}
+\end{equation}
+
 
 \bibliographystyle{unsrt}
 \bibliography{bib}
