@@ -64,7 +64,7 @@ for p = 1:p_max
     lnL_array(p) = -(area/2) * (log(2*pi) + log(MSE) + 1);
 end
 
-BIC = -2*lnL_array + (1:p_max)'*log(100);
+BIC = -2*lnL_array + ((1:p_max)+1)'*log(area);
 figure;
 plot(BIC);
 xlabel('Polynomial order');
