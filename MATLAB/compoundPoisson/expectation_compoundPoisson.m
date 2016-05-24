@@ -25,15 +25,28 @@ function [expectation,zeta,Z] = expectation_compoundPoisson(truncation,x,m,v,psy
     %else for positive x...
     else
         %define the y's to be sumed
-        y = 1:truncation;
+        y = (1:truncation);
+        
+        %define a matrix of terms of the log likelihood
+            %columns: for each y = 1,2,3,...
+            %rows: each term
+        lnz = [
+            -psy*ones(truncation,1)';
+            y*log(psy);
+            -gammaln(y+1);
+            -0.5*log(2*pi)*ones(truncation,1)';
+            -0.5*log(v)*ones(truncation,1)';
+            -0.5*(x-y*m).^2./(v*y)
+        ];
+        
         %Z = p_X(x) by marginalising the joint distribution
-        Z = sum( exp( -psy + y*log(psy) - gammaln(y+1) - 0.5*log(2*pi) - 0.5*log(y*v) - 0.5*(x-y*m).^2./(v*y) ) );
+        Z = sum( exp( sum([lnz;-0.5*log(y)],1) ) );
         
         %work out the expectation of Y by truncating the expectation sum
-        expectation = sum( exp( -psy + y*log(psy) - gammaln(y+1) - 0.5*log(2*pi) + 0.5*log(y) - 0.5*log(v) - 0.5*(x-y*m).^2./(v*y) ) ) / Z;
+        expectation = sum( exp( sum([lnz;0.5*log(y)],1) ) ) / Z;
         
         %work out the expectation of 1/Y by truncating the expectation sum
-        zeta = sum( exp( -psy + y*log(psy) - gammaln(y+1) - 0.5*log(2*pi) - (3/2)*log(y) - 0.5*log(v) - 0.5*(x-y*m).^2./(v*y) ) ) / Z;
+        zeta = sum( exp( sum([lnz;-(3/2)*log(y)],1) ) ) / Z;
     end
 
     %FUNCTION: CHECK THE PARAMETERS ARE OF THE CORRECT TYPE
