@@ -1,4 +1,4 @@
-%SCRIPT: FIT COMPOUND POISSON USING EM ALGORITHM
+%SCRIPT: FIT COMPOUND POISSON USING EM ALGORITHM FOR DIFFERENT INITIAL PARAMETERS
 %DETAILS:
     %The data are simulated with known parameters.
     %EM algorithm was initalised by assigning random Poisson distributed
