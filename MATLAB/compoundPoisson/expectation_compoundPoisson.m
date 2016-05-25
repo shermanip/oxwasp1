@@ -1,6 +1,6 @@
 %FUNCTION: CONDITIONAL EXPECTED SUFFICIENT STATISTICS FOR COMPOUND POISSON
 %PARAMETER:
-    %truncation (positive integer): number of terms in the sum
+    %truncation (2 vector positive integer): number of terms in the sum
     %x (scalar): conditional observable
     %m (scalar): mean Normal parameter
     %v (positive scalar): variance Normal parameter
@@ -13,6 +13,8 @@ function [expectation,zeta,Z] = expectation_compoundPoisson(truncation,x,m,v,psy
 
     %CHECK THE PARAMETERS ARE OF THE CORRECT TYPE
     checkParameters(truncation,x,m,v,psy);
+    
+    n_truncation = truncation(2) - truncation(1) + 1;
 
     %if condition that the observed compound poisson varaible is 0...
     if x==0
@@ -25,17 +27,17 @@ function [expectation,zeta,Z] = expectation_compoundPoisson(truncation,x,m,v,psy
     %else for positive x...
     else
         %define the y's to be sumed
-        y = (1:truncation);
+        y = (truncation(1):truncation(2));
         
         %define a matrix of terms of the log likelihood
             %columns: for each y = 1,2,3,...
             %rows: each term
         lnz = [
-            -psy*ones(truncation,1)';
+            -psy*ones(n_truncation,1)';
             y*log(psy);
             -gammaln(y+1);
-            -0.5*log(2*pi)*ones(truncation,1)';
-            -0.5*log(v)*ones(truncation,1)';
+            -0.5*log(2*pi)*ones(n_truncation,1)';
+            -0.5*log(v)*ones(n_truncation,1)';
             -0.5*(x-y*m).^2./(v*y)
         ];
         
@@ -51,9 +53,14 @@ function [expectation,zeta,Z] = expectation_compoundPoisson(truncation,x,m,v,psy
 
     %FUNCTION: CHECK THE PARAMETERS ARE OF THE CORRECT TYPE
     function checkParameters(truncation,x,m,v,psy)
-        %n_samples is a positive integer scalar
-        if ( (~isscalar(truncation)) || (truncation <= 0) || (truncation ~= floor(truncation)) )
-            error('truncation needs to be a positive integer scalar');
+        %truncation is a 2 vector positive integer
+        if (numel(truncation)~=2)
+            error('truncation needs to have only 2 elements');
+        end
+        for i = 1:2
+            if ( (truncation(i) <= 0) || (truncation(i) ~= floor(truncation(i))) )
+                error('truncation needs to be a positive integer scalar');
+            end
         end
         %x is a scalar
         if ~isscalar(x);

@@ -3,6 +3,7 @@
     %X (column vector): vector of observables
     %initialPoisson_parameter (positive scalar): initial latent variables are Poisson distributed with this parameter
     %n_EM (positive integer): number of EM steps
+    %truncation (2 vector positive integer): the starting and end point of the truncated sum
     %alpha (positive scalar): scaling of the Normal variables
     %time_exposure (positive scalar): scaling of the estimated Poisson parameter
 %RETURN
@@ -10,10 +11,10 @@
     %var_array (column vector): estimated variance Normal parameter at each EM step
     %rate_array (column vector): estimated Poisson rate at each EM step
     %lnL_array (column vector): log likelihood at each EM step
-function [mean_array,var_array,rate_array,lnL_array] = EM_compoundPoisson(X,initialPoisson_parameter,n_EM,alpha,time_exposure)
+function [mean_array,var_array,rate_array,lnL_array] = EM_compoundPoisson(X,initialPoisson_parameter,n_EM,truncation,alpha,time_exposure)
 
     %check parameters are of the correct type
-    checkParameters(X,initialPoisson_parameter,n_EM,alpha,time_exposure);
+    checkParameters(X,initialPoisson_parameter,n_EM,truncation,alpha,time_exposure);
 
     %get the sample size
     n_sample = numel(X);
@@ -54,7 +55,7 @@ function [mean_array,var_array,rate_array,lnL_array] = EM_compoundPoisson(X,init
         %foe each data, estimate the expected sufficient statistic
         for j = 1:n_sample
             %get the expected sufficient statistic [y = E[Y|X=x], zeta = E[1/Y|X=x], l = p_X(x)
-            [y,zeta,l] = expectation_compoundPoisson(100,X(j),alpha*m/time_exposure,alpha^2*v/time_exposure^2,rate*time_exposure);
+            [y,zeta,l] = expectation_compoundPoisson(truncation,X(j),alpha*m/time_exposure,alpha^2*v/time_exposure^2,rate*time_exposure);
             %save the sufficient statistic and likelihood
             Y(j) = y;
             Zeta(j) = zeta;
@@ -69,7 +70,7 @@ function [mean_array,var_array,rate_array,lnL_array] = EM_compoundPoisson(X,init
     end
     
     %FUNCTION: CHECK THE PARAMETERS ARE OF THE CORRECT TYPE
-    function checkParameters(X,initialPoisson_parameter,n_EM,alpha,time_exposure)
+    function checkParameters(X,initialPoisson_parameter,n_EM,truncation,alpha,time_exposure)
         %X is a column vector
         if ( ~iscolumn(X) )
             error('X needs to be a column vector');
@@ -81,6 +82,15 @@ function [mean_array,var_array,rate_array,lnL_array] = EM_compoundPoisson(X,init
         %n_EM is a positive integer
         if ( (~isscalar(n_EM)) || (n_EM <= 0) || (n_EM ~= floor(n_EM)) )
             error('n_EM needs to be a positive integer scalar');
+        end
+        %truncation is a 2 vector positive integer
+        if (numel(truncation)~=2)
+            error('truncation needs to have only 2 elements');
+        end
+        for i = 1:2
+            if ( (truncation(i) <= 0) || (truncation(i) ~= floor(truncation(i))) )
+                error('truncation needs to be a positive integer scalar');
+            end
         end
         %alpha is a positive scalar
         if ( (~isscalar(alpha)) || (alpha <= 0) );

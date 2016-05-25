@@ -40,7 +40,7 @@ parfor i = 1:n_repeat
     [X,~] = simulateData(n_sample,alpha*mu_actual/time_exposure,alpha^2*var_actual/time_exposure^2,rate_actual*time_exposure);
     
     %run EM and get array of mean, variance, rate parameters and log likelihood
-    [m,v,rate,lnL] = EM_compoundPoisson(X,poissonParameter,n_EM,alpha,time_exposure);
+    [m,v,rate,lnL] = EM_compoundPoisson(X,poissonParameter,n_EM,[1,100],alpha,time_exposure);
     m_array(:,i) = m'; %save the mean parameters
     v_array(:,i) = v'; %save the variance parameters
     rate_array(:,i) = rate'; %save the rate parameters
