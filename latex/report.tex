@@ -1225,7 +1225,7 @@ p_{X_i,Y_i}\left(x_i,y_i\right)=\int_{u_i=-\infty}^{u_i=\infty}
 to get
 \begin{multline}
 p_{X_i,Y_i}\left(x_i,y_i\right)=
-\frac{\euler^{\nu_i\tau}(\nu_i\tau)^{y_i}}{y_i!}
+\frac{\euler^{-\nu_i\tau}(\nu_i\tau)^{y_i}}{y_i!}
 \\
 \frac{1}{\sqrt{2\pi}\sqrt{\beta_i^2+\alpha^2y_i\sigma_i^2/\tau^2}}
 \exp\left[-\frac{1}{2}\left(\frac{x_i-y_i\mu_i\alpha/\tau}{\sqrt{\beta_i^2+\alpha^2y_i\sigma_i^2/\tau^2}}\right)^2\right] \ .
@@ -1240,69 +1240,225 @@ X_i|Y_i\sim\normal\left(
 \right) \ .
 \end{equation}
 
-For the E step, $Y_i$ is estimated given all the parameters using the conditional expectation $\expectation\left[Y_i|X_i=x_i\right]$. The conditional probability mass function can be obtained
+The marginal expectation and variance can be calculated
+\begin{equation}
+\expectation[X_i]=\expectation[\expectation[X_i|Y_i]]
+\end{equation}
+\begin{equation}
+\expectation[X_i]=\expectation\left[\frac{\alpha\mu_i}{\tau}Y_i\right]
+\end{equation}
+\begin{equation}
+\expectation[X_i] = \alpha \mu_i \nu_i
+\end{equation}
+and
+\begin{equation}
+\variance[X_i] = \expectation[\variance[X_i|Y_i]] + \variance[\expectation[X_i|Y_i]]
+\end{equation}
+\begin{equation}
+\variance[X_i] = \expectation\left[\frac{\alpha^2\sigma_i^2}{\tau^2}Y_i+\beta_i^2\right] + \variance\left[\frac{\alpha\mu_i}{\tau}Y_i\right]
+\end{equation}
+\begin{equation}
+\variance[X_i] =
+\frac{\alpha^2\sigma_i^2}{\tau^2}\nu_i\tau+\beta_i^2\
++\frac{\alpha^2\mu_i^2}{\tau^2}\nu_i\tau
+\end{equation}
+\begin{equation}
+\variance[X_i] =
+\frac{\alpha^2\sigma_i^2}{\tau^2}\nu_i\tau+\beta_i^2\
++\frac{\alpha^2\mu_i^2}{\tau^2}\nu_i\tau
+\end{equation}
+\begin{equation}
+\variance[X_i] = \frac{\alpha^2\nu_i}{\tau}\left(\mu_i^2+\sigma_i^2\right)+\beta_i^2 \ .
+\end{equation}
+
+This model can be made simpler by setting $\beta_i=0$ because by doing so the joint probability density function is in the exponential family. However for the case of $\beta_i=0$, the joint probability density function much consider the special case of $Y_i=0$ because such a case will drive the variance of $X_i|Y_i$ to zero.
+\begin{equation}
+p_{X_i,Y_i}\left(x_i,y_i\right)=
+\begin{cases}
+\euler^{-\nu_i\tau}\delta(x) & \text{for }y=0
+\\
+\dfrac{\euler^{-\nu_i\tau}(\nu_i\tau)^{y_i}\tau}{y_i!\sqrt{2\pi y_i}\alpha\sigma_i}
+\exp\left[-\dfrac{1}{2}\dfrac{\left(x_i-y_i\mu_i\alpha/\tau\right)^2}{\alpha^2y_i\sigma_i^2/\tau^2}\right] & \text{for }y=1,2,\dotdotdot
+\end{cases}
+\end{equation}
+For the $y=1,2,\dotdotdot$ case, the joint probability density function can be rewritten as
+\begin{equation}
+p_{X_i,Y_i}\left(x_i,y_i\right)=\dfrac{\euler^{-\nu_i\tau}(\nu_i\tau)^{y_i}\tau}{y_i!\sqrt{2\pi y_i}\alpha\sigma_i}
+\exp\left[-\dfrac{1}{2}\dfrac{\left(x_i-y_i\mu_i\alpha/\tau\right)^2}{\alpha^2y_i\sigma_i^2/\tau^2}\right]
+\end{equation}
+\begin{multline}
+p_{X_i,Y_i}\left(x_i,y_i\right)=\dfrac{\euler^{-\nu_i\tau}\tau}{\sqrt{2\pi}\alpha\sigma_i}
+\exp\left[-\dfrac{1}{2}\dfrac{\left(x_i-y_i\mu_i\alpha/\tau\right)^2}{\alpha^2y_i\sigma_i^2/\tau^2}
+\right.
+\\
+\left.
+-y_i\ln(\nu_i\tau) -\frac{1}{2}\ln{y_i} - \ln{y_i!}\right]
+\end{multline}
+\begin{multline}
+p_{X_i,Y_i}\left(x_i,y_i\right)=\dfrac{\euler^{-\nu_i\tau}\tau}{\sqrt{2\pi}\alpha\sigma_i}
+\exp\left[-\dfrac{\tau^2}{2\alpha^2\sigma_i^2}\dfrac{x_i^2-2\alpha\mu_ix_iy_i/\tau+\alpha^2\mu_i^2y_i^2/\tau^2}{y_i}
+\right.
+\\
+\left.
+-y_i\ln(\nu_i\tau) -\frac{1}{2}\ln{y_i} - \ln{y_i!}\right]
+\end{multline}
+\begin{multline}
+p_{X_i,Y_i}\left(x_i,y_i\right)=\dfrac{\euler^{-\nu_i\tau}\tau}{\sqrt{2\pi}\alpha\sigma_i}
+\exp\left[-\dfrac{\tau^2}{2\alpha^2\sigma_i^2}\left(\frac{x_i^2}{y_i}-\frac{2\alpha\mu_ix_i}{\tau}+\frac{\alpha^2\mu_i^2y_i}{\tau^2}\right)
+\right.
+\\
+\left.
+-y_i\ln(\nu_i\tau) -\frac{1}{2}\ln{y_i} - \ln{y_i!}\right]
+\end{multline}
+\begin{multline}
+p_{X_i,Y_i}\left(x_i,y_i\right)=\dfrac{\euler^{-\nu_i\tau}\tau}{\sqrt{2\pi}\alpha\sigma_i}
+\exp\left[
+-\frac{\tau^2}{2\alpha^2\sigma_i^2}\frac{x_i^2}{y_i}
++\frac{\tau\mu_i}{\alpha\sigma_i^2}x_i
+\right.
+\\
+\left.
+-\left(\frac{\mu_i^2}{2\sigma^2}+\ln(\nu_i\tau)\right)y_i
+-\frac{1}{2}\ln{y_i}
+-\ln{y_i!}
+\right] \ .
+\end{multline}
+This shows that the joint probability density function is in the exponential family where the sufficient statistics are $X_i^2/Y_i,X_i$ and $Y_i$.
+
+For the E step, $Y_i$ and $1/Y_i$ are estimated given all the parameters using the conditional expectation $y_i=\expectation\left[Y_i|X_i=x_i\right]$ and $\zeta_i=\expectation\left[1/Y_i|X_i=x_i\right]$ respectively. The conditional probability mass function can be obtained by
 \begin{equation}
 \prob\left(Y_i=y_i|X_i=x_i\right)=\frac{p_{X_i,Y_i}\left(x_i,y_i\right)}{p_{X_i}(x_i)}
 \end{equation}
-\begin{multline}
-\prob\left(Y_i=y_i|X_i=x_i\right)=\frac{1}{Z_i}
-\frac{(\nu_i\tau)^{y_i}}{y_i!}
+where $p_{X_i}(x_i)$ is the normalization constant.
+For the special cases
+\begin{equation}
+\prob\left(Y_i=0|X_i=0\right) \propto \delta(0)
+\end{equation}
+\begin{equation}
+\prob\left(Y_i=y|X_i=0\right) \propto
+\dfrac{(\nu_i\tau)^{y_i}}{y_i!\sqrt{y_i}}
+\exp\left[-\dfrac{1}{2}\dfrac{\left(x_i-y_i\mu_i\alpha/\tau\right)^2}{\alpha^2y_i\sigma_i^2/\tau^2}\right]
+\quad \text{for }y=1,2,\dotdotdot \ .
+\end{equation}
+But because $\delta(0)$ is infinite,
+\begin{equation}
+\prob\left(Y_i=y|X_i=0\right) =
+\begin{cases}
+1 & \text{for }y=0
 \\
-\frac{1}{\sqrt{\beta_i^2+\alpha^2y_i\sigma_i^2/\tau^2}}
-\exp\left[-\frac{1}{2}\left(\frac{x_i-y_i\mu_i\alpha/\tau}{\sqrt{\beta_i^2+\alpha^2y_i\sigma_i^2/\tau^2}}\right)^2\right]
-\end{multline}
-where $Z_i$ is the partition function
-\begin{multline}
-Z_i=\sum_{y_i=0}^{\infty}
-\frac{(\nu_i\tau)^{y_i}}{y_i!}
-\frac{1}{\sqrt{\beta_i^2+\alpha^2y_i\sigma_i^2/\tau^2}}
-\exp\left[-\frac{1}{2}\left(\frac{x_i-y_i\mu_i\alpha/\tau}{\sqrt{\beta_i^2+\alpha^2y_i\sigma_i^2/\tau^2}}\right)^2\right] \ .
-\end{multline}
-Unfortunately such a sum cannot be simplified, thus the conditional probability mass function is only known up to a constant. One way to obtain the conditional expectation is to use the sample mean from samples of the conditional.
+0 & \text{for }y=1,2,\dotdotdot
+\end{cases}
+\end{equation}
+and
+\begin{equation}
+\expectation[Y_i|X_i=0] = 0 \ .
+\end{equation}
+$\expectation[1/Y_i|X_i=0]$ does not exist.
+
+Another special case is
+\begin{equation}
+\prob\left(Y_i=0|X_i=x\right) \propto \delta(x) \quad \text{for }x\neq0
+\end{equation}
+then
+\begin{equation}
+\prob\left(Y_i=0|X_i=x\right) = 0 \quad \text{for }x\neq0
+\end{equation}
+
+For the general case $y_i=1,2,\dotdotdot$ and $x_i\neq0$
+\begin{equation}
+\prob\left(Y_i=y_i|X_i=x_i\right)=\frac{1}{p_{X_i}(x_i)}\dfrac{\euler^{-\nu_i\tau}(\nu_i\tau)^{y_i}\tau}{y_i!\sqrt{2\pi y_i}\alpha\sigma_i}
+\exp\left[-\dfrac{1}{2}\dfrac{\left(x_i-y_i\mu_i\alpha/\tau\right)^2}{\alpha^2y_i\sigma_i^2/\tau^2}\right]
+\end{equation}
+where
+\begin{equation}
+p_{X_i}(x_i)=\sum_{y=0}^{\infty}p_{X_i,Y_i}(x_i,y_i)
+\end{equation}
+\begin{equation}
+p_{X_i}(x_i)=\sum_{y_i=1}^{\infty}\dfrac{\euler^{-\nu_i\tau}(\nu_i\tau)^{y_i}\tau}{y_i!\sqrt{2\pi y_i}\alpha\sigma_i}
+\exp\left[-\dfrac{1}{2}\dfrac{\left(x_i-y_i\mu_i\alpha/\tau\right)^2}{\alpha^2y_i\sigma_i^2/\tau^2}\right] \ .
+\end{equation}
+The expectation of the sufficient statistics are then
+\begin{equation}
+\expectation\left[Y_i|X_i=x_i\right]=
+\frac{1}{p_{X_i}(x_i)}
+\sum_{y_i=1}^{\infty}\dfrac{\euler^{-\nu_i\tau}(\nu_i\tau)^{y_i}\tau}{y_i!\sqrt{2\pi}\alpha\sigma_i}y_i^{1/2}
+\exp\left[-\dfrac{1}{2}\dfrac{\left(x_i-y_i\mu_i\alpha/\tau\right)^2}{\alpha^2y_i\sigma_i^2/\tau^2}\right]
+\end{equation}
+and
+\begin{equation}
+\expectation\left[1/Y_i|X_i=x_i\right]=
+\frac{1}{p_{X_i}(x_i)}
+\sum_{y_i=1}^{\infty}\dfrac{\euler^{-\nu_i\tau}(\nu_i\tau)^{y_i}\tau}{y_i!\sqrt{2\pi}\alpha\sigma_i}y_i^{-3/2}
+\exp\left[-\dfrac{1}{2}\dfrac{\left(x_i-y_i\mu_i\alpha/\tau\right)^2}{\alpha^2y_i\sigma_i^2/\tau^2}\right]
+\end{equation}
+Unfortunately such a sum cannot be simplified. The fastest (approximate) way to get a value for these expectations is to truncate the sum. Another way to obtain the conditional expectation is to use the sample mean from samples of the conditional.
 
 Because the conditional probability mass function is known up to a constant, rejection sampling can be used to draw conditional samples. Rejection sampling samples exactly but a proposal is needed and this influences the rejection rate. Approximate Bayesian computation (ABC) can be used instead because $Y_i$ and $X_i|Y_i$ can be simulated. ABC draws approximate samples without a proposal but can suffer from high rejection rates.
 
-In the M step the parameters $\nu_i,\mu_i,\sigma_i^2,\beta_i^2$ are estimated given the latent variables. This is done by maximising the conditional expectation of the log likelihood function, that is
+In the M step the parameters $\nu_i,\mu_i,\sigma_i^2$ are estimated given the latent variables. This is done by maximising the conditional expectation of the log likelihood function, that is
 \begin{equation}
 H_i=\sum_{j=1}^n\expectation_{Y_i|X_i}\left[\ln p_{X_i,Y_i}\left(x_i^{(j)},Y_i^{(j)}\right)\right]
 \end{equation}
 \begin{multline}
 H_i=\sum_{j=1}^n\expectation_{Y_i|X_i}\left[
--\nu\tau+Y_i^{(j)}\ln(\nu_i\tau)-\frac{1}{2}\ln\left(\beta_i^2+\frac{\alpha^2\sigma_i^2}{\tau^2}Y_i^{(j)}\right)
+-\nu_i\tau+Y_i^{(j)}\ln(\nu_i\tau)-\frac{1}{2}\ln\left(\frac{\alpha^2\sigma_i^2}{\tau^2}Y_i^{(j)}\right)
 \right.
 \\
 \left.
--\frac{1}{2}\left(\frac{x_i^{(j)}-Y_i^{(j)}\mu_i\alpha/\tau}{\sqrt{\beta_i^2+\alpha^2Y_i^{(j)}\sigma_i^2/\tau^2}}\right)^2
+-\frac{1}{2}\frac{\left(x_i^{(j)}-Y_i^{(j)}\mu_i\alpha/\tau\right)^2}{\alpha^2Y_i^{(j)}\sigma_i^2/\tau^2}
 \right] + c_1 \ .
 \end{multline}
-Let $\expectation_{Y_i|X_i}\left[Y_i^{(j)}\right]=y_i^{(j)}$ which was obtained from from the E step. Using the 1st order approximation for the expectation
 \begin{multline}
-H_i=\sum_{j=1}^n\left[
--\nu\tau+y_i^{(j)}\ln(\nu_i\tau)-\frac{1}{2}\ln\left(\beta_i^2+\frac{\alpha^2\sigma_i^2}{\tau^2}y_i^{(j)}\right)
-\right.
+H_i= -n\nu_i\tau+\ln(\nu_i\tau)\sum_{j=1}^n\expectation_{Y_i|X_i}\left[Y_i^{(j)}\right]-\frac{n}{2}\ln\left(\frac{\alpha^2\sigma_i^2}{\tau^2}\right)
 \\
-\left.
--\frac{1}{2}\left(\frac{x_i^{(j)}-y_i^{(j)}\mu_i\alpha/\tau}{\sqrt{\beta_i^2+\alpha^2y_i^{(j)}\sigma_i^2/\tau^2}}\right)^2
-\right]
- + c_1 \ .
+-\frac{1}{2}\sum_{j=1}^n\expectation_{Y_i|X_i}\left[\frac{\left(x_i^{(j)}-Y_i^{(j)}\mu_i\alpha/\tau\right)^2}{\alpha^2Y_i^{(j)}\sigma_i^2/\tau^2}\right]
+ + c_2 \ .
 \end{multline}
-By setting $\beta_i^2=0$ and the partial differentials to zero with respect to $\mu_i$, $\sigma_i^2$ and $\nu_i$ to zero, then the following M step estimators can be obtained:
+\begin{multline}
+H_i= -n\nu_i\tau+\ln(\nu_i\tau)\sum_{j=1}^n\expectation_{Y_i|X_i}\left[Y_i^{(j)}\right]-\frac{n}{2}\ln\left(\frac{\alpha^2\sigma_i^2}{\tau^2}\right)
+\\
+-\frac{1}{2}\sum_{j=1}^n\expectation_{Y_i|X_i}\left[\frac{\left(x_i^{(j)}\right)^2-2x_i^{(j)}Y_i^{(j)}\mu_i\alpha/\tau+\left(Y_i^{(j)}\mu_i\alpha/\tau\right)^2}{\alpha^2Y_i^{(j)}\sigma_i^2/\tau^2}\right]
+ + c_2 \ .
+\end{multline}
+\begin{multline}
+H_i= -n\nu_i\tau+\ln(\nu_i\tau)\sum_{j=1}^n\expectation_{Y_i|X_i}\left[Y_i^{(j)}\right]-\frac{n}{2}\ln\left(\frac{\alpha^2\sigma_i^2}{\tau^2}\right)
+\\
+-\frac{\tau^2}{2\alpha^2\sigma_i^2}\sum_{j=1}^n\left(x_i^{(j)}\right)^2\expectation_{Y_i|X_i}\left[1/Y_i^{(j)}\right]
++ \frac{\tau\mu_i}{\alpha\sigma_i^2}\sum_{j=1}^nx_i^{(j)}
+-\frac{\mu_i^2}{2\sigma_i^2}\sum_{j=1}^n\expectation_{Y_i|X_i}\left[Y_i^{(j)}\right]
+\ .
+\end{multline}
+
+Let $\expectation_{Y_i|X_i}\left[Y_i^{(j)}\right]=y_i^{(j)}$ and $\expectation_{Y_i|X_i}\left[1/Y_i^{(j)}\right]=\zeta_i^{(j)}$which was obtained from from the E step. Then
+\begin{multline}
+H_i= -n\nu_i\tau+\ln(\nu_i\tau)\sum_{j=1}^ny_i^{(j)}-\frac{n}{2}\ln\left(\frac{\alpha^2\sigma_i^2}{\tau^2}\right)
+\\
+-\frac{\tau^2}{2\alpha^2\sigma_i^2}\sum_{j=1}^n\left(x_i^{(j)}\right)^2\zeta_i^{(j)}
++ \frac{\tau\mu_i}{\alpha\sigma_i^2}\sum_{j=1}^nx_i^{(j)}
+-\frac{\mu_i^2}{2\sigma_i^2}\sum_{j=1}^ny_i^{(j)}
+\ .
+\end{multline}
+By setting the partial differentials to zero with respect to $\mu_i$, $\sigma_i^2$ and $\nu_i$ to zero, then the following M step estimators can be obtained:
 \begin{equation}
 \mu_i=\frac{\tau\sum_{j=1}^nx_i^{(j)}}{\alpha\sum_{j=1}^ny_i^{(j)}}
 \end{equation}
 \begin{equation}
-\sigma_i^2=\frac{\tau^2}{\alpha^2n}\sum_{j=1}^n\frac{\left(x_i^{(j)}-y_i^{(j)}\mu_j\alpha/\tau\right)^2}{y_i^{(j)}}
+\sigma_i^2=\frac{1}{n}\left[
+\frac{\tau^2}{\alpha^2}\sum_{j=1}^n\left(x_i^{(j)}\right)^2\zeta_i^{(j)}
+-\frac{2\tau\mu_i}{\alpha}\sum_{j=1}^nx_i^{(j)}
++\mu_i^2\sum_{j=1}^ny_i^{(j)}
+\right]
 \end{equation}
 \begin{equation}
-\nu_i=\frac{\sum_{j=1}^ny_i^{(j)}}{n\tau} \ .
+\nu_i=\frac{\sum_{j=1}^ny_i^{(j)}}{n\tau}
 \end{equation}
-By setting $\beta_i^2=0$, the joint distribution is in the exponential family and the estimators are done through the sufficient statistics.
+where $\left(x_i^{(j)}\right)^2\zeta_i^{(j)}=0$ if $\left(x_i^{(j)}\right)^2=0$.
 
 The constant $\alpha$ only sets the scale of $\mu_i$ and $\sigma_i^2$ but can be calibrated so that it has units of keV. The following properties of the X-ray tube follows (\textbf{NO UNCERTAINTY CALCULATIONS SO FAR}):
 \begin{itemize}
 	\item Voltage = $V$ = 100 kV
 	\item Power = $P$ = 33.0 W
-	\item Exposure time = $\tau$ = 500 s (I assume)
+	\item Exposure time = $\tau$ = 500 ms
 	\item Target material is tungsten.
 \end{itemize}
 The efficiency $\eta$ of photon production is given as
@@ -1313,7 +1469,7 @@ where $a=1.1\times10^{-9}\text{ V}^{-1}$ and $Z$ is the atomic number of the tar
 
 Assume the X-ray spreads out and targets the detector with $1996^2$ pixels only and nothing else, then the total energy detected in one pixel is
 \begin{equation}
-U=\frac{\eta P\tau}{1996^2}=2.1\times10^{11}\text{ keV}\cdot\text{pixel}^{-1} \ .
+U=\frac{\eta P\tau}{1996^2}=2.1\times10^{8}\text{ keV}\cdot\text{pixel}^{-1} \ .
 \end{equation}
 Assuming the air has attenuation coefficient of zero, then $\alpha$ can be crudely estimated by
 \begin{equation}
@@ -1327,6 +1483,45 @@ Other parameters for air such as the rate and energy of photons can be calculate
 \begin{equation}
 \frac{\diff E}{\diff N} = \frac{\diff E}{\diff Q} \frac{\diff Q}{\diff N} = Ve = 1.0\times10^{2}\text{ keV}
 \end{equation}
+
+\subsection{Small example}
+A dataset was simulated, with $n=100$ samples, using the follow parameters with arbitrary units: $\alpha=1$, $\tau=1$, $\nu=5$, $\mu=3$ and $\sigma^2=0.1$. The EM algorithm was initialized by assigning each latent variable such that $Y^{(j)}\sim\poisson(\phi)$ for i.i.d.~$j=1,2,\dotdotdot,n$. The sum was truncated to include 100 terms.
+
+The figures show that the EM algorithm works because for different initial values, the parameters converge towards the true value and the log likelihood always increases.
+
+For high $\nu\tau$, problems arises as more and more terms are needed in the truncated sum. Too many terms in the truncated sum slow down the program a lot.
+
+\begin{figure}
+	\begin{subfigure}{0.5\textwidth}
+		\includegraphics[width=\textwidth]{figures/hierarchicalModel/EM_initial_mean.eps}
+	\end{subfigure}
+	\begin{subfigure}{0.5\textwidth}
+		\includegraphics[width=\textwidth]{figures/hierarchicalModel/EM_initial_var.eps}
+	\end{subfigure}
+	\begin{subfigure}{0.5\textwidth}
+		\includegraphics[width=\textwidth]{figures/hierarchicalModel/EM_initial_rate.eps}
+	\end{subfigure}
+	\begin{subfigure}{0.5\textwidth}
+		\includegraphics[width=\textwidth]{figures/hierarchicalModel/EM_initial_lnL.eps}
+	\end{subfigure}
+	\caption{The parameters and log likelihood at each step of EM. The EM algorithm was used to estimate the parameters of a single simulated $n=100$ dataset. The latent variables were initialized $\poisson(\phi)$ 50 times. Blue: $\phi=1$, Red: $\phi=4$, Green: $\phi=9$. Dotted line: true value}
+\end{figure}
+
+\begin{figure}
+	\begin{subfigure}{0.5\textwidth}
+		\includegraphics[width=\textwidth]{figures/hierarchicalModel/EM_repeat_mean.eps}
+	\end{subfigure}
+	\begin{subfigure}{0.5\textwidth}
+		\includegraphics[width=\textwidth]{figures/hierarchicalModel/EM_repeat_variance.eps}
+	\end{subfigure}
+	\begin{subfigure}{0.5\textwidth}
+		\includegraphics[width=\textwidth]{figures/hierarchicalModel/EM_repeat_rate.eps}
+	\end{subfigure}
+	\begin{subfigure}{0.5\textwidth}
+		\includegraphics[width=\textwidth]{figures/hierarchicalModel/EM_repeat_lnL.eps}
+	\end{subfigure}
+	\caption{The parameters and log likelihood at each step of EM. The EM algorithm was used to estimate the parameters of 50 different simulated $n=100$ dataset. The latent variables were initialized $\poisson(4)$. Dotted line: true value}
+\end{figure}
 
 
 \bibliographystyle{unsrt}
