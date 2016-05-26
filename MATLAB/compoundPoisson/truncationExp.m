@@ -13,7 +13,7 @@ yConditional_array = zeros(1,numel(x_array));
 for i = 1:numel(x_array)
     x = x_array(i); %get the x
     %work out the conditional expectation
-    yConditional_array(i) = expectation_compoundPoisson(1000,x,m,v,psy);
+    yConditional_array(i) = expectation_compoundPoisson([1,1000],x,m,v,psy);
 end
 
 %plot the conditional expectation
