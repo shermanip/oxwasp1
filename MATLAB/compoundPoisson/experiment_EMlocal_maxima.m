@@ -42,7 +42,7 @@ for j = 1:3
         %reset the random seed
         rng(seeds(i,j));
         %run EM and get array of mean, variance, rate parameters and log likelihood
-        [m,v,rate,lnL] = EM_compoundPoisson(X,poissonParameters(j),n_EM,alpha,time_exposure);
+        [m,v,rate,lnL] = EM_compoundPoisson(X,poissonParameters(j),n_EM,[1,100],alpha,time_exposure);
         m_array(:,i,j) = m'; %save the mean parameters
         v_array(:,i,j) = v'; %save the variance parameters
         rate_array(:,i,j) = rate'; %save the rate parameters
