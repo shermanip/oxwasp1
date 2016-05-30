@@ -33,11 +33,9 @@ function [expectation,zeta,Z] = expectation_compoundPoisson(truncation,x,m,v,psy
             %columns: for each y = 1,2,3,...
             %rows: each term
         lnz = [
-            -psy*ones(n_truncation,1)';
+            (-psy-0.5*log(2*pi)-0.5*log(v))*ones(n_truncation,1)';
             y*log(psy);
             -gammaln(y+1);
-            -0.5*log(2*pi)*ones(n_truncation,1)';
-            -0.5*log(v)*ones(n_truncation,1)';
             -0.5*(x-y*m).^2./(v*y)
         ];
         
