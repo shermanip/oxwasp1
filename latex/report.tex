@@ -160,28 +160,50 @@ Most X-ray detectors are scintillator-photodiode detectors. The X-ray photons in
 \section{Reconstruction}
 The scale of the 2D images are calibrated with the use of reference standards \cite{bartscher2007enhancement}. The method used to reconstruct the 3D geometry of the sample is called the filtered back-projection \cite{michael2001x}. The mathematics can be reviewed in \cite{brooks1976principles}.
 
-\chapter{Exploratory Data Analysis}
-\section{Summary Statistics}
-A dataset was given for this project. It consists of 100 realizations of an X-ray image of a cuboid with its vertices in the middle, taken using an X-ray detector. These images were 1\,996$\times$1\,996 pixels in size and have a colour depth of 16 bits. A sample of them can be viewed in Figure \ref{fig:block_montage}.
+%======ABOUT THE DATA========
 
-\begin{figure}
+\chapter{About the data}
+\section{Apparatus}
+A dataset was given for this project. 100 images of a stationary cuboid, with its vertices in the middle, were taken using a Perkin Elmer XRD 1621 digital X-ray detector. These greyscale images were 1\,996$\times$1\,996 pixels in size and have a colour depth of 16 bits. This means each pixel can have grey values which take integer values from 0 to $2^{16}-1$. In addition, these images were calibrated so that the air has grey value of 60\,000. As a result, the units of the grey values have arbitrary units. A sample of the images can be viewed in Figure \ref{fig:block_montage}.
+
+\begin{figure}[htp]
 \centering
 \includegraphics[width=1\textwidth]{figures/block_montage.jpg}
 \caption{The 1st, 50th and 99th image in the dataset of an X-ray image of a cuboid.} 
 \label{fig:block_montage}
 \end{figure}
 
-\subsection{Histogram}
+The X-ray tube was stated to have the following properties, with the number of significant figures stated as given and no error bars given:
+\begin{itemize}
+	\item Voltage = $V$ = 100 kV
+	\item Power = $P$ = 33.0 W
+	\item Exposure time = $\tau$ = 500 ms
+	\item Target material is tungsten.
+\end{itemize}
+From this, some additional properties of the X-ray can be estimated. It is given that the efficiency of X-ray production $\eta$ is \cite{michael2001x}
+\begin{equation}
+\eta = aVZ =8.1\times10^{-3}
+\end{equation}
+where $a=1.1\times 10^{-1}\text{ V}^{-1}$ is a constant and $Z=74$ is the atomic number of tungsten. The rate $\nu$ and energy per photon $E$ can be calculated
+\begin{equation}
+\nu =\frac{\eta P}{V e}=1.7\times10^{13}\text{ s}^{-1}
+\end{equation}
+\begin{equation}
+E = Ve = 1.0\times10^{2}\text{ keV}
+\end{equation}
+where $e$ is the charge per electron.
+
+\section{Histogram}
 The distribution of the grey values of all the pixels in the data set is shown in Figure \ref{fig:block_histogram}. It was observed that there were 3 distinct peaks in the histogram at $\sim2\times10^4$, $\sim4\times10^4$ and $\sim5\times10^4$. By doing a threshold, as shown in Figure \ref{fig:block_histogram}, it was clear that the main 3 sources of the grey values were the sample, the background and the foam holder at the bottom of the image.
 
-\begin{figure}
+\begin{figure}[htp]
 \centering
 \includegraphics[width=0.5\textwidth]{figures/block_histogram.png}
 \caption{Histogram of the grey values of all the pixels in the 100 images in the dataset. The grey values range from 18\,286 to 60\,045.}
 \label{fig:block_histogram}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[p]
 	\centering
 	\begin{subfigure}[b]{0.45\textwidth}
 		\includegraphics[width=\textwidth]{figures/block_threshold.png}
@@ -195,43 +217,11 @@ The distribution of the grey values of all the pixels in the data set is shown i
 	\label{fig:block_threshold}
 \end{figure}
 
-\subsection{Time Series}
-The mean and standard error of the grey values for each of the 100 images were taken and plotted as a time series as shown in Figure \ref{fig:timeSeries}. There was evidence of dependence between samples by looking the sample autocorrelation plots as shown in Figure \ref{fig:timeSeries_acf_pacf}. Because there was a peak at lag 1 in the sample partial autocorrelation plot, the time series could be modelled using an autoregressive model with one parameter.
-
-\begin{figure}
-	\centering
-	\includegraphics[width=0.75\textwidth]{figures/initial_timeSeries.eps}
-	\caption{The mean and standard error of all the pixel grey values for each image.}
-	\label{fig:timeSeries}
-\end{figure}
-
-\begin{figure}
-	\centering
-	\begin{subfigure}[b]{0.45\textwidth}
-		\includegraphics[width=1\textwidth]{figures/initial_acf.eps}
-		\caption{Sample autocorrelation}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.45\textwidth}
-		\includegraphics[width=1\textwidth]{figures/initial_pacf.eps}
-		\caption{Sample partial autocorrelation}
-	\end{subfigure}
-	\caption{Sample autocorrelation and partial autocorrelation of the mean grey values time series.}
-	\label{fig:timeSeries_acf_pacf}
-\end{figure}
-
-\subsection{Distribution of Individual Pixels}
-The mean and standard deviation for each pixel's grey value was estimated and as shown in Figure \ref{fig:initial_mean_std}. Both supervised and unsupervised learning can be used to model the mean and variance relationship of the grey values.
-
-\begin{figure}
-	\centering
-	\includegraphics[width=0.9\textwidth]{figures/initial_mean_std.eps}
-	\caption{Frequency density of the $1\,996^2$ pixel's grey values mean and standard deviation.}
-	\label{fig:initial_mean_std}
-\end{figure}
+\section{Normality}
 
 A Normal distribution was fitted on each pixel's grey values and the $\chi^2$ goodness of fit test was conducted, as shown in Figure \ref{fig:initial_fit_normal_test}. When considering the Bonferoni correction \cite{weisstein2004bonferroni} for multiple hypothesis testing, the Normal distribution appeared to be a good fit because only 9 pixels have $p$ values less than 10\%. In addition, these significant pixels did not seem to cluster and appear random in space. When ignoring the Bonferoni correction, there was a suspicious patch of low $p$ values on the bottom right.
 
-\begin{figure}
+\begin{figure}[p]
 \centering
 	\begin{subfigure}[b]{0.75\textwidth}
 		\includegraphics[width=1\textwidth]{figures/initial_p.eps}
@@ -245,402 +235,31 @@ A Normal distribution was fitted on each pixel's grey values and the $\chi^2$ go
 	\label{fig:initial_fit_normal_test}
 \end{figure}
 
-\section{Principal Component Analysis}
-By estimating the covariance matrix of the individual pixel's grey values, sources of (orthgonal) variance can be estimated. This can be done investigating eigendecomposition representation of the sample covariance matrix. A lot of the linear algebra can be reviewed in undergraudate maths text book such as \cite{riley2006mathematical}.
+\section{Time Series}
+The mean and standard error of the grey values for each of the 100 images were taken and plotted as a time series as shown in Figure \ref{fig:timeSeries}. There was evidence of dependence between samples by looking the sample autocorrelation plots as shown in Figure \ref{fig:timeSeries_acf_pacf}. Because there was a peak at lag 1 in the sample partial autocorrelation plot, the time series could be modelled using an autoregressive model with one parameter.
 
-\subsection{Theory}
-Suppose the $p\times p$ covariance matrix $\matr{\Sigma}$ has eigenvalues $\lambda_i$ and eigenvector $\vectGreek{\phi}_i$ for $i=1,2,\dotdotdot,p$. Then the eigenvectors and eigenvalues are related by
-\begin{equation}
-\matr{\Sigma}\vectGreek{\phi}_i = \lambda_i\vectGreek{\phi}_i \ .
-\label{eq:eigenvector_eigenvalue_forCovariance}
-\end{equation}
-A closure can be form by pre-multiplying both sides by $\vectGreek{\phi}_j\T$ so that
-\begin{align*}
-\vectGreek{\phi}_j\T \matr{\Sigma}\vectGreek{\phi}_i &= \lambda_i\vectGreek{\phi}_j\T\vectGreek{\phi}_i \\
-\left(\matr{\Sigma}\T \vectGreek{\phi}_j \right)\T\vectGreek{\phi}_i &= \lambda_i\vectGreek{\phi}_j\T\vectGreek{\phi}_i \ .
-\end{align*}
-But given the covariance matrix is symmetric, $\matr{\Sigma}=\matr{\Sigma}\T$, and $\lambda_j$ is the corresponding eigenvalue of the eigenvector $\vectGreek{\phi}_j$, then
-\begin{align*}
-\left(\lambda_j\vectGreek{\phi}_j \right)\T\vectGreek{\phi}_i &= \lambda_i\vectGreek{\phi}_j\T\vectGreek{\phi}_i \\
-\lambda_j\vectGreek{\phi}_j\T\vectGreek{\phi}_i &= \lambda_i\vectGreek{\phi}_j\T\vectGreek{\phi}_i \ .
-\end{align*}
-As long as $\lambda_i\neq\lambda_j$ for $i\neq j$, then $\vectGreek{\phi}_j\T\vectGreek{\phi}_i=0$. Therefore all eigenvalues in the covariance matrix are orthogonal to each other.
-
-Equation \eqref{eq:eigenvector_eigenvalue_forCovariance} can be extended to include all eigenvectors and eigenvalues such that
-\begin{equation}
-\matr{\Sigma}
-	\begin{pmatrix}
-		\uparrow & \uparrow & & \uparrow \\
-		\vectGreek{\phi}_1 & \vectGreek{\phi}_2 &\cdots& \vectGreek{\phi}_p \\
-		\downarrow & \downarrow & & \downarrow \\
-	\end{pmatrix}
-=
-	\begin{pmatrix}
-		\uparrow & \uparrow & & \uparrow \\
-		\lambda_1\vectGreek{\phi}_1 & \lambda_2\vectGreek{\phi}_2 &\cdots& \lambda_p\vectGreek{\phi}_p \\
-		\downarrow & \downarrow & & \downarrow \\
-	\end{pmatrix} \ .
-\end{equation}
-Transposing both sides
-\begin{equation*}
-\begin{pmatrix}
-	\leftarrow\vectGreek{\phi}_1\rightarrow \\
-	\leftarrow\vectGreek{\phi}_2\rightarrow \\
-	\vdots \\
-	\leftarrow\vectGreek{\phi}_p\rightarrow
-\end{pmatrix}
-\matr{\Sigma}
-=
-\begin{pmatrix}
-	\lambda_1 & 0 & \cdots 0 \\
-	0 & \lambda_2 & \cdots 0 \\
-	\vdots & \vdots & \ddots \\
-	0 & 0 & \cdots \lambda_p \\
-\end{pmatrix}
-\begin{pmatrix}
-	\leftarrow\vectGreek{\phi}_1\rightarrow \\
-	\leftarrow\vectGreek{\phi}_2\rightarrow \\
-	\vdots \\
-	\leftarrow\vectGreek{\phi}_p\rightarrow
-\end{pmatrix}
-\end{equation*}
-but because all eigenvectors are orthogonal
-\begin{equation*}
-\matr{\Sigma}
-=
-\begin{pmatrix}
-		\uparrow & \uparrow & & \uparrow \\
-		\vectGreek{\phi}_1 & \vectGreek{\phi}_2 &\cdots& \vectGreek{\phi}_p \\
-		\downarrow & \downarrow & & \downarrow \\
-\end{pmatrix}
-\begin{pmatrix}
-	\lambda_1 & 0 & \cdots 0 \\
-	0 & \lambda_2 & \cdots 0 \\
-	\vdots & \vdots & \ddots \\
-	0 & 0 & \cdots \lambda_p \\
-\end{pmatrix}
-\begin{pmatrix}
-	\leftarrow\vectGreek{\phi}_1\rightarrow \\
-	\leftarrow\vectGreek{\phi}_2\rightarrow \\
-	\vdots \\
-	\leftarrow\vectGreek{\phi}_p\rightarrow
-\end{pmatrix} \ .
-\end{equation*}
-This is just a weighted sum of the outer products of the eigenvectors, therefore the eigendecomposition is
-\begin{equation}
-\matr{\Sigma} = \sum_{i=1}^{p} \lambda_i \vectGreek{\phi}_i \vectGreek{\phi}_i\T \ .
-\end{equation}
-Because this is a weighted sum, the eigenvectors with the biggest eigenvalue will be most responsible for the covariance matrix. $\vectGreek{\phi}_i$ are called the principle components.
-
-\subsection{Methods}
-The 100 images were shrunk with averaging to a size of $100\times100$ pixels using ImageJ. The sample covariance matrix, of the pixel's grey values, was calculated using the maximum likelihood estimator so that the 6 eigenvectors with the biggest eigenvalues can be obtained. Using 1\,600 bootstrap samples, the sampling distribution of the 6 eigenvalues were sampled.
-
-\subsection{Results}
-Figure \ref{fig:initial_PC_eigenvalues} shows the first 6 of the diagonal of the outer product of the individual principle components, they represent the normalised main sources of variance. It was observed that on the first and second principle components, there are sources of variance in the bottom right and top right of the image. This could imply that the sources of variance are not uniformly distributed in the background.
-
-The sampling distribution of the eigenvalues are shown in Figure \ref{fig:initial_PC_eigenvalues}. Quite clearly there were 2 significant sources of variance because the eigenvalues of the first 2 principle components were much larger than zero when comparing it with its interquartile range.
-
-\begin{figure}
-	\includegraphics[width=\textwidth]{figures/initial_PCvariance.eps}
-	\caption{Normalised variance due to the principle components (1 to 6). The values of all the pixels in the figures equal to 1.}
-	\label{fig:initial_PCvariance}
-\end{figure}
-\begin{figure}
+\begin{figure}[p]
 	\centering
-	\includegraphics[width=0.7\textwidth]{figures/initial_PC_eigenvalues.eps}
-	\caption{Eigenvalues of the sample covariance matrix. 1\,600 bootstrap samples were used.}
-	\label{fig:initial_PC_eigenvalues}
+	\includegraphics[width=0.75\textwidth]{figures/initial_timeSeries.eps}
+	\caption{The mean and standard error of all the pixel grey values for each image.}
+	\label{fig:timeSeries}
 \end{figure}
 
-\section{Factor Analysis}
-A probabilistic latent model can be used to model the pixel's grey values. These latent variables then can be used to describe the underlining structure, and perhaps sources of variance.
-
-\subsection{Theory}
-Let $\vect{Y}$ be a random vector containing $k$ latent variables, called factors, and
-\begin{equation}
-\vect{Y}\sim\normal\left(\vect{0},\matr{1}\right) \ .
-\end{equation}
-Let $\vect{e}$ be a random $p$ vector modelling the uncorrelated intrinsic noise such that
-\begin{equation}
-\vect{e}\sim\normal\left(\vect{0},\matr{\Psi}\right)
-\end{equation}
-where $\matr{\Psi}$ is a diagonal matrix.
-
-Given a $p\times k$ loading matrix $\matr{\Lambda}$, the observable data $\vect{X}$ can be modelled through
-\begin{equation}
-\vect{X}=\matr{\Lambda}\vect{Y}+\vect{e}
-\end{equation}
-thus
-\begin{equation}
-\vect{X}\sim\normal\left(\vect{0},\matr{\Lambda}\matr{\Lambda}\T+\matr{\Psi}\right) \ .
-\end{equation}
-As a result there are two sources of variance, factor noise from the $\matr{\Lambda}\matr{\Lambda}\T$ component and the instrinic noise $\matr{\Psi}$. The model can be extended for non-zero mean easily by adding an arbitrary constant.
-
-The conditional distribution of $\vect{X}$ given $\vect{Y}$ can be calculated to be
-\begin{equation}
-\vect{X}|\vect{Y}\sim\normal\left(\matr{\Lambda}\vect{Y},\matr{\Psi}\right) \ .
-\label{eq:factor_analysis_x_given_y_dist}
-\end{equation}
-Using Bayes' theorem, the conditional distribution of $\vect{Y}$ given $\vect{X}$ can be calculated
-\begin{align*}
-p_{\vect{Y}|\vect{X}}(\vect{y}|\vect{x}) &\propto p_{\vect{X}|\vect{Y}}(\vect{x}|\vect{y}) p_{\vect{Y}}(\vect{y})
-\\
-p_{\vect{Y}|\vect{X}}(\vect{y}|\vect{x}) &\propto \exp\left[-\frac{1}{2}\left(\vect{x}-\matr{\Lambda}\vect{y}\right)\T\matr{\Psi}^{-1}\left(\vect{x}-\matr{\Lambda}\vect{y}\right)\right]
-\exp\left[-\frac{1}{2}\vect{y}\T\vect{y}\right]
-\\
-p_{\vect{Y}|\vect{X}}(\vect{y}|\vect{x}) &\propto \exp \left[-\frac{1}{2}\left(-\vect{x}\T\matr{\Psi}^{-1}\matr{\Lambda}\vect{y}-\vect{y}\T\matr{\Lambda}\T\matr{\Psi}^{-1}\vect{x}+\vect{y}\T\matr{\Lambda}\T\matr{\Psi}^{-1}\matr{\Lambda}\vect{y}+\vect{y}\T\vect{y}\right)\right]
-\\
-p_{\vect{Y}|\vect{X}}(\vect{y}|\vect{x}) &\propto \exp \left[-\frac{1}{2}\left(\vect{y}\T\left(\matr{\Lambda}\T\matr{\Psi}^{-1}\matr{\Lambda}+\matr{1}\right)\vect{y}-2\vect{y}\T\matr{\Lambda}\T\matr{\Psi}^{-1}\vect{x}\right)\right]
-\end{align*}
-and comparing it with the density function of a general multivariate Normal distribution
-\begin{equation}
-\vect{Y}|\vect{X}\sim\normal\left(\left(\matr{\Lambda}\T\matr{\Psi}^{-1}\matr{\Lambda}+\matr{1}\right)^{-1}\matr{\Lambda}\T\matr{\Psi}^{-1}\vect{X},\left(\matr{\Lambda}\T\matr{\Psi}^{-1}\matr{\Lambda}+\matr{1}\right)^{-1}\right) \ .
-\label{eq:factor_analysis_y_given_x_dist}
-\end{equation}
-
-Suppose $\vect{X}=\vect{x}^{(i)}$ was observed for $i=1,2,\dotdotdot,n$, then the likelihood is
-\begin{equation}
-L=\prod_{i=1}^n\frac{1}{{\|2\pi\left(\matr{\Lambda}\matr{\Lambda}\T+\matr{\Psi}\right)\|}^{1/2}}
-\exp\left[-\frac{1}{2}\left(\vect{x}^{(i)}\right)\T\left(\matr{\Lambda}\matr{\Lambda}\T+\matr{\Psi}\right)^{-1}\vect{x}^{(i)}\right] \ .
-\end{equation}
-The log likelihood is then
-\begin{equation*}
-\ln{L}=-\frac{n}{2}\ln{\|2\pi\left(\matr{\Lambda}\matr{\Lambda}\T+\matr{\Psi}\right)\|}-\frac{1}{2}\sum_{i=1}^{n}\left(\vect{x}^{(i)}\right)\T\left(\matr{\Lambda}\matr{\Lambda}\T+\matr{\Psi}\right)^{-1}\vect{x}^{(i)}
-\end{equation*}
-and by using the trace and its properties
-\begin{align}
-\ln{L}&=-\frac{n}{2}\ln{\|2\pi\left(\matr{\Lambda}\matr{\Lambda}\T+\matr{\Psi}\right)\|}-\frac{1}{2}\sum_{i=1}^{n}\trace\left[\left(\vect{x}^{(i)}\right)\T\left(\matr{\Lambda}\matr{\Lambda}\T+\matr{\Psi}\right)^{-1}\vect{x}^{(i)}\right]
-\nonumber \\
-\ln{L}&=-\frac{n}{2}\ln{\|2\pi\left(\matr{\Lambda}\matr{\Lambda}\T+\matr{\Psi}\right)\|}-\frac{1}{2}\sum_{i=1}^{n}\trace\left[\left(\matr{\Lambda}\matr{\Lambda}\T+\matr{\Psi}\right)^{-1}\vect{x}^{(i)}\left(\vect{x}^{(i)}\right)\T\right]
-\nonumber \\
-\ln{L}&=-\frac{n}{2}\ln{\|2\pi\left(\matr{\Lambda}\matr{\Lambda}\T+\matr{\Psi}\right)\|}-\frac{1}{2}\trace\left[\left(\matr{\Lambda}\matr{\Lambda}\T+\matr{\Psi}\right)^{-1}\sum_{i=1}^{n}\vect{x}^{(i)}\left(\vect{x}^{(i)}\right)\T\right] \ .
-\end{align}
-The loading matrix $\matr{\Lambda}$ and intrinsic noise $\matr{\Psi}$ can be estimated by maximising the log likelihood. This is best done using the expectation maximisation (EM) algorithm. The EM algorithm is an iterative procedure conducting an E step followed by a M step many times till some convergence conditions are met.
-
-The E step estimates the values of the latent variables, $\vect{y}^{(1)},\vect{y}^{(2)},\dotdotdot,\vect{y}^{(n)}$, using the expectation of the condition distribution of the latent variables given the observed data $\vect{x}^{(1)},\vect{x}^{(2)},\dotdotdot,\vect{x}^{(n)}$. The parameters $\matr{\Lambda}$ and $\matr{\Psi}$ are assumed to be know in this step and are fixed. By using Equation \eqref{eq:factor_analysis_y_given_x_dist}, each latent variable are assigned by
-\begin{equation}
-\vect{y}^{(i)} \leftarrow \left(\matr{\Lambda}\T\matr{\Psi}^{-1}\matr{\Lambda}+\matr{1}\right)^{-1}\matr{\Lambda}\T\matr{\Psi}^{-1}\vect{x}^{(i)}
-\end{equation}
-for $i=1,2,\dotdotdot,n$. The covariance of the latent variables are estimated by
-\begin{equation}
-\matr{\Sigma}_{\vect{Y}} \leftarrow \left(\matr{\Lambda}\T\matr{\Psi}^{-1}\matr{\Lambda}+\matr{1}\right)^{-1}
-\end{equation}
-
-In the E step, the parameters $\matr{\Lambda}$ and $\matr{\Psi}$ are varied to maximise the log likelihood, assuming the latent variables are known and fixed. The objective to maximise is the condition expectation of the log joint likelihood, this is given as
-\begin{equation}
-H = \expectation_{\vect{Y}|\vect{X}}\left[\sum_{i=1}^{n}\ln p_{\vect{X},\vect{Y}}\left(\vect{x}^{(i)},\vect{y}^{(i)}\right)\right] \ .
-\end{equation}
-This can be expressed as
-\begin{equation*}
-H = \expectation_{\vect{Y}|\vect{X}}\left[
-\sum_{i=1}^{n}\left(\ln p_{\vect{X}|\vect{Y}}\left(\vect{x}^{(i)}|\vect{y}^{(i)}\right)+\ln p_{\vect{Y}}\left(\vect{y}^{(i)}\right)\right)
-\right]
-\end{equation*}
-Because the marginal distribution of the latent variables do not depend on $\matr{\Lambda}$ and $\matr{\Psi}$, this can be ignored. Using Equation \eqref{eq:factor_analysis_x_given_y_dist}
-\begin{equation*}
-H = \expectation_{\vect{Y}|\vect{X}}\left[
-\sum_{i=1}^{n}\ln\left(\frac{1}{\|2\pi\matr{\Psi}\|^{1/2}}\exp\left(-\frac{1}{2}\left(\vect{x}^{(i)}-\matr{\Lambda}\vect{y}^{(i)}\right)\T\matr{\Psi}^{-1}\left(\vect{x}^{(i)}-\matr{\Lambda}\vect{y}^{(i)}\right)\right)\right)
-\right]
-+c_1
-\end{equation*}
-\begin{equation*}
-H = \expectation_{\vect{Y}|\vect{X}}\left[
-\sum_{i=1}^{n}\left(-\frac{1}{2}\ln{\|2\pi\matr{\Psi}\|}-\frac{1}{2}\left(\vect{x}^{(i)}-\matr{\Lambda}\vect{y}^{(i)}\right)\T\matr{\Psi}^{-1}\left(\vect{x}^{(i)}-\matr{\Lambda}\vect{y}^{(i)}\right)\right)
-\right]
-+c_1
-\end{equation*}
-\begin{equation*}
-H = -\frac{1}{2}\expectation_{\vect{Y}|\vect{X}}\left[
-\sum_{i=1}^{n}\left(\ln{\|2\pi\matr{\Psi}\|}+\left(\vect{x}^{(i)}\right)\T\matr{\Psi}^{-1}\matr{\Lambda}\vect{y}^{(i)}-2\left(\vect{x}^{(i)}\right)\T\matr{\Psi}^{-1}\matr{\Lambda}\vect{y}^{(i)}+\left(\vect{y}^{(i)}\right)\T\matr{\Lambda}\T\matr{\Psi}^{-1}\matr{\Lambda}\vect{y}^{(i)}\right)
-\right]
-+c_1
-\end{equation*}
-By defining
-\begin{equation}
-\expectation_{\vect{Y}|\vect{X}}\left[\vect{y}^{(i)}\right]=\vectGreek{\mu}^{(i)} = \left(\matr{\Lambda}\T\matr{\Psi}^{-1}\matr{\Lambda}+\matr{1}\right)^{-1}\matr{\Lambda}\T\matr{\Psi}^{-1}\vect{x}^{(i)}
-\end{equation}
-and
-\begin{equation}
-\cov{\vect{Y}} = \matr{\Sigma}_{\vect{Y}} = \left(\matr{\Lambda}\T\matr{\Psi}^{-1}\matr{\Lambda}+\matr{1}\right)^{-1}
-\end{equation}
-then when taking the conditional expectation
-\begin{multline*}
-H = -\frac{1}{2}\sum_{i=1}^{n}\left[
-\ln\|2\pi\matr{\Psi}\|+\left(\vect{x}^{(i)}\right)\T\matr{\Psi}^{-1}\vect{x}^{(i)}-2\left(\vect{x}^{(i)}\right)\T\matr{\Psi}^{-1}\matr{\Lambda}\vectGreek{\mu}^{(i)}\right.\\
-\left.+\trace\left(\matr{\Lambda}\T\matr{\Psi}^{-1}\matr{\Lambda}\matr{\Sigma}_{\vect{Y}}\right)+\left(\vectGreek{\mu}^{(i)}\right)\T\matr{\Lambda}\T\matr{\Psi}^{-1}\matr{\Lambda}\vectGreek{\mu}^{(i)}
-\right]+c_1
-\end{multline*}
-\begin{multline*}
-H = -\frac{1}{2}\sum_{i=1}^{n}\left[
-\ln\|2\pi\matr{\Psi}\|+\left(\vect{x}^{(i)}\right)\T\matr{\Psi}^{-1}\vect{x}^{(i)}-2\left(\vect{x}^{(i)}\right)\T\matr{\Psi}^{-1}\matr{\Lambda}\vectGreek{\mu}^{(i)}\right.\\
-\left.+\trace\left(\matr{\Lambda}\T\matr{\Psi}^{-1}\matr{\Lambda}\matr{\Sigma}_{\vect{Y}}\right)+\trace\left(\matr{\Lambda}\T\matr{\Psi}^{-1}\matr{\Lambda}\vectGreek{\mu}^{(i)}\left(\vectGreek{\mu}^{(i)}\right)\T\right)
-\right]+c_1
-\end{multline*}
-\begin{multline*}
-H = -\frac{1}{2}\sum_{i=1}^{n}\left[
-\ln\|2\pi\matr{\Psi}\|+\left(\vect{x}^{(i)}\right)\T\matr{\Psi}^{-1}\vect{x}^{(i)}-2\left(\vect{x}^{(i)}\right)\T\matr{\Psi}^{-1}\matr{\Lambda}\vectGreek{\mu}^{(i)}\right.\\
-\left.+\trace\left(\matr{\Lambda}\T\matr{\Psi}^{-1}\matr{\Lambda}\left(\matr{\Sigma}_{\vect{Y}}+\vectGreek{\mu}^{(i)}\left(\vectGreek{\mu}^{(i)}\right)\T\right)\right)
-\right]+c_1
-\end{multline*}
-\begin{multline*}
-H = -\frac{n}{2}
-\ln\|\matr{\Psi}\|
--\frac{1}{2}\sum_{i=1}^{n}\left(\vect{x}^{(i)}\right)\T\matr{\Psi}^{-1}\vect{x}^{(i)}
-+\sum_{i=1}^{n}\left(\vect{x}^{(i)}\right)\T\matr{\Psi}^{-1}\matr{\Lambda}\vectGreek{\mu}^{(i)}\\
--\frac{1}{2}\sum_{i=1}^{n}\trace\left(\matr{\Lambda}\T\matr{\Psi}^{-1}\matr{\Lambda}\left(\matr{\Sigma}_{\vect{Y}}+\vectGreek{\mu}^{(i)}\left(\vectGreek{\mu}^{(i)}\right)\T\right)\right)
-+c_2
-\end{multline*}
-
-Taking the derivative with respect to $\matr{\Lambda}$
-\begin{equation*}
-\matr{D}_{\matr{\Lambda}}H=
-\matr{D}_{\matr{\Lambda}}\left[
-\sum_{i=1}^n\left(\vect{x}^{(i)}\right)\T\matr{\Psi}^{-1}\matr{\Lambda}\vectGreek{\mu}^{(i)}
--\frac{1}{2}\sum_{i=1}^{n}\trace\left(\matr{\Lambda}\T\matr{\Psi}^{-1}\matr{\Lambda}\left(\matr{\Sigma}_{\vect{Y}}+\vectGreek{\mu}^{(i)}\left(\vectGreek{\mu}^{(i)}\right)\T\right)\right)
-\right]
-\end{equation*}
-\begin{equation*}
-\matr{D}_{\matr{\Lambda}}H=
-\matr{D}_{\matr{\Lambda}}\left[
-\sum_{i=1}^n\trace\left(\left(\vectGreek{\mu}^{(i)}\right)\T\matr{\Lambda}\T\matr{\Psi}^{-1}\vect{x}^{(i)}\right)
--\frac{1}{2}\sum_{i=1}^{n}\trace\left(\matr{\Lambda}\T\matr{\Psi}^{-1}\matr{\Lambda}\left(\matr{\Sigma}_{\vect{Y}}+\vectGreek{\mu}^{(i)}\left(\vectGreek{\mu}^{(i)}\right)\T\right)\right)
-\right]
-\end{equation*}
-\begin{equation*}
-\matr{D}_{\matr{\Lambda}}H=
-\matr{D}_{\matr{\Lambda}}\left[
-\sum_{i=1}^n\trace\left(\matr{\Lambda}\T\matr{\Psi}^{-1}\vect{x}^{(i)}\left(\vectGreek{\mu}^{(i)}\right)\T\right)
--\frac{1}{2}\sum_{i=1}^{n}\trace\left(\matr{\Lambda}\T\matr{\Psi}^{-1}\matr{\Lambda}\left(\matr{\Sigma}_{\vect{Y}}+\vectGreek{\mu}^{(i)}\left(\vectGreek{\mu}^{(i)}\right)\T\right)\right)
-\right]
-\end{equation*}
-\begin{equation*}
-\matr{D}_{\matr{\Lambda}}H=
-\sum_{i=1}^n\matr{\Psi}^{-1}\vect{x}^{(i)}\left(\vectGreek{\mu}^{(i)}\right)\T
--\sum_{i=1}^{n}\matr{\Psi}^{-1}\matr{\Lambda}\left(\matr{\Sigma}_{\vect{Y}}+\vectGreek{\mu}^{(i)}\left(\vectGreek{\mu}^{(i)}\right)\T\right) \ .
-\end{equation*}
-Setting the derivative to zero
-\begin{equation*}
-\matr{0}=
-\sum_{i=1}^n\matr{\Psi}^{-1}\vect{x}^{(i)}\left(\vectGreek{\mu}^{(i)}\right)\T
--\sum_{i=1}^{n}\matr{\Psi}^{-1}\matr{\Lambda}\left(\matr{\Sigma}_{\vect{Y}}+\vectGreek{\mu}^{(i)}\left(\vectGreek{\mu}^{(i)}\right)\T\right) \ .
-\end{equation*}
-\begin{equation*}
-\matr{0}=
-\sum_{i=1}^n\vect{x}^{(i)}\left(\vectGreek{\mu}^{(i)}\right)\T
--\matr{\Lambda}\left(n\matr{\Sigma}_{\vect{Y}}+\sum_{i=1}^{n}\vectGreek{\mu}^{(i)}\left(\vectGreek{\mu}^{(i)}\right)\T\right)
-\end{equation*}
-\begin{equation}
-\matr{\Lambda}
-=
-\left(\sum_{i=1}^n\vect{x}^{(i)}\left(\vectGreek{\mu}^{(i)}\right)\T\right)\left(n\matr{\Sigma}_{\vect{Y}}+\sum_{i=1}^{n}\vectGreek{\mu}^{(i)}\left(\vectGreek{\mu}^{(i)}\right)\T\right)^{-1}\ .
-\end{equation}
-
-The objective can be re-parametrised using $\matr{T}=\matr{\Psi}^{-1}$ so that
-\begin{multline*}
-H = -\frac{n}{2}
-\ln\|\matr{T^{-1}}\|
--\frac{1}{2}\sum_{i=1}^{n}\left(\vect{x}^{(i)}\right)\T\matr{T}\vect{x}^{(i)}
-+\sum_{i=1}^{n}\left(\vect{x}^{(i)}\right)\T\matr{T}\matr{\Lambda}\vectGreek{\mu}^{(i)}\\
--\frac{1}{2}\sum_{i=1}^{n}\trace\left(\matr{\Lambda}\T\matr{T}\matr{\Lambda}\left(\matr{\Sigma}_{\vect{Y}}+\vectGreek{\mu}^{(i)}\left(\vectGreek{\mu}^{(i)}\right)\T\right)\right)
-+c_2
-\end{multline*}
-\begin{multline*}
-H = -\frac{n}{2}
-\ln\|\matr{T^{-1}}\|
--\frac{1}{2}\sum_{i=1}^{n}\left(\vect{x}^{(i)}\right)\T\matr{T}\vect{x}^{(i)}
-+\sum_{i=1}^{n}\left(\vect{x}^{(i)}\right)\T\matr{T}\matr{\Lambda}\vectGreek{\mu}^{(i)}\\
--\frac{1}{2}\sum_{i=1}^{n}\trace\left(\matr{\Lambda}\T\matr{T}\matr{\Lambda}\left(\matr{\Sigma}_{\vect{Y}}+\vectGreek{\mu}^{(i)}\left(\vectGreek{\mu}^{(i)}\right)\T\right)\right)
-+c_2 \ .
-\end{multline*}
-$\|\matr{T}^{-1}\| = 1/\|\matr{T}\|$ and using the properties of the trace
-\begin{multline*}
-H = \frac{n}{2}
-\ln\|\matr{T}\|
--\frac{1}{2}\sum_{i=1}^{n}\trace\left(\matr{T}\vect{x}^{(i)}\left(\vect{x}^{(i)}\right)\T\right)
-+\sum_{i=1}^{n}\trace\left(\matr{T}\matr{\Lambda}\vectGreek{\mu}^{(i)}\left(\vect{x}^{(i)}\right)\T\right)\\
--\sum_{i=1}^{n}\frac{1}{2}\trace\left(\matr{T}\matr{\Lambda}\left(\matr{\Sigma}_{\vect{Y}}+\vectGreek{\mu}^{(i)}\left(\vectGreek{\mu}^{(i)}\right)\T\right)\matr{\Lambda}\T\right)
-+c_2 \ .
-\end{multline*}
-Taking the derivative with respect to $\matr{\Psi}$
-\begin{multline*}
-\matr{D}_{\matr{\Psi}}H = \frac{n}{2}\matr{T}^{-1}
--\frac{1}{2}\sum_{i=1}^{n}\vect{x}^{(i)}\left(\vect{x}^{(i)}\right)\T
-+\sum_{i=1}^{n}\matr{\Lambda}\vectGreek{\mu}^{(i)}\left(\vect{x}^{(i)}\right)\T\\
--\sum_{i=1}^{n}\frac{1}{2}\matr{\Lambda}\left(\matr{\Sigma}_{\vect{Y}}+\vectGreek{\mu}^{(i)}\left(\vectGreek{\mu}^{(i)}\right)\T\right)\matr{\Lambda}\T \ .
-\end{multline*}
-Setting the derivative to zero
-\begin{multline*}
-\matr{0} = \frac{n}{2}\matr{\Psi}
--\frac{1}{2}\sum_{i=1}^{n}\vect{x}^{(i)}\left(\vect{x}^{(i)}\right)\T
-+\sum_{i=1}^{n}\matr{\Lambda}\vectGreek{\mu}^{(i)}\left(\vect{x}^{(i)}\right)\T\\
--\frac{n}{2}\matr{\Lambda}\matr{\Sigma}_{\vect{Y}}\matr{\Lambda}-\frac{1}{2}\matr{\Lambda}\sum_{i=1}^{n}\vectGreek{\mu}^{(i)}\left(\vectGreek{\mu}^{(i)}\right)\T)\matr{\Lambda}\T
-\end{multline*}
-\begin{equation*}
-\matr{0} = \frac{n}{2}\matr{\Psi}
--\frac{1}{2}\sum_{i=1}^{n}\left(
-\left(\vect{x}^{(i)}-\matr{\Lambda}\vectGreek{\mu}^{(i)}\right)
-\left(\vect{x}^{(i)}-\matr{\Lambda}\vectGreek{\mu}^{(i)}\right)\T
-\right)
--\frac{n}{2}\matr{\Lambda}\matr{\Sigma}_{\vect{Y}}\matr{\Lambda}
-\end{equation*}
-\begin{equation}
-\matr{\Psi} =
-\frac{1}{n}\sum_{i=1}^{n}\left(
-\left(\vect{x}^{(i)}-\matr{\Lambda}\vectGreek{\mu}^{(i)}\right)
-\left(\vect{x}^{(i)}-\matr{\Lambda}\vectGreek{\mu}^{(i)}\right)\T
-\right)
-+\matr{\Lambda}\matr{\Sigma}_{\vect{Y}}\matr{\Lambda}\ .
-\end{equation}
-Because $\matr{\Psi}$ is a diagonal matrix, only the diagonal entries need to be updated.
-\subsection{Methods}
-The data was centred so that the mean of each pixel's gray value was zero. By doing this, factor analysis focuses on modelling the variance of the pixel's gray values.
-
-For a given $k$ number of factors, the EM algorithm was initialized by randomly assigning each element of $\matr{\Lambda}$ to have distribution $\normal(0,(10^3)^2)$. In addition, each diagonal entry of $\matr{\Psi}$ was initialized by sampling from the $\gammaDist(1,10^{-3})$ distribution. This was chosen to have arbitrary large variance so that it covers as much of the parameter space as possible.
-
-The EM algorithm was run many times with different initial values. Because evaluating the log likelihood was expensive, the stopping condition is met when a certain amount of E and M steps were taken. The parameters with the lowest log likelihood was recorded.
-
-The Bayesian information criterion (BIC) was used to select the best $k$ to use. The BIC is given as
-\begin{equation}
-\BIC=-2\ln L + p(k+1)\ln n \ .
-\end{equation}
-The data was bootstrapped to assess the uncertainty in the model selection.
-
-\subsection{Results}
-$k=1,2,\dotdotdot,15$ were investigated. The EM algorithm was repeated 81 times for each $k$ with a stopping condition of 100 EM steps. The BIC for each $k$ is as shown in Figure \ref{fig:initial_factor_BIC}. The number of factors with the lowest BIC was found to be 8.
-
-The 8 factor variances were isolated and as shown in Figure \ref{fig:initial_factor_factorNoise}, together with the intrinsic variance as shown in Figure \ref{fig:initial_factor_instrinicNoise}. It was interesting to note that in Figure \ref{fig:initial_factor_factorNoise}, there are clusters of high variance in most of the factors. This suggest clusters of high variance can appear in the data randomly, thus the variance of each of the pixel's gray values can depend on each other spatially. In Figure \label{fig:initial_factor_instrinicNoise}, the shape of the sample can be seen represented by the low intrinsic variance. This was evidence that they may well be a mean and variance relationship.
-
-\begin{figure}
+\begin{figure}[p]
 	\centering
-	\includegraphics[width=\textwidth]{figures/initial_factor_BIC.eps}
-	\caption{BIC for fitting different number of factors onto the data. 81 different initials were used for each $k$ with a stopping condition of 100 EM steps.}
-	\label{fig:initial_factor_BIC}
+	\begin{subfigure}[b]{0.45\textwidth}
+		\includegraphics[width=1\textwidth]{figures/initial_acf.eps}
+		\caption{Sample autocorrelation}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.45\textwidth}
+		\includegraphics[width=1\textwidth]{figures/initial_pacf.eps}
+		\caption{Sample partial autocorrelation}
+	\end{subfigure}
+	\caption{Sample autocorrelation and partial autocorrelation of the mean grey values time series.}
+	\label{fig:timeSeries_acf_pacf}
 \end{figure}
 
-\begin{figure}
-	\centering
-	\includegraphics[width=\textwidth]{figures/initial_factor_factorNoise.eps}
-	\caption{The 8 individual factor variances with the lowest log likelihood found.}
-	\label{fig:initial_factor_factorNoise}
-\end{figure}
-
-\begin{figure}
-	\centering
-	\includegraphics[width=\textwidth]{figures/initial_factor_instrinicNoise.eps}
-	\caption{The intrinsic variances with the lowest log likelihood found.}
-	\label{fig:initial_factor_instrinicNoise}
-\end{figure}
-
-The uncertainty of model selection was assessed by investigating how the BIC and optimal $k$ varied for different bootstrap samples. The BIC for the 99 bootstrap samples is shown in Figure \ref{fig:initial_factor_BIC_bootstrap}. Only one initial value was used for each $k$ to capture the uncertainty if the EM algorithm converges to a global maxima or not. From the figure, quite clearly there was a lot of variability in the BIC and can cause imprecise decisions on model selection. Over all 99 bootstrap samples, the mean and standard deviation optimal $k$ was found to be $10\pm2$ factors.
-
-The main source of error was down to the small sample size. The experiments can be improved if the analysis was done on the full size image rather than downsizing it. When downsizing, there is a risk of tampering the variance of the pixel's grey values.
-
-\begin{figure}
-	\centering
-	\includegraphics[width=\textwidth]{figures/initial_factor_BIC_bootstrap.eps}
-	\caption{BIC for fitting different number of factors onto the data. 99 bootstrap samples were used and only 1 initial value was used for each $k$. A stopping condition of 100 EM steps was used.}
-	\label{fig:initial_factor_BIC_bootstrap}
-\end{figure}
+%==========MEAN AND VARIANCE
 
 \chapter{Mean and Variance Relationship}
 The aim of this chapter was to do supervised learning on predicting the variance of the pixel's grey values given its mean. By training a classifier, a single CT scan can be used to quantify the uncertainty on each pixel's grey values. This uncertainty is then carried forward when doing volumetric reconstruction.
@@ -1044,8 +663,406 @@ For higher Gaussian widths, the regression becomes an ordinary least squares reg
 	\caption{3 independent Gaussian weighted least squares regressions. The weights depend on the distance from the $k$-means sample mean grey values and some width $\sigma$.}
 \end{figure}
 
-\chapter{Model for Intensity}
-\section{Rate Density}
+\chapter{Latent Variable Model}
+
+\section{Principal Component Analysis}
+By estimating the covariance matrix of the individual pixel's grey values, sources of (orthgonal) variance can be estimated. This can be done investigating eigendecomposition representation of the sample covariance matrix. A lot of the linear algebra can be reviewed in undergraudate maths text book such as \cite{riley2006mathematical}.
+
+\subsection{Theory}
+Suppose the $p\times p$ covariance matrix $\matr{\Sigma}$ has eigenvalues $\lambda_i$ and eigenvector $\vectGreek{\phi}_i$ for $i=1,2,\dotdotdot,p$. Then the eigenvectors and eigenvalues are related by
+\begin{equation}
+\matr{\Sigma}\vectGreek{\phi}_i = \lambda_i\vectGreek{\phi}_i \ .
+\label{eq:eigenvector_eigenvalue_forCovariance}
+\end{equation}
+A closure can be form by pre-multiplying both sides by $\vectGreek{\phi}_j\T$ so that
+\begin{align*}
+\vectGreek{\phi}_j\T \matr{\Sigma}\vectGreek{\phi}_i &= \lambda_i\vectGreek{\phi}_j\T\vectGreek{\phi}_i \\
+\left(\matr{\Sigma}\T \vectGreek{\phi}_j \right)\T\vectGreek{\phi}_i &= \lambda_i\vectGreek{\phi}_j\T\vectGreek{\phi}_i \ .
+\end{align*}
+But given the covariance matrix is symmetric, $\matr{\Sigma}=\matr{\Sigma}\T$, and $\lambda_j$ is the corresponding eigenvalue of the eigenvector $\vectGreek{\phi}_j$, then
+\begin{align*}
+\left(\lambda_j\vectGreek{\phi}_j \right)\T\vectGreek{\phi}_i &= \lambda_i\vectGreek{\phi}_j\T\vectGreek{\phi}_i \\
+\lambda_j\vectGreek{\phi}_j\T\vectGreek{\phi}_i &= \lambda_i\vectGreek{\phi}_j\T\vectGreek{\phi}_i \ .
+\end{align*}
+As long as $\lambda_i\neq\lambda_j$ for $i\neq j$, then $\vectGreek{\phi}_j\T\vectGreek{\phi}_i=0$. Therefore all eigenvalues in the covariance matrix are orthogonal to each other.
+
+Equation \eqref{eq:eigenvector_eigenvalue_forCovariance} can be extended to include all eigenvectors and eigenvalues such that
+\begin{equation}
+\matr{\Sigma}
+	\begin{pmatrix}
+		\uparrow & \uparrow & & \uparrow \\
+		\vectGreek{\phi}_1 & \vectGreek{\phi}_2 &\cdots& \vectGreek{\phi}_p \\
+		\downarrow & \downarrow & & \downarrow \\
+	\end{pmatrix}
+=
+	\begin{pmatrix}
+		\uparrow & \uparrow & & \uparrow \\
+		\lambda_1\vectGreek{\phi}_1 & \lambda_2\vectGreek{\phi}_2 &\cdots& \lambda_p\vectGreek{\phi}_p \\
+		\downarrow & \downarrow & & \downarrow \\
+	\end{pmatrix} \ .
+\end{equation}
+Transposing both sides
+\begin{equation*}
+\begin{pmatrix}
+	\leftarrow\vectGreek{\phi}_1\rightarrow \\
+	\leftarrow\vectGreek{\phi}_2\rightarrow \\
+	\vdots \\
+	\leftarrow\vectGreek{\phi}_p\rightarrow
+\end{pmatrix}
+\matr{\Sigma}
+=
+\begin{pmatrix}
+	\lambda_1 & 0 & \cdots 0 \\
+	0 & \lambda_2 & \cdots 0 \\
+	\vdots & \vdots & \ddots \\
+	0 & 0 & \cdots \lambda_p \\
+\end{pmatrix}
+\begin{pmatrix}
+	\leftarrow\vectGreek{\phi}_1\rightarrow \\
+	\leftarrow\vectGreek{\phi}_2\rightarrow \\
+	\vdots \\
+	\leftarrow\vectGreek{\phi}_p\rightarrow
+\end{pmatrix}
+\end{equation*}
+but because all eigenvectors are orthogonal
+\begin{equation*}
+\matr{\Sigma}
+=
+\begin{pmatrix}
+		\uparrow & \uparrow & & \uparrow \\
+		\vectGreek{\phi}_1 & \vectGreek{\phi}_2 &\cdots& \vectGreek{\phi}_p \\
+		\downarrow & \downarrow & & \downarrow \\
+\end{pmatrix}
+\begin{pmatrix}
+	\lambda_1 & 0 & \cdots 0 \\
+	0 & \lambda_2 & \cdots 0 \\
+	\vdots & \vdots & \ddots \\
+	0 & 0 & \cdots \lambda_p \\
+\end{pmatrix}
+\begin{pmatrix}
+	\leftarrow\vectGreek{\phi}_1\rightarrow \\
+	\leftarrow\vectGreek{\phi}_2\rightarrow \\
+	\vdots \\
+	\leftarrow\vectGreek{\phi}_p\rightarrow
+\end{pmatrix} \ .
+\end{equation*}
+This is just a weighted sum of the outer products of the eigenvectors, therefore the eigendecomposition is
+\begin{equation}
+\matr{\Sigma} = \sum_{i=1}^{p} \lambda_i \vectGreek{\phi}_i \vectGreek{\phi}_i\T \ .
+\end{equation}
+Because this is a weighted sum, the eigenvectors with the biggest eigenvalue will be most responsible for the covariance matrix. $\vectGreek{\phi}_i$ are called the principle components.
+
+\subsection{Methods}
+The 100 images were shrunk with averaging to a size of $100\times100$ pixels using ImageJ. The sample covariance matrix, of the pixel's grey values, was calculated using the maximum likelihood estimator so that the 6 eigenvectors with the biggest eigenvalues can be obtained. Using 1\,600 bootstrap samples, the sampling distribution of the 6 eigenvalues were sampled.
+
+\subsection{Results}
+Figure \ref{fig:initial_PC_eigenvalues} shows the first 6 of the diagonal of the outer product of the individual principle components, they represent the normalised main sources of variance. It was observed that on the first and second principle components, there are sources of variance in the bottom right and top right of the image. This could imply that the sources of variance are not uniformly distributed in the background.
+
+The sampling distribution of the eigenvalues are shown in Figure \ref{fig:initial_PC_eigenvalues}. Quite clearly there were 2 significant sources of variance because the eigenvalues of the first 2 principle components were much larger than zero when comparing it with its interquartile range.
+
+\begin{figure}
+	\includegraphics[width=\textwidth]{figures/initial_PCvariance.eps}
+	\caption{Normalised variance due to the principle components (1 to 6). The values of all the pixels in the figures equal to 1.}
+	\label{fig:initial_PCvariance}
+\end{figure}
+\begin{figure}
+	\centering
+	\includegraphics[width=0.7\textwidth]{figures/initial_PC_eigenvalues.eps}
+	\caption{Eigenvalues of the sample covariance matrix. 1\,600 bootstrap samples were used.}
+	\label{fig:initial_PC_eigenvalues}
+\end{figure}
+
+\section{Factor Analysis}
+A probabilistic latent model can be used to model the pixel's grey values. These latent variables then can be used to describe the underlining structure, and perhaps sources of variance.
+
+\subsection{Theory}
+Let $\vect{Y}$ be a random vector containing $k$ latent variables, called factors, and
+\begin{equation}
+\vect{Y}\sim\normal\left(\vect{0},\matr{1}\right) \ .
+\end{equation}
+Let $\vect{e}$ be a random $p$ vector modelling the uncorrelated intrinsic noise such that
+\begin{equation}
+\vect{e}\sim\normal\left(\vect{0},\matr{\Psi}\right)
+\end{equation}
+where $\matr{\Psi}$ is a diagonal matrix.
+
+Given a $p\times k$ loading matrix $\matr{\Lambda}$, the observable data $\vect{X}$ can be modelled through
+\begin{equation}
+\vect{X}=\matr{\Lambda}\vect{Y}+\vect{e}
+\end{equation}
+thus
+\begin{equation}
+\vect{X}\sim\normal\left(\vect{0},\matr{\Lambda}\matr{\Lambda}\T+\matr{\Psi}\right) \ .
+\end{equation}
+As a result there are two sources of variance, factor noise from the $\matr{\Lambda}\matr{\Lambda}\T$ component and the instrinic noise $\matr{\Psi}$. The model can be extended for non-zero mean easily by adding an arbitrary constant.
+
+The conditional distribution of $\vect{X}$ given $\vect{Y}$ can be calculated to be
+\begin{equation}
+\vect{X}|\vect{Y}\sim\normal\left(\matr{\Lambda}\vect{Y},\matr{\Psi}\right) \ .
+\label{eq:factor_analysis_x_given_y_dist}
+\end{equation}
+Using Bayes' theorem, the conditional distribution of $\vect{Y}$ given $\vect{X}$ can be calculated
+\begin{align*}
+p_{\vect{Y}|\vect{X}}(\vect{y}|\vect{x}) &\propto p_{\vect{X}|\vect{Y}}(\vect{x}|\vect{y}) p_{\vect{Y}}(\vect{y})
+\\
+p_{\vect{Y}|\vect{X}}(\vect{y}|\vect{x}) &\propto \exp\left[-\frac{1}{2}\left(\vect{x}-\matr{\Lambda}\vect{y}\right)\T\matr{\Psi}^{-1}\left(\vect{x}-\matr{\Lambda}\vect{y}\right)\right]
+\exp\left[-\frac{1}{2}\vect{y}\T\vect{y}\right]
+\\
+p_{\vect{Y}|\vect{X}}(\vect{y}|\vect{x}) &\propto \exp \left[-\frac{1}{2}\left(-\vect{x}\T\matr{\Psi}^{-1}\matr{\Lambda}\vect{y}-\vect{y}\T\matr{\Lambda}\T\matr{\Psi}^{-1}\vect{x}+\vect{y}\T\matr{\Lambda}\T\matr{\Psi}^{-1}\matr{\Lambda}\vect{y}+\vect{y}\T\vect{y}\right)\right]
+\\
+p_{\vect{Y}|\vect{X}}(\vect{y}|\vect{x}) &\propto \exp \left[-\frac{1}{2}\left(\vect{y}\T\left(\matr{\Lambda}\T\matr{\Psi}^{-1}\matr{\Lambda}+\matr{1}\right)\vect{y}-2\vect{y}\T\matr{\Lambda}\T\matr{\Psi}^{-1}\vect{x}\right)\right]
+\end{align*}
+and comparing it with the density function of a general multivariate Normal distribution
+\begin{equation}
+\vect{Y}|\vect{X}\sim\normal\left(\left(\matr{\Lambda}\T\matr{\Psi}^{-1}\matr{\Lambda}+\matr{1}\right)^{-1}\matr{\Lambda}\T\matr{\Psi}^{-1}\vect{X},\left(\matr{\Lambda}\T\matr{\Psi}^{-1}\matr{\Lambda}+\matr{1}\right)^{-1}\right) \ .
+\label{eq:factor_analysis_y_given_x_dist}
+\end{equation}
+
+Suppose $\vect{X}=\vect{x}^{(i)}$ was observed for $i=1,2,\dotdotdot,n$, then the likelihood is
+\begin{equation}
+L=\prod_{i=1}^n\frac{1}{{\|2\pi\left(\matr{\Lambda}\matr{\Lambda}\T+\matr{\Psi}\right)\|}^{1/2}}
+\exp\left[-\frac{1}{2}\left(\vect{x}^{(i)}\right)\T\left(\matr{\Lambda}\matr{\Lambda}\T+\matr{\Psi}\right)^{-1}\vect{x}^{(i)}\right] \ .
+\end{equation}
+The log likelihood is then
+\begin{equation*}
+\ln{L}=-\frac{n}{2}\ln{\|2\pi\left(\matr{\Lambda}\matr{\Lambda}\T+\matr{\Psi}\right)\|}-\frac{1}{2}\sum_{i=1}^{n}\left(\vect{x}^{(i)}\right)\T\left(\matr{\Lambda}\matr{\Lambda}\T+\matr{\Psi}\right)^{-1}\vect{x}^{(i)}
+\end{equation*}
+and by using the trace and its properties
+\begin{align}
+\ln{L}&=-\frac{n}{2}\ln{\|2\pi\left(\matr{\Lambda}\matr{\Lambda}\T+\matr{\Psi}\right)\|}-\frac{1}{2}\sum_{i=1}^{n}\trace\left[\left(\vect{x}^{(i)}\right)\T\left(\matr{\Lambda}\matr{\Lambda}\T+\matr{\Psi}\right)^{-1}\vect{x}^{(i)}\right]
+\nonumber \\
+\ln{L}&=-\frac{n}{2}\ln{\|2\pi\left(\matr{\Lambda}\matr{\Lambda}\T+\matr{\Psi}\right)\|}-\frac{1}{2}\sum_{i=1}^{n}\trace\left[\left(\matr{\Lambda}\matr{\Lambda}\T+\matr{\Psi}\right)^{-1}\vect{x}^{(i)}\left(\vect{x}^{(i)}\right)\T\right]
+\nonumber \\
+\ln{L}&=-\frac{n}{2}\ln{\|2\pi\left(\matr{\Lambda}\matr{\Lambda}\T+\matr{\Psi}\right)\|}-\frac{1}{2}\trace\left[\left(\matr{\Lambda}\matr{\Lambda}\T+\matr{\Psi}\right)^{-1}\sum_{i=1}^{n}\vect{x}^{(i)}\left(\vect{x}^{(i)}\right)\T\right] \ .
+\end{align}
+The loading matrix $\matr{\Lambda}$ and intrinsic noise $\matr{\Psi}$ can be estimated by maximising the log likelihood. This is best done using the expectation maximisation (EM) algorithm. The EM algorithm is an iterative procedure conducting an E step followed by a M step many times till some convergence conditions are met.
+
+The E step estimates the values of the latent variables, $\vect{y}^{(1)},\vect{y}^{(2)},\dotdotdot,\vect{y}^{(n)}$, using the expectation of the condition distribution of the latent variables given the observed data $\vect{x}^{(1)},\vect{x}^{(2)},\dotdotdot,\vect{x}^{(n)}$. The parameters $\matr{\Lambda}$ and $\matr{\Psi}$ are assumed to be know in this step and are fixed. By using Equation \eqref{eq:factor_analysis_y_given_x_dist}, each latent variable are assigned by
+\begin{equation}
+\vect{y}^{(i)} \leftarrow \left(\matr{\Lambda}\T\matr{\Psi}^{-1}\matr{\Lambda}+\matr{1}\right)^{-1}\matr{\Lambda}\T\matr{\Psi}^{-1}\vect{x}^{(i)}
+\end{equation}
+for $i=1,2,\dotdotdot,n$. The covariance of the latent variables are estimated by
+\begin{equation}
+\matr{\Sigma}_{\vect{Y}} \leftarrow \left(\matr{\Lambda}\T\matr{\Psi}^{-1}\matr{\Lambda}+\matr{1}\right)^{-1}
+\end{equation}
+
+In the E step, the parameters $\matr{\Lambda}$ and $\matr{\Psi}$ are varied to maximise the log likelihood, assuming the latent variables are known and fixed. The objective to maximise is the condition expectation of the log joint likelihood, this is given as
+\begin{equation}
+H = \expectation_{\vect{Y}|\vect{X}}\left[\sum_{i=1}^{n}\ln p_{\vect{X},\vect{Y}}\left(\vect{x}^{(i)},\vect{y}^{(i)}\right)\right] \ .
+\end{equation}
+This can be expressed as
+\begin{equation*}
+H = \expectation_{\vect{Y}|\vect{X}}\left[
+\sum_{i=1}^{n}\left(\ln p_{\vect{X}|\vect{Y}}\left(\vect{x}^{(i)}|\vect{y}^{(i)}\right)+\ln p_{\vect{Y}}\left(\vect{y}^{(i)}\right)\right)
+\right]
+\end{equation*}
+Because the marginal distribution of the latent variables do not depend on $\matr{\Lambda}$ and $\matr{\Psi}$, this can be ignored. Using Equation \eqref{eq:factor_analysis_x_given_y_dist}
+\begin{equation*}
+H = \expectation_{\vect{Y}|\vect{X}}\left[
+\sum_{i=1}^{n}\ln\left(\frac{1}{\|2\pi\matr{\Psi}\|^{1/2}}\exp\left(-\frac{1}{2}\left(\vect{x}^{(i)}-\matr{\Lambda}\vect{y}^{(i)}\right)\T\matr{\Psi}^{-1}\left(\vect{x}^{(i)}-\matr{\Lambda}\vect{y}^{(i)}\right)\right)\right)
+\right]
++c_1
+\end{equation*}
+\begin{equation*}
+H = \expectation_{\vect{Y}|\vect{X}}\left[
+\sum_{i=1}^{n}\left(-\frac{1}{2}\ln{\|2\pi\matr{\Psi}\|}-\frac{1}{2}\left(\vect{x}^{(i)}-\matr{\Lambda}\vect{y}^{(i)}\right)\T\matr{\Psi}^{-1}\left(\vect{x}^{(i)}-\matr{\Lambda}\vect{y}^{(i)}\right)\right)
+\right]
++c_1
+\end{equation*}
+\begin{equation*}
+H = -\frac{1}{2}\expectation_{\vect{Y}|\vect{X}}\left[
+\sum_{i=1}^{n}\left(\ln{\|2\pi\matr{\Psi}\|}+\left(\vect{x}^{(i)}\right)\T\matr{\Psi}^{-1}\matr{\Lambda}\vect{y}^{(i)}-2\left(\vect{x}^{(i)}\right)\T\matr{\Psi}^{-1}\matr{\Lambda}\vect{y}^{(i)}+\left(\vect{y}^{(i)}\right)\T\matr{\Lambda}\T\matr{\Psi}^{-1}\matr{\Lambda}\vect{y}^{(i)}\right)
+\right]
++c_1
+\end{equation*}
+By defining
+\begin{equation}
+\expectation_{\vect{Y}|\vect{X}}\left[\vect{y}^{(i)}\right]=\vectGreek{\mu}^{(i)} = \left(\matr{\Lambda}\T\matr{\Psi}^{-1}\matr{\Lambda}+\matr{1}\right)^{-1}\matr{\Lambda}\T\matr{\Psi}^{-1}\vect{x}^{(i)}
+\end{equation}
+and
+\begin{equation}
+\cov{\vect{Y}} = \matr{\Sigma}_{\vect{Y}} = \left(\matr{\Lambda}\T\matr{\Psi}^{-1}\matr{\Lambda}+\matr{1}\right)^{-1}
+\end{equation}
+then when taking the conditional expectation
+\begin{multline*}
+H = -\frac{1}{2}\sum_{i=1}^{n}\left[
+\ln\|2\pi\matr{\Psi}\|+\left(\vect{x}^{(i)}\right)\T\matr{\Psi}^{-1}\vect{x}^{(i)}-2\left(\vect{x}^{(i)}\right)\T\matr{\Psi}^{-1}\matr{\Lambda}\vectGreek{\mu}^{(i)}\right.\\
+\left.+\trace\left(\matr{\Lambda}\T\matr{\Psi}^{-1}\matr{\Lambda}\matr{\Sigma}_{\vect{Y}}\right)+\left(\vectGreek{\mu}^{(i)}\right)\T\matr{\Lambda}\T\matr{\Psi}^{-1}\matr{\Lambda}\vectGreek{\mu}^{(i)}
+\right]+c_1
+\end{multline*}
+\begin{multline*}
+H = -\frac{1}{2}\sum_{i=1}^{n}\left[
+\ln\|2\pi\matr{\Psi}\|+\left(\vect{x}^{(i)}\right)\T\matr{\Psi}^{-1}\vect{x}^{(i)}-2\left(\vect{x}^{(i)}\right)\T\matr{\Psi}^{-1}\matr{\Lambda}\vectGreek{\mu}^{(i)}\right.\\
+\left.+\trace\left(\matr{\Lambda}\T\matr{\Psi}^{-1}\matr{\Lambda}\matr{\Sigma}_{\vect{Y}}\right)+\trace\left(\matr{\Lambda}\T\matr{\Psi}^{-1}\matr{\Lambda}\vectGreek{\mu}^{(i)}\left(\vectGreek{\mu}^{(i)}\right)\T\right)
+\right]+c_1
+\end{multline*}
+\begin{multline*}
+H = -\frac{1}{2}\sum_{i=1}^{n}\left[
+\ln\|2\pi\matr{\Psi}\|+\left(\vect{x}^{(i)}\right)\T\matr{\Psi}^{-1}\vect{x}^{(i)}-2\left(\vect{x}^{(i)}\right)\T\matr{\Psi}^{-1}\matr{\Lambda}\vectGreek{\mu}^{(i)}\right.\\
+\left.+\trace\left(\matr{\Lambda}\T\matr{\Psi}^{-1}\matr{\Lambda}\left(\matr{\Sigma}_{\vect{Y}}+\vectGreek{\mu}^{(i)}\left(\vectGreek{\mu}^{(i)}\right)\T\right)\right)
+\right]+c_1
+\end{multline*}
+\begin{multline*}
+H = -\frac{n}{2}
+\ln\|\matr{\Psi}\|
+-\frac{1}{2}\sum_{i=1}^{n}\left(\vect{x}^{(i)}\right)\T\matr{\Psi}^{-1}\vect{x}^{(i)}
++\sum_{i=1}^{n}\left(\vect{x}^{(i)}\right)\T\matr{\Psi}^{-1}\matr{\Lambda}\vectGreek{\mu}^{(i)}\\
+-\frac{1}{2}\sum_{i=1}^{n}\trace\left(\matr{\Lambda}\T\matr{\Psi}^{-1}\matr{\Lambda}\left(\matr{\Sigma}_{\vect{Y}}+\vectGreek{\mu}^{(i)}\left(\vectGreek{\mu}^{(i)}\right)\T\right)\right)
++c_2
+\end{multline*}
+
+Taking the derivative with respect to $\matr{\Lambda}$
+\begin{equation*}
+\matr{D}_{\matr{\Lambda}}H=
+\matr{D}_{\matr{\Lambda}}\left[
+\sum_{i=1}^n\left(\vect{x}^{(i)}\right)\T\matr{\Psi}^{-1}\matr{\Lambda}\vectGreek{\mu}^{(i)}
+-\frac{1}{2}\sum_{i=1}^{n}\trace\left(\matr{\Lambda}\T\matr{\Psi}^{-1}\matr{\Lambda}\left(\matr{\Sigma}_{\vect{Y}}+\vectGreek{\mu}^{(i)}\left(\vectGreek{\mu}^{(i)}\right)\T\right)\right)
+\right]
+\end{equation*}
+\begin{equation*}
+\matr{D}_{\matr{\Lambda}}H=
+\matr{D}_{\matr{\Lambda}}\left[
+\sum_{i=1}^n\trace\left(\left(\vectGreek{\mu}^{(i)}\right)\T\matr{\Lambda}\T\matr{\Psi}^{-1}\vect{x}^{(i)}\right)
+-\frac{1}{2}\sum_{i=1}^{n}\trace\left(\matr{\Lambda}\T\matr{\Psi}^{-1}\matr{\Lambda}\left(\matr{\Sigma}_{\vect{Y}}+\vectGreek{\mu}^{(i)}\left(\vectGreek{\mu}^{(i)}\right)\T\right)\right)
+\right]
+\end{equation*}
+\begin{equation*}
+\matr{D}_{\matr{\Lambda}}H=
+\matr{D}_{\matr{\Lambda}}\left[
+\sum_{i=1}^n\trace\left(\matr{\Lambda}\T\matr{\Psi}^{-1}\vect{x}^{(i)}\left(\vectGreek{\mu}^{(i)}\right)\T\right)
+-\frac{1}{2}\sum_{i=1}^{n}\trace\left(\matr{\Lambda}\T\matr{\Psi}^{-1}\matr{\Lambda}\left(\matr{\Sigma}_{\vect{Y}}+\vectGreek{\mu}^{(i)}\left(\vectGreek{\mu}^{(i)}\right)\T\right)\right)
+\right]
+\end{equation*}
+\begin{equation*}
+\matr{D}_{\matr{\Lambda}}H=
+\sum_{i=1}^n\matr{\Psi}^{-1}\vect{x}^{(i)}\left(\vectGreek{\mu}^{(i)}\right)\T
+-\sum_{i=1}^{n}\matr{\Psi}^{-1}\matr{\Lambda}\left(\matr{\Sigma}_{\vect{Y}}+\vectGreek{\mu}^{(i)}\left(\vectGreek{\mu}^{(i)}\right)\T\right) \ .
+\end{equation*}
+Setting the derivative to zero
+\begin{equation*}
+\matr{0}=
+\sum_{i=1}^n\matr{\Psi}^{-1}\vect{x}^{(i)}\left(\vectGreek{\mu}^{(i)}\right)\T
+-\sum_{i=1}^{n}\matr{\Psi}^{-1}\matr{\Lambda}\left(\matr{\Sigma}_{\vect{Y}}+\vectGreek{\mu}^{(i)}\left(\vectGreek{\mu}^{(i)}\right)\T\right) \ .
+\end{equation*}
+\begin{equation*}
+\matr{0}=
+\sum_{i=1}^n\vect{x}^{(i)}\left(\vectGreek{\mu}^{(i)}\right)\T
+-\matr{\Lambda}\left(n\matr{\Sigma}_{\vect{Y}}+\sum_{i=1}^{n}\vectGreek{\mu}^{(i)}\left(\vectGreek{\mu}^{(i)}\right)\T\right)
+\end{equation*}
+\begin{equation}
+\matr{\Lambda}
+=
+\left(\sum_{i=1}^n\vect{x}^{(i)}\left(\vectGreek{\mu}^{(i)}\right)\T\right)\left(n\matr{\Sigma}_{\vect{Y}}+\sum_{i=1}^{n}\vectGreek{\mu}^{(i)}\left(\vectGreek{\mu}^{(i)}\right)\T\right)^{-1}\ .
+\end{equation}
+
+The objective can be re-parametrised using $\matr{T}=\matr{\Psi}^{-1}$ so that
+\begin{multline*}
+H = -\frac{n}{2}
+\ln\|\matr{T^{-1}}\|
+-\frac{1}{2}\sum_{i=1}^{n}\left(\vect{x}^{(i)}\right)\T\matr{T}\vect{x}^{(i)}
++\sum_{i=1}^{n}\left(\vect{x}^{(i)}\right)\T\matr{T}\matr{\Lambda}\vectGreek{\mu}^{(i)}\\
+-\frac{1}{2}\sum_{i=1}^{n}\trace\left(\matr{\Lambda}\T\matr{T}\matr{\Lambda}\left(\matr{\Sigma}_{\vect{Y}}+\vectGreek{\mu}^{(i)}\left(\vectGreek{\mu}^{(i)}\right)\T\right)\right)
++c_2
+\end{multline*}
+\begin{multline*}
+H = -\frac{n}{2}
+\ln\|\matr{T^{-1}}\|
+-\frac{1}{2}\sum_{i=1}^{n}\left(\vect{x}^{(i)}\right)\T\matr{T}\vect{x}^{(i)}
++\sum_{i=1}^{n}\left(\vect{x}^{(i)}\right)\T\matr{T}\matr{\Lambda}\vectGreek{\mu}^{(i)}\\
+-\frac{1}{2}\sum_{i=1}^{n}\trace\left(\matr{\Lambda}\T\matr{T}\matr{\Lambda}\left(\matr{\Sigma}_{\vect{Y}}+\vectGreek{\mu}^{(i)}\left(\vectGreek{\mu}^{(i)}\right)\T\right)\right)
++c_2 \ .
+\end{multline*}
+$\|\matr{T}^{-1}\| = 1/\|\matr{T}\|$ and using the properties of the trace
+\begin{multline*}
+H = \frac{n}{2}
+\ln\|\matr{T}\|
+-\frac{1}{2}\sum_{i=1}^{n}\trace\left(\matr{T}\vect{x}^{(i)}\left(\vect{x}^{(i)}\right)\T\right)
++\sum_{i=1}^{n}\trace\left(\matr{T}\matr{\Lambda}\vectGreek{\mu}^{(i)}\left(\vect{x}^{(i)}\right)\T\right)\\
+-\sum_{i=1}^{n}\frac{1}{2}\trace\left(\matr{T}\matr{\Lambda}\left(\matr{\Sigma}_{\vect{Y}}+\vectGreek{\mu}^{(i)}\left(\vectGreek{\mu}^{(i)}\right)\T\right)\matr{\Lambda}\T\right)
++c_2 \ .
+\end{multline*}
+Taking the derivative with respect to $\matr{\Psi}$
+\begin{multline*}
+\matr{D}_{\matr{\Psi}}H = \frac{n}{2}\matr{T}^{-1}
+-\frac{1}{2}\sum_{i=1}^{n}\vect{x}^{(i)}\left(\vect{x}^{(i)}\right)\T
++\sum_{i=1}^{n}\matr{\Lambda}\vectGreek{\mu}^{(i)}\left(\vect{x}^{(i)}\right)\T\\
+-\sum_{i=1}^{n}\frac{1}{2}\matr{\Lambda}\left(\matr{\Sigma}_{\vect{Y}}+\vectGreek{\mu}^{(i)}\left(\vectGreek{\mu}^{(i)}\right)\T\right)\matr{\Lambda}\T \ .
+\end{multline*}
+Setting the derivative to zero
+\begin{multline*}
+\matr{0} = \frac{n}{2}\matr{\Psi}
+-\frac{1}{2}\sum_{i=1}^{n}\vect{x}^{(i)}\left(\vect{x}^{(i)}\right)\T
++\sum_{i=1}^{n}\matr{\Lambda}\vectGreek{\mu}^{(i)}\left(\vect{x}^{(i)}\right)\T\\
+-\frac{n}{2}\matr{\Lambda}\matr{\Sigma}_{\vect{Y}}\matr{\Lambda}-\frac{1}{2}\matr{\Lambda}\sum_{i=1}^{n}\vectGreek{\mu}^{(i)}\left(\vectGreek{\mu}^{(i)}\right)\T)\matr{\Lambda}\T
+\end{multline*}
+\begin{equation*}
+\matr{0} = \frac{n}{2}\matr{\Psi}
+-\frac{1}{2}\sum_{i=1}^{n}\left(
+\left(\vect{x}^{(i)}-\matr{\Lambda}\vectGreek{\mu}^{(i)}\right)
+\left(\vect{x}^{(i)}-\matr{\Lambda}\vectGreek{\mu}^{(i)}\right)\T
+\right)
+-\frac{n}{2}\matr{\Lambda}\matr{\Sigma}_{\vect{Y}}\matr{\Lambda}
+\end{equation*}
+\begin{equation}
+\matr{\Psi} =
+\frac{1}{n}\sum_{i=1}^{n}\left(
+\left(\vect{x}^{(i)}-\matr{\Lambda}\vectGreek{\mu}^{(i)}\right)
+\left(\vect{x}^{(i)}-\matr{\Lambda}\vectGreek{\mu}^{(i)}\right)\T
+\right)
++\matr{\Lambda}\matr{\Sigma}_{\vect{Y}}\matr{\Lambda}\ .
+\end{equation}
+Because $\matr{\Psi}$ is a diagonal matrix, only the diagonal entries need to be updated.
+\subsection{Methods}
+The data was centred so that the mean of each pixel's gray value was zero. By doing this, factor analysis focuses on modelling the variance of the pixel's gray values.
+
+For a given $k$ number of factors, the EM algorithm was initialized by randomly assigning each element of $\matr{\Lambda}$ to have distribution $\normal(0,(10^3)^2)$. In addition, each diagonal entry of $\matr{\Psi}$ was initialized by sampling from the $\gammaDist(1,10^{-3})$ distribution. This was chosen to have arbitrary large variance so that it covers as much of the parameter space as possible.
+
+The EM algorithm was run many times with different initial values. Because evaluating the log likelihood was expensive, the stopping condition is met when a certain amount of E and M steps were taken. The parameters with the lowest log likelihood was recorded.
+
+The Bayesian information criterion (BIC) was used to select the best $k$ to use. The BIC is given as
+\begin{equation}
+\BIC=-2\ln L + p(k+1)\ln n \ .
+\end{equation}
+The data was bootstrapped to assess the uncertainty in the model selection.
+
+\subsection{Results}
+$k=1,2,\dotdotdot,15$ were investigated. The EM algorithm was repeated 81 times for each $k$ with a stopping condition of 100 EM steps. The BIC for each $k$ is as shown in Figure \ref{fig:initial_factor_BIC}. The number of factors with the lowest BIC was found to be 8.
+
+The 8 factor variances were isolated and as shown in Figure \ref{fig:initial_factor_factorNoise}, together with the intrinsic variance as shown in Figure \ref{fig:initial_factor_instrinicNoise}. It was interesting to note that in Figure \ref{fig:initial_factor_factorNoise}, there are clusters of high variance in most of the factors. This suggest clusters of high variance can appear in the data randomly, thus the variance of each of the pixel's gray values can depend on each other spatially. In Figure \label{fig:initial_factor_instrinicNoise}, the shape of the sample can be seen represented by the low intrinsic variance. This was evidence that they may well be a mean and variance relationship.
+
+\begin{figure}
+	\centering
+	\includegraphics[width=\textwidth]{figures/initial_factor_BIC.eps}
+	\caption{BIC for fitting different number of factors onto the data. 81 different initials were used for each $k$ with a stopping condition of 100 EM steps.}
+	\label{fig:initial_factor_BIC}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\includegraphics[width=\textwidth]{figures/initial_factor_factorNoise.eps}
+	\caption{The 8 individual factor variances with the lowest log likelihood found.}
+	\label{fig:initial_factor_factorNoise}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\includegraphics[width=\textwidth]{figures/initial_factor_instrinicNoise.eps}
+	\caption{The intrinsic variances with the lowest log likelihood found.}
+	\label{fig:initial_factor_instrinicNoise}
+\end{figure}
+
+The uncertainty of model selection was assessed by investigating how the BIC and optimal $k$ varied for different bootstrap samples. The BIC for the 99 bootstrap samples is shown in Figure \ref{fig:initial_factor_BIC_bootstrap}. Only one initial value was used for each $k$ to capture the uncertainty if the EM algorithm converges to a global maxima or not. From the figure, quite clearly there was a lot of variability in the BIC and can cause imprecise decisions on model selection. Over all 99 bootstrap samples, the mean and standard deviation optimal $k$ was found to be $10\pm2$ factors.
+
+The main source of error was down to the small sample size. The experiments can be improved if the analysis was done on the full size image rather than downsizing it. When downsizing, there is a risk of tampering the variance of the pixel's grey values.
+
+\begin{figure}
+	\centering
+	\includegraphics[width=\textwidth]{figures/initial_factor_BIC_bootstrap.eps}
+	\caption{BIC for fitting different number of factors onto the data. 99 bootstrap samples were used and only 1 initial value was used for each $k$. A stopping condition of 100 EM steps was used.}
+	\label{fig:initial_factor_BIC_bootstrap}
+\end{figure}
+
+\section{Compound Poisson}
 Consider photons emitted from an X-ray tube. These photons have a board energy spectrum as a result of Bremsstrahlung and characteristic radiation. An experiment can be conducted by measuring the energy of each photon, over some exposure time, to obtain a histogram of photon energies, similar to the one in Figure \ref{fig:x_ray_spectrum2}.
 
 \begin{figure}
@@ -1097,7 +1114,7 @@ I = \frac{1}{A}\int_{0}^{\infty}E\lambda(E)\diff E \ .
 \end{equation}
 Thus intensity is proportional to the average energy.
 
-\section{Attenuation}
+\subsection{Attenuation}
 Consider an incident pencil beam of X-ray photons, with intensity $I_0$, random energy $E_0$ and rate density $\lambda_0(E)$. The beam penetrates through an object with attenuation constant $\mu$ and length $L$. It is given that the intensity of the transmitted beam $I_1$ is
 \begin{equation}
 I_1 = I_0 \euler^{-\mu L} \ .
@@ -1137,7 +1154,7 @@ I_1=\frac{1}{A}\int_0^{\infty}\lambda_0(E)\diff E \times \expectation\left[E_0\e
 \end{equation}
 Such a relationship is considerably more complicated.
 
-\section{Intensity}
+\subsection{Intensity}
 Let $U_i$ be the energy of photon $i$. Let $T$ be the sum of all the $N$ photons' energy detected after some exposure time $t$. These can be modelled as
 \begin{equation}
 N\sim\poisson\left(t\int_0^{\infty}\lambda_1(E)\diff E\right)
@@ -1186,7 +1203,7 @@ The variance of $I_1$ is
 \variance[I_1] = \frac{\alpha^2}{t}\left(\mu_U^2+\sigma_U^2\right)\int_0^{\infty}\lambda_1(E)\diff E+\beta^2 \ .
 \end{equation}
 
-\section{Hierarchical Model}
+\subsection{Hierarchical Model}
 Suppose $n$ images have been obtained and each image has $p$ pixels. Each pixel has a corresponding intensity $X_i$ for $i=1,2,\dotdotdot,p$. The following hierarchical model was proposed to model the intensity of each pixel where $\alpha$ and $\tau$ are known constants.
 \begin{equation}
 Y_i\sim\poisson(\nu_i \tau)
@@ -1524,8 +1541,7 @@ For high $\nu\tau$, problems arises as more and more terms are needed in the tru
 \end{figure}
 
 
-\bibliographystyle{unsrt}
-\bibliography{bib}
+
 
 \appendix
 
@@ -1564,5 +1580,7 @@ then it can be shown that \cite{petersen2008matrix}
 \end{equation}
 Because a vector is a special case of a matrix, these results can be extended to vectors.
 
+\bibliographystyle{unsrt}
+\bibliography{bib}
 
 \end{document}
