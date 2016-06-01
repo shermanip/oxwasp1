@@ -24,7 +24,7 @@ end
 figure;
 errorbar(greyValue_mean_std(:,1),greyValue_mean_std(:,2)/sqrt(area));
 xlabel('Observation number');
-ylabel('Mean grey value');
+ylabel('Mean grey value (arb. unit)');
 xlim([1,n]);
 
 %plot autocorrelation
