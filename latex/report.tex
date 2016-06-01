@@ -78,7 +78,12 @@ I did this. This happened. I should of done that.
 %======ACKNOWLEDGEMENT=========
 \renewcommand{\abstractname}{Acknowledgements}
 \begin{abstract}
-None
+\begin{itemize}
+	\item Supervisors: Julia Brettschneider and Tom Nichols
+	\item Inside Out team: Wilfrid Kendall, Audrey Kueh, Jay Warnett and Clair Barnes
+	\item OxWaSP 2015 Cohort: Nathan Cunningham, Giuseppe di Benedetto, Beniamino Hadj-Amar, Jack Jewson, Ella Kaye, Leon Law, Kaspar Martens, Marcin Mider, Xenia Miscouridou, Paul Vanetti and Andi Wang.
+	\item EPSRC Funding: EP/L016710/1
+\end{itemize}
 \end{abstract}
 
 %=====FRONT MATTER=====
@@ -88,7 +93,13 @@ None
 
 %======INTRODUCTION========
 \chapter{Introduction}
-Mini-project for OxWaSP.
+The Inside-Out group at the University of Warwick aims to develop statistical methodology for using CT scans to do quality control on 3D printed samples. Recent research include how the penumbra can be modelled \cite{kueh2014modelling}, simulating and detecting defects and on the behaviour of dead pixels.
+
+The aim of this specific project was to do linear regression on the mean and variance of the grey values in the CT scans to find explanatory relationships. Separately, latent variable models were fitted to the images to find sources of noise.
+
+This report is written in a Master dissertation style and assumes knowledge up to Master level in physics and statistics. Complicated matrix calculus results will be stated without proof in Chapter \ref{chapter:matrixCalculus} in the appendix.
+
+A research paper version of this report is also available.
 
 %======LITERATURE REVIEW========
 \chapter{Literature Review}
@@ -107,7 +118,7 @@ CT scanning was invented by G. Hounsfield \cite{hounsfield1980computed} in the 1
 
 There are many sources of error in CT scanning \cite{cantatore2011introduction} and this can cause problems when reconstructing the geometry of the sample. Sources of error include: defects in the detector, environmental noise and the behaviour of photons.
 
-This chapter aims to give brief description on how CT scanning works and a short discussion on the sources of error.
+This chapter aims to give brief description on how CT scanning works.
 
 \section{X-Ray Production}
 X-ray photons in CT scanning are produced in an X-ray tube. In an X-ray tube, a cathode, consisting of a heated filament, fires projectile electrons through an electric potential to a target which forms the anode \cite{michael2001x}, as shown in Figure \ref{fig:x_ray_tube}. Most of the kinetic energy of the projectile electrons is converted into heat however some is converted into electromagnetic radiation. This depends on how the projectile electrons interact with the atoms in the anode \cite{cantatore2011introduction}.
@@ -132,7 +143,7 @@ A typical energy spectrum of X-ray photons emitted from an X-ray tube is as show
 \label{fig:x_ray_spectrum}
 \end{figure}
 
-The voltage, the energy per charge, and current, the rate of charge, can be varied in the X-ray tube to produce different energy spectrums and rate of X-ray emittion. This can vary the results produced when collecting CT data \cite{cantatore2011introduction}. Another important factor is the focal spot size because smaller spot sizes produce sharper edges. Larger spot sizes produce unsharp results and this is know as the penumbra effect, as shown in Figure \ref{fig:x_ray_penumbra}. However spot sizes too small can produce concentrated heat \cite{welkenhuyzen2009industrial}.
+The voltage and current can be varied in the X-ray tube to produce different energy spectrums and rate of X-ray production. This can vary the results produced when collecting CT data \cite{cantatore2011introduction}. Another important factor is the focal spot size because smaller spot sizes produce sharper edges. Larger spot sizes produce unsharp results and this is know as the penumbra effect, as shown in Figure \ref{fig:x_ray_penumbra}. However spot sizes too small can produce concentrated heat \cite{welkenhuyzen2009industrial} and can damage the X-ray tube.
 
 \begin{figure}
 \centering
@@ -144,21 +155,21 @@ The voltage, the energy per charge, and current, the rate of charge, can be vari
 \section{X-Ray Interactions}
 X-ray radiation emitted by the X-ray tube are projected onto the sample and interacts with it in a number of ways \cite{cantatore2011introduction}.
 
-The sample can effectively absorb X-ray radiation via the photoelectric effect or pair production \cite{cantatore2011introduction}. In the photoelectric effect, the X-ray photons transfers all its energy to a bounded electron and ejects it from the atom \cite{millikan1916direct}. In pair production, the X-ray photons converts into an electron-position pair by interacting with the Coulomb field of the sample's atomic nucleus \cite{hubbell2006electron}.
+The sample can effectively absorb X-ray radiation via the photoelectric effect or pair production \cite{cantatore2011introduction}. In the photoelectric effect, the X-ray photons transfers all its energy to a bounded electron and ejects it from the atom \cite{millikan1916direct}. In pair production, the X-ray photons converts into an electron-position pair by interacting with the Coulomb field of the sample's atomic nucleus \cite{hubbell2006electron}. In addition to getting absorbed, X-ray photons can be scattered by the sample. This happens when X-ray photons collide inelastically with and transfers it's energy to the sample's electrons. This process is know as Compton scattering \cite{compton1923quantum}.
 
-X-ray photons can be scattered by the sample. This happens when X-ray photons collide inelastically with and transfers it's energy to the sample's electrons. This process is know as Compton scattering \cite{compton1923quantum}.
-
-The attenuation (decrease in X-ray intensity from $I_0$ to $I_1$) when propagating though a material with attenuation coefficient $\mu$ and distance $x$ is given as
+Suppose a mono-energetic X-ray pencil beam attenuating through an object with varying attenuation coefficient in position $\mu=\mu(x)$. The beam starts at $x=0$ and is detected at $x=L$, then the attenuation (decrease in X-ray intensity from $I_0$ to $I_1$) is given as
 \begin{equation}
-I_1 = I_0\euler^{-\mu x}
+I_1 = I_0\exp\left[\int_0^L-\mu(x)\diff x\right].
+\label{eq:beerLaw}
 \end{equation}
-where it was assumed the X-ray photons are monoenergetic \cite{michael2001x}. This can be extended to a continuous spectrum of X-ray energies by making $\mu$ dependent on the energy of the X-ray photons \cite{cantatore2011introduction}. In general low energy photons are more likely to be absorbed than high energy photons, this increases the average energy of the attenuated photons and can be a source of error in CT scanning. This is referred to beam hardening \cite{michael2001x}. This can be reduced by placing a thin sheet of filter to absorb low energy photons \cite{welkenhuyzen2009industrial} or by correcting it in the data analysis stage \cite{michael2001x}.
+By comparing the intensity before and after attenuation, the integral of the attenuation coefficient along the path of the X-ray can be calculated. Because of the discrete nature of pixels, the integral is usually replaced by a sum \cite{michael2001x}. 
 
-\section{Detector}
+However it was shown that the attenuation coefficient does depend on the energy of the photons. Thus $\mu=\mu(x,E)$ should be made dependent on the energy of the X-ray photons \cite{cantatore2011introduction}. In general low energy photons are more likely to be absorbed than high energy photons, this increases the average energy of the attenuated photons and can be a source of error in CT scanning. This is referred to beam hardening and can cause inaccuracies in Equation \eqref{eq:beerLaw} \cite{michael2001x}. This can be reduced by placing a thin sheet of filter to absorb low energy photons \cite{welkenhuyzen2009industrial} or by correcting it in the data analysis stage \cite{michael2001x}.
+
+\section{Detection and Reconstruction}
 Most X-ray detectors are scintillator-photodiode detectors. The X-ray photons interact with the scintiallator material and produces visible light. The visible light is then detected by photodiodes and coverts it into electricical current \cite{michael2001x}. The detectors used in CT scanning are flat bed scanner which consist of an array of panels of photodiodes \cite{cantatore2011introduction}.
 
-\section{Reconstruction}
-The scale of the 2D images are calibrated with the use of reference standards \cite{bartscher2007enhancement}. The method used to reconstruct the 3D geometry of the sample is called the filtered back-projection \cite{michael2001x}. The mathematics can be reviewed in \cite{brooks1976principles}.
+The scale of the 2D images can be calibrated with the use of reference standards \cite{bartscher2007enhancement}. The methods used to reconstruct the 3D geometry of the sample is called the filtered back-projection \cite{michael2001x}. The mathematics can be reviewed in \cite{brooks1976principles} and recent methods consider  polyenergetic photons \cite{elbakri2002statistical}.
 
 %======ABOUT THE DATA========
 
@@ -194,7 +205,13 @@ E = Ve = 1.0\times10^{2}\text{ keV}
 where $e$ is the charge per electron.
 
 \section{Histogram}
-The distribution of the grey values of all the pixels in the data set is shown in Figure \ref{fig:block_histogram}. It was observed that there were 3 distinct peaks in the histogram at $\sim2\times10^4$, $\sim4\times10^4$ and $\sim5\times10^4$. By doing a threshold, as shown in Figure \ref{fig:block_histogram}, it was clear that the main 3 sources of the grey values were the sample, the background and the foam holder at the bottom of the image.
+The distribution of the grey values of all the pixels in the data set is shown in Figure \ref{fig:block_histogram}. It was observed that there were 3 distinct peaks in the histogram at grey values:
+\begin{itemize}
+	\item$\sim2\times10^4$ arb.~unit
+	\item$\sim4\times10^4$ arb.~unit
+	\item$\sim5\times10^4$ arb.~unit.
+\end{itemize}
+By doing a threshold, as shown in Figure \ref{fig:block_histogram}, it was clear that the main 3 sources of the grey values were the sample, the background and the foam holder at the bottom of the image.
 
 \begin{figure}[htp]
 \centering
@@ -219,7 +236,7 @@ The distribution of the grey values of all the pixels in the data set is shown i
 
 \section{Normality}
 
-A Normal distribution was fitted on each pixel's grey values and the $\chi^2$ goodness of fit test was conducted, as shown in Figure \ref{fig:initial_fit_normal_test}. When considering the Bonferoni correction \cite{weisstein2004bonferroni} for multiple hypothesis testing, the Normal distribution appeared to be a good fit because only 9 pixels have $p$ values less than 10\%. In addition, these significant pixels did not seem to cluster and appear random in space. When ignoring the Bonferoni correction, there was a suspicious patch of low $p$ values on the bottom right.
+For a given pixel, a Normal distribution was fitted on the 100 grey values and the $\chi^2$ goodness of fit test was conducted, as shown in Figure \ref{fig:initial_fit_normal_test} for each pixel in the image. When considering the Bonferoni correction \cite{weisstein2004bonferroni} for multiple hypothesis testing, the Normal distribution appeared to be a good fit because only 9 pixels have $p$ values less than 10\%. In addition, these significant pixels did not seem to cluster and appear random in space. When ignoring the Bonferoni correction, there was a suspicious patch of low $p$ values on the bottom right.
 
 \begin{figure}[p]
 \centering
@@ -262,6 +279,7 @@ The mean and standard error of the grey values for each of the 100 images were t
 %==========MEAN AND VARIANCE
 
 \chapter{Mean and Variance Relationship}
+
 The aim of this chapter was to do supervised learning on predicting the variance of the pixel's grey values given its mean. By training a classifier, a single CT scan can be used to quantify the uncertainty on each pixel's grey values. This uncertainty is then carried forward when doing volumetric reconstruction.
 
 \section{Weighted Least Squares}
@@ -1545,7 +1563,7 @@ For high $\nu\tau$, problems arises as more and more terms are needed in the tru
 
 \appendix
 
-\chapter{Matrix Calculus}
+\chapter{Matrix Calculus}\label{chapter:matrixCalculus}
 Let $\matr{A},\matr{B},\matr{C}$ be matrices with elements
 \begin{equation*}
 \matr{A}=
