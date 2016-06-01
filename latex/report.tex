@@ -1526,4 +1526,43 @@ For high $\nu\tau$, problems arises as more and more terms are needed in the tru
 
 \bibliographystyle{unsrt}
 \bibliography{bib}
+
+\appendix
+
+\chapter{Matrix Calculus}
+Let $\matr{A},\matr{B},\matr{C}$ be matrices with elements
+\begin{equation*}
+\matr{A}=
+\begin{pmatrix}
+a_{1,1}&a_{1,2}&\cdots&a_{1,n} \\
+a_{2,1}&a_{2,2}&\cdots&a_{2,n} \\
+\vdots&\vdots&\ddots&\vdots \\
+a_{m,1}&a_{m,2}&\cdots&a_{m,n} 
+\end{pmatrix}
+\end{equation*}
+and similar for $\matr{B}$ and $\matr{C}$.
+
+Let $\matr{D_{A}}$ be the gradient operator such that
+\begin{equation*}
+\matr{D_{A}}=
+\begin{pmatrix}
+\partial/\partial a_{1,1}&\partial/\partial a_{1,2}&\cdots&\partial/\partial a_{1,n} \\
+\partial/\partial a_{2,1}&\partial/\partial a_{2,2}&\cdots&\partial/\partial a_{2,n} \\
+\vdots&\vdots&\ddots&\vdots \\
+\partial/\partial a_{m,1}&\partial/\partial a_{m,2}&\cdots&\partial/\partial a_{m,n} 
+\end{pmatrix}
+\end{equation*}
+then it can be shown that \cite{petersen2008matrix}
+\begin{equation}
+\matr{D_{A}}\trace\left(\matr{A}\T\matr{B}\right) = \matr{B}
+\end{equation}
+\begin{equation}
+\matr{D_{A}}\trace\left(\matr{A}\T\matr{B}\matr{A}\matr{C}\right) = \matr{B}\matr{A}\matr{C}+\matr{B}\T\matr{A}\matr{C}\T
+\end{equation}
+\begin{equation}
+\matr{D_{A}}\ln\left\|\matr{A}\right\| = \left(\matr{A}^{-1}\right)\T \ .
+\end{equation}
+Because a vector is a special case of a matrix, these results can be extended to vectors.
+
+
 \end{document}
