@@ -3,7 +3,7 @@
 %PARAMETERS:
     %sample_mean: n vector of the sample mean grey values
     %sample_var: n vector of the sample variance grey values
-function plotHistogramHeatmap(sample_mean,sample_var,nbin)
+function [ax] = plotHistogramHeatmap(sample_mean,sample_var,nbin)
 
     checkParameters(sample_mean,sample_var);
 
@@ -15,7 +15,7 @@ function plotHistogramHeatmap(sample_mean,sample_var,nbin)
     [N,c] = hist3([sample_var,sample_mean],[nbin,nbin]);
     
     %plot the heatmap
-    figure;
+    ax = figure;
     %normalize N so that the colormap is the frequency density
     imagesc(cell2mat(c(2)),cell2mat(c(1)),N/( (c{2}(2)-c{2}(1))*(c{1}(2)-c{1}(1)) ) );
     axis xy; %switch the y axis
