@@ -8,7 +8,7 @@
     %p_max: the maxmimum polynomial order to fit
 %RETURN:
     %BIC: row vector the BIC for each polynomial order
-function BIC = samplingDist_weighted_BIC(sample_mean,sample_var,wantPlot,p_max)
+function BIC = samplingDist_weighted_BIC(sample_mean,sample_var,wantPlot,p_max,n_bin)
 
     %check the parameters are of the correct type
     checkParameters(sample_mean,sample_var,wantPlot,p_max);
@@ -76,7 +76,7 @@ function BIC = samplingDist_weighted_BIC(sample_mean,sample_var,wantPlot,p_max)
         if wantPlot
             
             %plot the histogram
-            ax = plotHistogramHeatmap(sample_mean,sample_var);
+            ax = plotHistogramHeatmap(sample_mean,sample_var,n_bin);
             %resize the histogram
             set(ax, 'Position', [600,800,400,300]);
             %set the label of the histogram
