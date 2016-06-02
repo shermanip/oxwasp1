@@ -396,18 +396,18 @@ and variance
 where $\widehat{\sigma}_\epsilon^2$ can be used in the estimation of $\variance\left(\widehat{Y}\right)$.
 
 \subsection{Methods}
-Polynomial features for the sample mean were constructed up to order $k=6$. The weighted linear regression was then fitted. Before fitting the linear regression, the weighted were normalized to have a maximum of 1. Furthermore, each feature was normalized to have mean 0 and standard deviation 1. Afterwards, a constant of 1 was appended to the feature vector to model the intercept of the linear regression.
+Polynomial features for the sample mean were constructed up to order $k=6$. The weighted linear regression was then fitted. Before fitting the linear regression, the weights were normalized to have a maximum of 1. Furthermore, each feature was normalized to have mean 0 and standard deviation 1. Afterwards, a constant of 1 was appended to each feature vector to model the intercept of the linear regression.
 
 In addition, the BIC was calculated given as
 \begin{equation}
 \text{BIC} = m\left(\ln2\pi+\ln\widehat{\sigma}_\epsilon^2+1\right)+(k+1)\ln{m}
 \end{equation}
-for each polynomial order and repeated for 40 different bootstrap samples, in other words samples with replacement from the original dataset. 
+for each polynomial order and repeated for 40 different bootstrap samples. A bootstrap sample was obtained by sampling $m$ times without replacement from the original dataset. 
 
 \subsection{Results}
-The weighted least squares with polynomial features were fitted successfully as shown in Figure \ref{fig:weightedLS_polynomials}. It can be observed that the weighted least squares gave less weights to data points with high sample variance, thus in a way treating them like outliers.
+The weighted least squares with polynomial features were fitted successfully as shown in Figure \ref{fig:weightedLS_polynomials}. It appears successful because the regression goes through the majority of the mean and variance pairs. It was unusual to note that the prediction variance for the 6th order polynomial blew up, further investigate will be needed to explain such behaviour.
 
-The BIC, as shown in Figure \ref{fig:weightedLS_BIC}, favoured high order polynomials. Because the BIC favoured more complicated models, this suggested that fitting polynomial features was not a good model. The BIC aimed to seek more and more polynomials so that the model become more similar to the true model. 
+The BIC, as shown in Figure \ref{fig:weightedLS_BIC}, favoured high order polynomials. Because the BIC favoured more complicated models, this suggested that fitting polynomial features was not a good model. The BIC aimed to seek more and more polynomials so that the model becomes more similar to the true model. 
 
 \begin{figure}
 	\centering
@@ -450,34 +450,56 @@ The BIC, as shown in Figure \ref{fig:weightedLS_BIC}, favoured high order polyno
 \subsection{Methods}
 From the previous chapter, it was clear there were 3 materials, the sample, background and foam, which contributed to the peaks in the histogram of the grey values.
 
-The sample mean sample variance pairs were sub-sampled from each of the 3 materials. A 1st order linear regression was fitted for each sub-sample.
+The sample mean sample variance pairs were sub-sampled from each of the 3 materials. A 1st and 2nd order weighted linear regression was fitted for each sub-sample. In addition, the BIC was calculated when fitting such weighted regression on 40 bootstrap samples, for each material.
 
 \subsection{Results}
 
-It is clear the gradients are material dependent.
+It was clear the mean-variance relationship is material dependent, this can be seen by the different gradients of the separate regressions in Figure \ref{fig:subsample_meanVar}. The BIC, as shown in Table \ref{table:subsample_BIC}, showed that for the sample and foam the BIC favours high order models. However for the background, when taking into consideration the uncertainty the BIC can favour the 1st order model.
+
+It is unusual to see the prediction variance to blow for the 2nd order model in the background and foam data.
 
 \begin{figure}
 	\centering
 	\begin{subfigure}{0.45\textwidth}
-		\includegraphics[width=\textwidth]{figures/meanVar/subsample_sample.eps}
-		\caption{Sample}
+		\includegraphics[width=\textwidth]{figures/meanVar/subsample_sample1.eps}
+		\caption{Sample- Order 1}
 	\end{subfigure}
 	\begin{subfigure}{0.45\textwidth}
-		\includegraphics[width=\textwidth]{figures/meanVar/subsample_background.eps}
-		\caption{Background}
+		\includegraphics[width=\textwidth]{figures/meanVar/subsample_sample2.eps}
+		\caption{Sample - Order 2}
 	\end{subfigure}
 	\begin{subfigure}{0.45\textwidth}
-		\includegraphics[width=\textwidth]{figures/meanVar/subsample_foam.eps}
-		\caption{Foam}
+		\includegraphics[width=\textwidth]{figures/meanVar/subsample_background1.eps}
+		\caption{Background - Order 1}
 	\end{subfigure}
-	\caption{A linear regression was fitted on a subsample of sample mean-variance pairs for each material.}
+	\begin{subfigure}{0.45\textwidth}
+		\includegraphics[width=\textwidth]{figures/meanVar/subsample_background2.eps}
+		\caption{Background - Order 2}
+	\end{subfigure}
+	\begin{subfigure}{0.45\textwidth}
+		\includegraphics[width=\textwidth]{figures/meanVar/subsample_foam1.eps}
+		\caption{Foam - Order 1}
+	\end{subfigure}
+	\begin{subfigure}{0.45\textwidth}
+		\includegraphics[width=\textwidth]{figures/meanVar/subsample_foam2.eps}
+		\caption{Foam - Order 2}
+	\end{subfigure}
+	\caption{Frequency density of the sample mean and variance of the grey values. Weighted linear regression with polynomial features was fitted on a subsample of sample mean-variance pairs for each material.}
+	\label{fig:subsample_meanVar}
 \end{figure}
 
-\begin{figure}
+\begin{table}
 	\centering
-	\includegraphics[width=0.6\textwidth]{figures/meanVar/subsample.eps}
-	\caption{Frequency density of all the sample mean-variance pairs. The dotted lines represent the 95\% prediction interval of the least squares regression for each sub-sample, these lines ranges so that they do not extrapolate.} 
-\end{figure}
+	\begin{tabular}{ c | c c  }
+		BIC & Order 1 & Order 2 \\
+		\hline
+		Sample & $(4.7421\pm0.0003)\times 10^7$ & $(4.7413\pm0.0003)\times 10^7$ \\
+		Background & $(4.177\pm0.001)\times 10^6$ & $(4.176\pm0.001)\times 10^6$ \\
+		Foam & $(1.5418\pm0.0003)\times 10^6$ & $(1.5403\pm0.0003)\times 10^6$
+	\end{tabular}
+	\caption{The mean $\pm$ standard deviation of the BIC when fitting weighted least squares with polynomial features on 40 bootstrap samples of the sub-sampled mean-variance pairs for each material.}
+	\label{table:subsample_BIC}
+\end{table}
 
 \section{Mixture of Linear Regression}
 \subsection{Theory}
