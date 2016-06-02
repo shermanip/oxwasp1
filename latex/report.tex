@@ -282,20 +282,45 @@ The sample mean and standard error of the grey values for each of the 100 images
 
 \chapter{Mean and Variance Relationship}
 
-The aim of this chapter was to do supervised learning on predicting the variance of the pixel's grey values given its sample mean. By training a classifier, a single CT scan can be used to quantify the uncertainty on each pixel's grey values. This uncertainty is then carried forward when doing volumetric reconstruction.
+The aim of this chapter was to do supervised learning on predicting the variance of the pixel's grey values given its sample mean. This can be done by fitting a linear regression to obtain a explanatory model. Once a good model is found, a single CT scan can be used to quantify the uncertainty on each pixel's grey values. This uncertainty then can be carried forward when doing volumetric reconstruction.
+
+Figure \ref{fig:histogramHeatmap} shows the sample variance and sample mean of all the pixel's grey values. It can be seen that for sample means of $(4.5\pm0.5)\times 10^4$, the range of sample variances does increase. In addition, there were a few outliers with extremely large sample variance, one example can be seen in Figure \ref{fig:scatterMeanVar}.
+
+To take into consideration outliers, a simple weighted least squares regression can be done to give less weight on outliers.
+
+\begin{figure}
+	\centering
+	\includegraphics[width=0.75\textwidth]{figures/meanVar/histogramHeatmap.eps}
+	\caption{Frequency density plot of the sample variance against sample mean of all $1\,996^2$ pixel's grey values.}
+	\label{fig:histogramHeatmap}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\begin{subfigure}[b]{0.45\textwidth}
+		\includegraphics[width=1\textwidth]{figures/meanVar/scatter1.eps}
+		\caption{Sample of 7\,968 points}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.45\textwidth}
+		\includegraphics[width=1\textwidth]{figures/meanVar/scatter2.eps}
+		\caption{Another sample of 7\,968 points}
+	\end{subfigure}
+	\caption{Scatter plots of the sample variance-mean pairs of a sample of pixel's grey values.}
+	\label{fig:scatterMeanVar}
+\end{figure}
 
 \section{Weighted Least Squares}
 \subsection{Theory}
-The sample variance of the grey values is a random variable, thus has variance or in other words uncertainty. Weighted least squares can be used to take into consideration the uncertainty of the sample variance. This can be done by giving low weights to data points with high uncertainty on the grey value variance.
+The sample variance of the grey values is a random variable, thus itself has uncertainty. Weighted least squares can be used to take into consideration the uncertainty of the sample variance. This can be done by giving low weights to data points with high uncertainty on the grey value variance.
 
-Let $S_i^2$ and $\sigma_i^2$ be the sample variance and true variance, respectively, of the $i$th pixel's grey value for $i=1,2,\dotdotdot,m$. The sample variance has a sampling distribution such that
+Let $S_i^2$ and $\sigma_i^2$ be the sample variance and true variance, respectively, of the $i$th pixel's grey value for $i=1,2,\dotdotdot,m$ and $m=1\,996^2$. The sample variance has a sampling distribution such that
 \begin{equation}
 U_i=\frac{(n-1)S_i^2}{\sigma_i^2}\sim\chi_{n-1}^2
 \end{equation}
-where $n$ is the number of samples used in estimating the variance. The variance is then
-\begin{equation}
+where $n=100$ is the number of samples used in estimating the variance. The variance is then
+\begin{equation*}
 2(n-1)=\frac{(n-1)^2}{\sigma_i^4}\variance\left(S_i^2\right)
-\end{equation}
+\end{equation*}
 thus
 \begin{equation}
 \variance\left(S_i^2\right)=\frac{2\sigma_i^4}{n-1} \ .
@@ -306,63 +331,78 @@ A good weight for pixel $i$, $w_i$, would be one which is proportional to the pr
 w_i \propto \frac{1}{\left(S_i^2\right)^2} \ .
 \end{equation}
 
-The weights can be introduced into the least squares problem.  Let $Y_1,Y_2,\dotdotdot,Y_m$ be the sample variance of the grey values and $\vect{x}_1,\vect{x}_2,\dotdotdot,\vect{x}_m$ be the feature vectors of the sample mean of the grey values. The weighted least squares is an optimization problem where the objective is
+The weights can be introduced into the least squares problem. Let $Y_1,Y_2,\dotdotdot,Y_m$ and $x_1,x_2,\dotdotdot,x_m$ be the sample variance and mean of the grey values respectively. Let $\vect{x}_1,\vect{x}_2,\dotdotdot,\vect{x}_m$ be the $p$ length feature vectors of the sample mean of the grey values. For example the feature vectors can contain polynomials such that
+\begin{equation*}
+\vect{x}_i=
+\begin{pmatrix}
+	1\\x_i\\x_i^2\\\vdots\\x_i^{p-1}
+\end{pmatrix} \ .
+\end{equation*}
+Let $Y_i$ and $x_i$ have a linear relationship such that
+\begin{equation}
+Y_i = \left(\vect{x}_i\right)\T\vectGreek{\beta} + \epsilon_i
+\end{equation}
+where $\vectGreek{\beta}$ is a $p$ length parameter vector and $\epsilon_i\sim\normal(0,\sigma_{\epsilon}^2)$ for i.i.d.~$i=1,2,\dotdotdot,m$. The weighted least squares is an optimization problem where the objective $T$ is minimized by varying $\vectGreek{\beta}$
 \begin{equation}
 T =
 \frac{\sum_{i=1}^mw_i\left(Y_i-\left(\vect{x}_i\right)\T\vectGreek{\beta}\right)^2}
 {\sum_{i=1}^mw_i} \ .
 \end{equation}
 This can be expanded
-\begin{equation}
+\begin{equation*}
 T =
 \frac{\sum_{i=1}^mw_i\left(Y_i-2Y_i\vectGreek{\beta}\T\vect{x}_i+\vectGreek{\beta}\T\vect{x}_i\left(\vect{x}_i\right)\T\vectGreek{\beta}\right)}
 {\sum_{i=1}^mw_i} \ .
-\end{equation}
+\end{equation*}
 Using the properties of the trace
-\begin{equation}
+\begin{equation*}
 T =
 \frac{\sum_{i=1}^mw_i\left(Y_i-2Y_i\trace\left(\vectGreek{\beta}\T\vect{x}_i\right)+\trace\left(\vectGreek{\beta}\T\vect{x}_i\left(\vect{x}_i\right)\T\vectGreek{\beta}\right)\right)}
 {\sum_{i=1}^mw_i}
-\end{equation}
-the differential with respect to $\vectGreek{\beta}$ is
-\begin{equation}
+\end{equation*}
+the differential with respect to $\vectGreek{\beta}$, using the results in Appendix \ref{chapter:matrixCalculus}, is
+\begin{equation*}
 \nabla_{\vectGreek{\beta}}T = \frac{-2\sum_{i=1}^mw_iY_i\vect{x}_i+2\sum_{i=1}^mw_i\vect{x}_i\left(\vect{x}_i\right)\T\vectGreek{\beta}}{\sum_{i=1}^mw_i} \ .
-\end{equation}
-Setting the differential to 0
+\end{equation*}
+Setting the differential to $\vect{0}$, the value of $\vectGreek{\beta}$ which minimises the objective is 
 \begin{equation}
-\vectGreek{\beta}=\left[\sum_{i=1}^mw_i\vect{x}_i\left(\vect{x}_i\right)\T\right]^{-1}\sum_{i=1}^mw_i\vect{x}_iY_i \ .
-\end{equation}
-
-Assuming $Y_1,Y_2,\dotdotdot,Y_m$ are independent and have constant variance $\sigma^2$, the covariance of the weighted least squares is
-\begin{equation}
-\cov(\vectGreek{\beta})=
-\sigma^2\left[\sum_{i=1}^mw_i\vect{x}_i\left(\vect{x}_i\right)\T\right]^{-1}\left[\sum_{i=1}^mw_i\vect{x}_i\right]\left[\sum_{i=1}^mw_i\left(\vect{x}_i\right)\T\right]\left[\sum_{i=1}^mw_i\vect{x}_i\left(\vect{x}_i\right)\T\right]^{-1} \ .
+\widehat{\vectGreek{\beta}}=\left[\sum_{i=1}^mw_i\vect{x}_i\left(\vect{x}_i\right)\T\right]^{-1}\sum_{i=1}^mw_i\vect{x}_iY_i \ .
 \end{equation}
 
-$\sigma^2$ can be estimated using the weighted mean squared error
+Assuming $Y_1,Y_2,\dotdotdot,Y_m$ are independent and have constant variance $\sigma_\epsilon^2$, the covariance of $\widehat{\vectGreek{\beta}}$ is
+\begin{multline}
+\cov(\widehat{\vectGreek{\beta}})=\matr{\Sigma}_{\widehat{\vectGreek{\beta}}}=
+\sigma_\epsilon^2\left[\sum_{i=1}^mw_i\vect{x}_i\left(\vect{x}_i\right)\T\right]^{-1}\left[\sum_{i=1}^mw_i\vect{x}_i\right]
+\\
+\left[\sum_{i=1}^mw_i\left(\vect{x}_i\right)\T\right]\left[\sum_{i=1}^mw_i\vect{x}_i\left(\vect{x}_i\right)\T\right]^{-1} \ .
+\end{multline}
+$\sigma_\epsilon^2$ can be estimated using the weighted mean squared error
 \begin{equation}
-\widehat{\sigma}^2=\frac{\sum_{i=1}^mw_i\left[Y_i-\left(\vect{x}_i\right)\T\vectGreek{\beta}\right]^2}{\sum_{i=1}^mw_i} \ .
+\widehat{\sigma}_\epsilon^2=\frac{\sum_{i=1}^mw_i\left[Y_i-\left(\vect{x}_i\right)\T\widehat{\vectGreek{\beta}}\right]^2}{\sum_{i=1}^mw_i} \ .
 \end{equation}
 
-After estimating $\vectGreek{\beta}$ and $\sigma^2$ and given a data point $\vect{x}_{\textup{test}}$, then the predicted variance is
+After estimating $\vectGreek{\beta}$ and $\sigma_\epsilon^2$ and given a data point $\vect{x}_{\textup{test}}$, the predicted grey value variance is
 \begin{equation}
-\widehat{Y}=\left(\vect{x}_{\textup{test}}\right)\T\vectGreek{\beta} + \epsilon_{\textup{test}}
+\widehat{Y}=\left(\vect{x}_{\textup{test}}\right)\T\widehat{\vectGreek{\beta}} + \epsilon_{\textup{test}}
 \end{equation}
 with expectation
 \begin{equation}
-\expectation\left({\widehat{Y}}\right)=\left(\vect{x}_{\textup{test}}\right)\T\vectGreek{\beta}
+\expectation\left({\widehat{Y}}\right)=\left(\vect{x}_{\textup{test}}\right)\T\widehat{\vectGreek{\beta}}
 \end{equation}
 and variance
 \begin{equation}
-\variance\left(\widehat{Y}\right)=\left(\vect{x}_{\textup{test}}\right)\T\cov(\vectGreek{\beta})\vect{x}_{\textup{test}}+\sigma^2 \ .
+\variance\left(\widehat{Y}\right)=\left(\vect{x}_{\textup{test}}\right)\T\matr{\Sigma}_{\widehat{\vectGreek{\beta}}}\vect{x}_{\textup{test}}+\sigma_\epsilon^2
 \end{equation}
+where $\widehat{\sigma}_\epsilon^2$ can be used in the estimation of $\variance\left(\widehat{Y}\right)$.
 
 \subsection{Methods}
-The sample mean and sample variance were calculated for all 3\,984\,016 pixel's grey values. Polynomial features were constructed, up to order $k$, using the sample mean. The weighted linear regression was then fitted.
+Polynomial features for the sample mean were constructed up to order $k=6$. The weighted linear regression was then fitted. Before fitting the linear regression, the weighted were normalized to have a maximum of 1. Furthermore, each feature was normalized to have mean 0 and standard deviation 1. Afterwards, a constant of 1 was appended to the feature vector to model the intercept of the linear regression.
 
-Before fitting the linear regression, the weighted were normalized to have a maximum of 1. Furthermore, each feature was normalized to have mean 0 and standard deviation 1. Afterwards, a constant of 1 was appended to the feature vector to model the intercept of the linear regression.
-
-As in previous experiments, the BIC was used to do model selection.
+In addition, the BIC was calculated given as
+\begin{equation}
+\text{BIC} = m\left(\ln2\pi+\ln\widehat{\sigma}_\epsilon^2+1\right)+(k+1)\ln{m}
+\end{equation}
+for each polynomial order and repeated for 40 different bootstrap samples, in other words samples with replacement from the original dataset. 
 
 \subsection{Results}
 The weighted least squares with polynomial features were fitted successfully as shown in Figure \ref{fig:weightedLS_polynomials}. It can be observed that the weighted least squares gave less weights to data points with high sample variance, thus in a way treating them like outliers.
@@ -395,14 +435,14 @@ The BIC, as shown in Figure \ref{fig:weightedLS_BIC}, favoured high order polyno
 		\includegraphics[width=\textwidth]{figures/meanVar/order6.eps}
 		\caption{Order 6}
 	\end{subfigure}
-	\caption{Frequency density plots of the sample mean and variance of the grey values. Weighted least squares with polynomial features was fitted. The (red) dotted line represent the 95\% prediction interval.}
+	\caption{Frequency density of the sample mean and variance of the grey values. Weighted least squares with polynomial features was fitted. The (red) dotted line represent the 95\% prediction interval.}
 	\label{fig:weightedLS_polynomials}
 \end{figure}
 
 \begin{figure}
 	\centering
-	\includegraphics[width=0.6\textwidth]{figures/meanVar/polynomialBIC.eps}
-	\caption{Weighted BIC when for fitting weighted least squares with polynomial features on the sample mean sample variance pairs.}
+	\includegraphics[width=0.75\textwidth]{figures/meanVar/polynomialBIC.eps}
+	\caption{BIC, for 40 different bootstrap samples, for fitting weighted least squares with polynomial features on the sample mean sample variance pairs.}
 	\label{fig:weightedLS_BIC}
 \end{figure}
 
@@ -1560,9 +1600,6 @@ For high $\nu\tau$, problems arises as more and more terms are needed in the tru
 	\caption{The parameters and log likelihood at each step of EM. The EM algorithm was used to estimate the parameters of 50 different simulated $n=100$ dataset. The latent variables were initialized $\poisson(4)$. Dotted line: true value}
 \end{figure}
 
-
-
-
 \appendix
 
 \chapter{Matrix Calculus}\label{chapter:matrixCalculus}
@@ -1599,6 +1636,9 @@ then it can be shown that \cite{petersen2008matrix}
 \matr{D_{A}}\ln\left\|\matr{A}\right\| = \left(\matr{A}^{-1}\right)\T \ .
 \end{equation}
 Because a vector is a special case of a matrix, these results can be extended to vectors.
+
+\chapter{Proofs and Calculations}
+
 
 \bibliographystyle{unsrt}
 \bibliography{bib}
