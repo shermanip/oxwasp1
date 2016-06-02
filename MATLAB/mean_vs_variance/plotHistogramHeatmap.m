@@ -21,8 +21,8 @@ function plotHistogramHeatmap(sample_mean,sample_var,nbin)
     axis xy; %switch the y axis
     ylim([0.05E6,4E5]); %set the y limit
     colorbar; %display the colour bar
-    xlabel('Sample grey value mean (AU)'); %label the axis
-    ylabel('Sample grey value variance (AU^{2})'); %label the axis
+    xlabel('Sample grey value mean (arb. unit)'); %label the axis
+    ylabel('Sample grey value variance {(arb. unit^2)}'); %label the axis
     
     %NESTED FUNCTION: CHECK PARAMETERS
     function checkParameters(sample_mean,sample_var)
