@@ -454,9 +454,9 @@ The sample mean sample variance pairs were sub-sampled from each of the 3 materi
 
 \subsection{Results}
 
-It was clear the mean-variance relationship is material dependent, this can be seen by the different gradients of the separate regressions in Figure \ref{fig:subsample_meanVar}. The BIC, as shown in Table \ref{table:subsample_BIC}, showed that for the sample and foam the BIC favours high order models. However for the background, when taking into consideration the uncertainty the BIC can favour the 1st order model.
+It was clear the mean-variance relationship is material dependent, this can be seen by the different gradients of the separate regressions in Figure \ref{fig:subsample_meanVar}. The BIC, as shown in Table \ref{table:subsample_BIC}, showed that for the sample and foam the BIC favours higher order models. However for the background, when taking into consideration the uncertainty, the BIC can favour the 1st order model.
 
-It is unusual to see the prediction variance to blow for the 2nd order model in the background and foam data.
+It was unusual to see the prediction variance to blow for the 2nd order model in the background and foam data.
 
 \begin{figure}
 	\centering
@@ -502,117 +502,55 @@ It is unusual to see the prediction variance to blow for the 2nd order model in 
 \end{table}
 
 \section{Mixture of Linear Regression}
+
+In order to take into consideration the different mean-variance relationship for different materials, a mixture of linear regression was tried to see if it captures the different behaviours.
+
 \subsection{Theory}
 In order to consider the 3 different materials, a mixture of linear regression was used of the form
 \begin{equation}
 Y_i\sim
 \begin{cases}
 \normal\left(\left(\vect{x}_i\right)\T\vectGreek{\beta}_1,\sigma_1^2\right) & \text{if }S_i=1\\ 
-\normal\left(\left(\vect{x}_i\right)\T\vectGreek{\beta}_2,\sigma_2^2\right) & \text{if }S_i=2\\ 
-\normal\left(\left(\vect{x}_i\right)\T\vectGreek{\beta}_3,\sigma_3^2\right) & \text{if }S_i=3\\
+\normal\left(\left(\vect{x}_i\right)\T\vectGreek{\beta}_2,\sigma_2^2\right) & \text{if }S_i=2\\
+\qquad\qquad\vdots\\
+\normal\left(\left(\vect{x}_i\right)\T\vectGreek{\beta}_q,\sigma_q^2\right) & \text{if }S_i=q\\
 \end{cases}
 \end{equation}
-where $S_i$ is a latent variable and $\prob\left(S_i=r\right)=\pi_r$ for $i=1,2,\dotdotdot,m$.
+where $S_i$ is a latent variable and $\prob\left(S_i=r\right)=\pi_r$ for $i=1,2,\dotdotdot,m$ and $r=1,2,\dotdotdot,q$.
 
 The likelihood is
-\begin{equation}
-L=\prod_{i=1}^m\sum_{j=1}^3p_{Y|S}\left(y_i|S_i=j\right)\pi_j
-\end{equation}
+\begin{equation*}
+L=\prod_{i=1}^m\sum_{j=1}^qp_{Y|S}\left(y_i|S_i=j\right)\pi_j
+\end{equation*}
 thus the log likelihood is
+\begin{equation*}
+\ln{L}=\sum_{i=1}^m\ln\left[
+\sum_{j=1}^qp_{Y|S}\left(y_i|S_i=j\right)\pi_j
+\right]
+\end{equation*}
 \begin{equation}
 \ln{L}=\sum_{i=1}^m\ln\left[
-\sum_{j=1}^3p_{Y|S}\left(y_i|S_i=j\right)\pi_j
+\sum_{j=1}^q \frac{\pi_j}{\sqrt{2\pi}\sigma_j}\exp\left(-\frac{1}{2}\left(\frac{y_i-\left(\vect{x}_i\right)\T\vectGreek{\beta}_j}{\sigma_j}\right)^2\right) 
 \right] \ .
 \end{equation}
 Such a log likelihood can be maximised by using the EM algorithm, treating $S_i$ as a random latent variable.
 
-In the E step, the posterior distribution is used to put a distribution on $S_i$ for $i=1,2,\dotdotdot,m$ given the parameters $\vectGreek{\beta}_j$, $\sigma_j^2$ and $\pi_j$ for $j=1,2,3$. The posterior distribution is given as
-\begin{equation}
+In the E step, the posterior distribution is used to put a prediction on the latent variables $S_i$ for $i=1,2,\dotdotdot,m$ given estimates of the parameters $\vectGreek{\beta}_j$, $\sigma_j^2$ and $\pi_j$ for $j=1,2,\dotdotdot,q$. The posterior distribution is given as
+\begin{equation*}
 r_{i,j}=\prob\left(S_i=j|Y_i=y_i\right)=\frac
 {p_{Y|S}\left(y_i|S_i=j\right)\pi_j}
-{\sum_{j'=1}^3p_{Y|S}\left(y_i|S_i=j'\right)\pi_j}
+{\sum_{j'=1}^qp_{Y|S}\left(y_i|S_i=j'\right)\pi_j}
+\end{equation*}
+\begin{equation}
+r_{i,j}=\prob\left(S_i=j|Y_i=y_i\right)=\dfrac
+{\dfrac{\pi_j}{\sqrt{2\pi}\sigma_j}\exp\left[-\frac{1}{2}\left(\dfrac{y_i-\left(\vect{x}_i\right)\T\vectGreek{\beta}_j}{\sigma_j}\right)^2\right] }
+{\sum_{j'=1}^q\dfrac{\pi_{j'}}{\sqrt{2\pi}\sigma_{j'}}\exp\left[-\frac{1}{2}\left(\dfrac{y_i-\left(\vect{x}_i\right)\T\vectGreek{\beta}_{j'}}{\sigma_{j'}}\right)^2\right] }
 \end{equation}
-and just a quantity is called the responsibility of the $i$th data belonging to the $j$th model.
+and such a quantity is called the responsibility of the $i$th data belonging to the $j$th model.
 
-In the M step, the parameters $\vectGreek{\beta}_j$, $\sigma_j^2$ and $\pi_j$ for $j=1,2,3$ are updated given the posterior distribution of $S_i$ for $i=1,2,\dotdotdot,m$. Consider some arbitrary parameter $\theta_j$ which model $j$ depends on. Then
+In the M step, the estimations of the  parameters $\vectGreek{\beta}_j$, $\sigma_j^2$ and $\pi_j$ for $j=1,2,\dotdotdot,q$ are updated, using the maximum log likelihood, given the responsibilities $r_{i,j}$ for $i=1,2,\dotdotdot,m$. The regression parameters are updated by
 \begin{equation}
-\frac{\partial\ln{L}}{\partial\theta_j}=
-\sum_{i=1}^m\frac{\pi_j}{\sum_{j'=1}^3p_{Y|S}\left(y_i|S_i=j'\right)\pi_j}
-\frac{\partial p_{Y|S}\left(y_i|S_i=j\right)}{\partial\theta_j}
-\end{equation}
-\begin{equation}
-\frac{\partial\ln{L}}{\partial\theta_j}=
-\sum_{i=1}^m\frac{p_{Y|S}\left(y_i|S_i=j\right)\pi_j}{\sum_{j'=1}^3p_{Y|S}\left(y_i|S_i=j'\right)\pi_j}
-\frac{\partial \ln\left[p_{Y|S}\left(y_i|S_i=j\right)\right]}{\partial\theta_j}
-\end{equation}
-which is just
-\begin{equation}
-\frac{\partial\ln{L}}{\partial\theta_j}=
-\sum_{i=1}^mr_{i,j}
-\frac{\partial \ln\left[p_{Y|S}\left(y_i|S_i=j\right)\right]}{\partial\theta_j} \ .
-\end{equation}
-Using the above result
-\begin{equation}
-\nabla_{\vectGreek{\beta}_j}\ln{L}
-=\sum_{i=1}^{m}
-r_{i,j}
-\nabla_{\vectGreek{\beta}_j}
-\ln\left[
-	\frac{1}{\sqrt{2\pi}\sigma_j}\exp\left(-\frac{1}{2}\left(\frac{y_i-\left(\vect{x}_i\right)\T\vectGreek{\beta}_j}{\sigma_j}\right)^2\right)
-\right]
-\end{equation}
-\begin{equation}
-\nabla_{\vectGreek{\beta}_j}\ln{L}
-=\sum_{i=1}^{m}
-r_{i,j}
-\nabla_{\vectGreek{\beta}_j}
-\left[
-	-\frac{1}{2}\ln(2\pi) - \frac{1}{2}\ln\left(\sigma_j^2\right)-\frac{1}{2}\left(\frac{y_i-\left(\vect{x}_i\right)\T\vectGreek{\beta}_j}{\sigma_j}\right)^2
-\right] \ .
-\end{equation}
-Expanding it out
-\begin{equation}
-\nabla_{\vectGreek{\beta}_j}\ln{L}
-=\sum_{i=1}^{m}
-r_{i,j}
-\nabla_{\vectGreek{\beta}_j}
-\left[-\frac{1}{2\sigma_j^2}\left(-2y_i\vectGreek{\beta}_j\T\vect{x}_i
-+\vectGreek{\beta}_j\T\vect{x}_i\left(\vect{x}_i\right)\T\vectGreek{\beta}_j
-\right)
-+c_1
-\right]
-\end{equation}
-and using the properties of the trace
-\begin{equation}
-\nabla_{\vectGreek{\beta}_j}\ln{L}
-=\sum_{i=1}^{m}
-r_{i,j}
-\nabla_{\vectGreek{\beta}_j}
-\left[-\frac{1}{2\sigma_j^2}\left(-2y_i\trace\left(\vectGreek{\beta}_j\T\vect{x}_i\right)
-+\trace\left(\vectGreek{\beta}_j\T\vect{x}_i\left(\vect{x}_i\right)\T\vectGreek{\beta}_j
-\right)\right)
-+c_1
-\right]
-\end{equation}
-\begin{equation}
-\nabla_{\vectGreek{\beta}_j}\ln{L}
-=\sum_{i=1}^{m}
--\frac{r_{i,j}}{2\sigma_j^2}
-\left(-2y_i\vect{x}_i
-+2\vect{x}_i\left(\vect{x}_i\right)\T\vectGreek{\beta}_j
-\right) \ .
-\end{equation}
-Setting this to zero
-\begin{equation}
-\sum_{i=1}^{m}
-r_{i,j}
-y_i\vect{x}_i
-=
-\sum_{i=1}^{m}r_{i,j}
-\vect{x}_i\left(\vect{x}_i\right)\T\vectGreek{\beta}_j
-\end{equation}
-\begin{equation}
-\vectGreek{\beta}_j
+\widehat{\vectGreek{\beta}}_j
 =
 \left[\sum_{i=1}^{m}r_{i,j}
 \vect{x}_i\left(\vect{x}_i\right)\T\right]^{-1}
@@ -620,77 +558,25 @@ y_i\vect{x}_i
 r_{i,j}
 y_i\vect{x}_i\right]
 \end{equation}
-and this is just weighted least squares where the weights are the responsibilities on model $j$.
-
-By re-parametrise $1/\sigma_j^2=\tau_j$
+and this is weighted least squares where the weights are the responsibilities on model $j$. For the rest of the parameters
 \begin{equation}
-\frac{\partial\ln{L}}{\partial\tau_j}
-=\sum_{i=1}^{m}
-r_{i,j}
-\frac{\partial}{\partial\tau_j}
-\left[
-	-\frac{1}{2}\ln(2\pi) + \frac{1}{2}\ln\left(\tau_j\right)-\frac{\tau_j}{2}\left({y_i-\left(\vect{x}_i\right)\T\vectGreek{\beta}_j}\right)^2
-\right]
-\end{equation}
-\begin{equation}
-\frac{\partial\ln{L}}{\partial\tau_j}
-=\sum_{i=1}^{m}
-r_{i,j}
-\left[\frac{1}{2\tau_j}-\frac{1}{2}\left({y_i-\left(\vect{x}_i\right)\T\vectGreek{\beta}_j}\right)^2
-\right] \ .
-\end{equation}
-Setting this to zero
-\begin{equation}
-\sigma_j^2
+\widehat{\sigma}_j^2
 =
 \frac{\sum_{i=1}^{m}
 r_{i,j}\left({y_i-\left(\vect{x}_i\right)\T\vectGreek{\beta}_j}\right)^2}
 {\sum_{i=1}^{m}r_{i,j}}
 \end{equation}
-and this is just the weighted mean squared error.
-
-To obtain the maximum log likelihood estimator for $\pi_j$, a Lagrange multiplier must be used to put a constraint that $\sum_{j=1}^3\pi_j=1$. The objective is then
+and this is the weighted mean squared error.  Finally
 \begin{equation}
-T = \ln{L} + \lambda\left(\sum_{j=1}^3\pi_j-1\right)
+\widehat{\pi}_j = \sum_{i=1}^m\frac{r_{i,j}}{m}
 \end{equation}
-\begin{equation}
-\frac{\partial T}{\partial\pi_j}=\frac{\partial}{\partial\pi_j}\sum_{i=1}^m\ln\left[
-\sum_{j'=1}^3p_{Y|S}\left(y_i|S_i=j'\right)\pi_{j'}
-\right] + \lambda
-\end{equation}
-\begin{equation}
-\frac{\partial T}{\partial\pi_j}=\sum_{i=1}^m\frac{p_{Y|S}\left(y_i|S_i=j\right)}{\sum_{j'=1}^3p_{Y|S}\left(y_i|S_i=j'\right)\pi_{j'}} + \lambda
-\end{equation}
-\begin{equation}
-\frac{\partial T}{\partial\pi_j}=\sum_{i=1}^m\frac{r_{i,j}}{\pi_j} + \lambda \ .
-\end{equation}
-Setting this to zero
-\begin{equation}
-\pi_j = \sum_{i=1}^m\frac{r_{i,j}}{\lambda} \ .
-\end{equation}
-$\lambda$ can be determined by putting a constraint on the estimators of $\pi_j$ for $j=1,2,3$
-\begin{equation}
-\sum_{j=1}^3\sum_{i=1}^m\frac{r_{i,j}}{\lambda}=1
-\end{equation}
-\begin{equation}
-\sum_{i=1}^m\sum_{j=1}^3r_{i,j}=\lambda
-\end{equation}
-\begin{equation}
-\sum_{i=1}^m1=\lambda
-\end{equation}
-\begin{equation}
-m=\lambda
-\end{equation}
-therefore
-\begin{equation}
-\pi_j = \sum_{i=1}^m\frac{r_{i,j}}{m} \ .
-\end{equation}
-This is the average responsibility.
-
-All steps in the EM algorithm have been derived.
+and this is the average responsibility. The proofs for the M step can be found in Appendix \ref{section:Mstep}.
 
 \subsection{Methods}
-The EM algorithm was initialised by assigning random responsibilities for all models and data points in the E step.
+
+In this project, only a mixture of 1st order linear regression was considered. The EM algorithm was initialised by assigning random responsibilities for all models and data points in the E step. The number of mixture was set to $q=3$ to see if this model captured the 3 materials. 50 EM steps were used.
+
+To make the EM algorithm run properly without problems, a random sample of 10\,000 sample mean-variance pairs was used in fitting the mixture model.
 
 \subsection{Results}
 It was verified that the EM algorithm always increased the log likelihood at every EM step, as can be seen in Figure \ref{fig:mixture_lnL}.
@@ -699,30 +585,30 @@ The resulting fit, as shown in Figure \ref{fig:mixture_histogram}, did not captu
 
 \begin{figure}
 	\centering	
-	\includegraphics[width=0.6\textwidth]{figures/meanVar/mixture_lnL.eps}
+	\includegraphics[width=0.75\textwidth]{figures/meanVar/mixture_lnL.eps}
 	\caption{The log likelihood of the mixture of linear regressions at every EM step for 10 different initial values.}
 	\label{fig:mixture_lnL}
 \end{figure}
 
 \begin{figure}
 	\centering	
-	\includegraphics[width=0.6\textwidth]{figures/meanVar/mixture_histogram.eps}
+	\includegraphics[width=0.75\textwidth]{figures/meanVar/mixture_histogram.eps}
 	\caption{Fitting a mixture of 3 linear regressions on the sample mean-variance data.}
 	\label{fig:mixture_histogram}
 \end{figure}
 
 \section{Distance Weighted Least Squares}
 \subsection{Methods}
-To consider the 3 different sources, weighted least squares can be used where the weights depends on some distance from some particular sample-mean grey value. 3 different weighted least squares were used where the weights are
+To consider the 3 different sources, weighted least squares was used where the weights depends on some distance from some particular sample-mean grey value. 3 independent weighted least squares were used where the weights are
 \begin{equation}
-w_i\propto\exp\left[-\frac{1}{2}\left(\frac{x_i-\mu_j}{\sigma_j}\right)^2\right]
+w_i=\exp\left[-\frac{1}{2}\left(\frac{x_i-\mu_j}{\sigma_j}\right)^2\right] \ ,
 \end{equation}
-$\mu_j$ was found using $k$-means in the sample-mean grey value space and $\sigma_j$ is predefined constant, called the Gaussian width.
-\subsection{Results}
+$\mu_j$ was found using $k$-means in the sample-mean grey value space and $\sigma_j$ is a predefined constant, called the Gaussian width.
 
+\subsection{Results}
 The model captured the sample and foam well because the regression captured the shape of the histogram. However for the background, the regression can be negative as a result of being influenced by lower sample grey values from the foam and sample.
 
-For higher Gaussian widths, the regression becomes an ordinary least squares regression because all the data points approximately equal weights.
+For higher Gaussian widths, the regression became an ordinary least squares regression because all the data points have approximately equal weights.
 
 \begin{figure}
 	\centering
@@ -844,12 +730,13 @@ The sampling distribution of the eigenvalues are shown in Figure \ref{fig:initia
 
 \begin{figure}
 	\includegraphics[width=\textwidth]{figures/initial_PCvariance.eps}
-	\caption{Normalised variance due to the principle components (1 to 6). The values of all the pixels in the figures equal to 1.}
+	\caption{Normalised variance due to the principle components (1 to 6). The sum of all the values in each figures equal to 1.}
 	\label{fig:initial_PCvariance}
 \end{figure}
+
 \begin{figure}
 	\centering
-	\includegraphics[width=0.7\textwidth]{figures/initial_PC_eigenvalues.eps}
+	\includegraphics[width=0.75\textwidth]{figures/initial_PC_eigenvalues.eps}
 	\caption{Eigenvalues of the sample covariance matrix. 1\,600 bootstrap samples were used.}
 	\label{fig:initial_PC_eigenvalues}
 \end{figure}
@@ -919,181 +806,36 @@ and by using the trace and its properties
 \end{align}
 The loading matrix $\matr{\Lambda}$ and intrinsic noise $\matr{\Psi}$ can be estimated by maximising the log likelihood. This is best done using the expectation maximisation (EM) algorithm. The EM algorithm is an iterative procedure conducting an E step followed by a M step many times till some convergence conditions are met.
 
-The E step estimates the values of the latent variables, $\vect{y}^{(1)},\vect{y}^{(2)},\dotdotdot,\vect{y}^{(n)}$, using the expectation of the condition distribution of the latent variables given the observed data $\vect{x}^{(1)},\vect{x}^{(2)},\dotdotdot,\vect{x}^{(n)}$. The parameters $\matr{\Lambda}$ and $\matr{\Psi}$ are assumed to be know in this step and are fixed. By using Equation \eqref{eq:factor_analysis_y_given_x_dist}, each latent variable are assigned by
+The E step estimates the values of the latent variables, $\vect{Y}^{(1)},\vect{Y}^{(2)},\dotdotdot,\vect{Y}^{(n)}$, using the expectation of the conditional distribution of the latent variables given the observed data $\vect{x}^{(1)},\vect{x}^{(2)},\dotdotdot,\vect{x}^{(n)}$. The parameters $\matr{\Lambda}$ and $\matr{\Psi}$ are assumed to be know in this step and are fixed. By using Equation \eqref{eq:factor_analysis_y_given_x_dist}, each latent variable are predicted by the conditional expectation
 \begin{equation}
-\vect{y}^{(i)} \leftarrow \left(\matr{\Lambda}\T\matr{\Psi}^{-1}\matr{\Lambda}+\matr{1}\right)^{-1}\matr{\Lambda}\T\matr{\Psi}^{-1}\vect{x}^{(i)}
+\expectation\left[\vect{Y}^{(i)}|\vect{X}^{(i)}=\vect{x}^{(i)}\right]=\vect{y}^{(i)} = \left(\matr{\Lambda}\T\matr{\Psi}^{-1}\matr{\Lambda}+\matr{1}\right)^{-1}\matr{\Lambda}\T\matr{\Psi}^{-1}\vect{x}^{(i)}
 \end{equation}
 for $i=1,2,\dotdotdot,n$. The covariance of the latent variables are estimated by
 \begin{equation}
-\matr{\Sigma}_{\vect{Y}} \leftarrow \left(\matr{\Lambda}\T\matr{\Psi}^{-1}\matr{\Lambda}+\matr{1}\right)^{-1}
+\matr{\Sigma}_{\vect{Y}} = \left(\matr{\Lambda}\T\matr{\Psi}^{-1}\matr{\Lambda}+\matr{1}\right)^{-1}
 \end{equation}
 
-In the E step, the parameters $\matr{\Lambda}$ and $\matr{\Psi}$ are varied to maximise the log likelihood, assuming the latent variables are known and fixed. The objective to maximise is the condition expectation of the log joint likelihood, this is given as
+In the E step, the parameters $\matr{\Lambda}$ and $\matr{\Psi}$ are varied to maximise the log likelihood, assuming the latent variables are known and fixed. The objective is to maximise is the condition expectation of the log joint likelihood, that is
 \begin{equation}
-H = \expectation_{\vect{Y}|\vect{X}}\left[\sum_{i=1}^{n}\ln p_{\vect{X},\vect{Y}}\left(\vect{x}^{(i)},\vect{y}^{(i)}\right)\right] \ .
+H = \expectation_{\vect{Y}|\vect{X}}\left[\sum_{i=1}^{n}\ln p_{\vect{X},\vect{Y}}\left(\vect{x}^{(i)},\vect{Y}^{(i)}\right)\right] \ .
 \end{equation}
-This can be expressed as
-\begin{equation*}
-H = \expectation_{\vect{Y}|\vect{X}}\left[
-\sum_{i=1}^{n}\left(\ln p_{\vect{X}|\vect{Y}}\left(\vect{x}^{(i)}|\vect{y}^{(i)}\right)+\ln p_{\vect{Y}}\left(\vect{y}^{(i)}\right)\right)
-\right]
-\end{equation*}
-Because the marginal distribution of the latent variables do not depend on $\matr{\Lambda}$ and $\matr{\Psi}$, this can be ignored. Using Equation \eqref{eq:factor_analysis_x_given_y_dist}
-\begin{equation*}
-H = \expectation_{\vect{Y}|\vect{X}}\left[
-\sum_{i=1}^{n}\ln\left(\frac{1}{\|2\pi\matr{\Psi}\|^{1/2}}\exp\left(-\frac{1}{2}\left(\vect{x}^{(i)}-\matr{\Lambda}\vect{y}^{(i)}\right)\T\matr{\Psi}^{-1}\left(\vect{x}^{(i)}-\matr{\Lambda}\vect{y}^{(i)}\right)\right)\right)
-\right]
-+c_1
-\end{equation*}
-\begin{equation*}
-H = \expectation_{\vect{Y}|\vect{X}}\left[
-\sum_{i=1}^{n}\left(-\frac{1}{2}\ln{\|2\pi\matr{\Psi}\|}-\frac{1}{2}\left(\vect{x}^{(i)}-\matr{\Lambda}\vect{y}^{(i)}\right)\T\matr{\Psi}^{-1}\left(\vect{x}^{(i)}-\matr{\Lambda}\vect{y}^{(i)}\right)\right)
-\right]
-+c_1
-\end{equation*}
-\begin{equation*}
-H = -\frac{1}{2}\expectation_{\vect{Y}|\vect{X}}\left[
-\sum_{i=1}^{n}\left(\ln{\|2\pi\matr{\Psi}\|}+\left(\vect{x}^{(i)}\right)\T\matr{\Psi}^{-1}\matr{\Lambda}\vect{y}^{(i)}-2\left(\vect{x}^{(i)}\right)\T\matr{\Psi}^{-1}\matr{\Lambda}\vect{y}^{(i)}+\left(\vect{y}^{(i)}\right)\T\matr{\Lambda}\T\matr{\Psi}^{-1}\matr{\Lambda}\vect{y}^{(i)}\right)
-\right]
-+c_1
-\end{equation*}
-By defining
+It is given the $\matr{\Lambda}$ and $\matr{\Psi}$ which maximises $H$ is
 \begin{equation}
-\expectation_{\vect{Y}|\vect{X}}\left[\vect{y}^{(i)}\right]=\vectGreek{\mu}^{(i)} = \left(\matr{\Lambda}\T\matr{\Psi}^{-1}\matr{\Lambda}+\matr{1}\right)^{-1}\matr{\Lambda}\T\matr{\Psi}^{-1}\vect{x}^{(i)}
+\widehat{\matr{\Lambda}}
+=
+\left(\sum_{i=1}^n\vect{x}^{(i)}\left(\vect{y}^{(i)}\right)\T\right)\left(n\matr{\Sigma}_{\vect{Y}}+\sum_{i=1}^{n}\vect{y}^{(i)}\left(\vect{y}^{(i)}\right)\T\right)^{-1}
 \end{equation}
 and
 \begin{equation}
-\cov{\vect{Y}} = \matr{\Sigma}_{\vect{Y}} = \left(\matr{\Lambda}\T\matr{\Psi}^{-1}\matr{\Lambda}+\matr{1}\right)^{-1}
-\end{equation}
-then when taking the conditional expectation
-\begin{multline*}
-H = -\frac{1}{2}\sum_{i=1}^{n}\left[
-\ln\|2\pi\matr{\Psi}\|+\left(\vect{x}^{(i)}\right)\T\matr{\Psi}^{-1}\vect{x}^{(i)}-2\left(\vect{x}^{(i)}\right)\T\matr{\Psi}^{-1}\matr{\Lambda}\vectGreek{\mu}^{(i)}\right.\\
-\left.+\trace\left(\matr{\Lambda}\T\matr{\Psi}^{-1}\matr{\Lambda}\matr{\Sigma}_{\vect{Y}}\right)+\left(\vectGreek{\mu}^{(i)}\right)\T\matr{\Lambda}\T\matr{\Psi}^{-1}\matr{\Lambda}\vectGreek{\mu}^{(i)}
-\right]+c_1
-\end{multline*}
-\begin{multline*}
-H = -\frac{1}{2}\sum_{i=1}^{n}\left[
-\ln\|2\pi\matr{\Psi}\|+\left(\vect{x}^{(i)}\right)\T\matr{\Psi}^{-1}\vect{x}^{(i)}-2\left(\vect{x}^{(i)}\right)\T\matr{\Psi}^{-1}\matr{\Lambda}\vectGreek{\mu}^{(i)}\right.\\
-\left.+\trace\left(\matr{\Lambda}\T\matr{\Psi}^{-1}\matr{\Lambda}\matr{\Sigma}_{\vect{Y}}\right)+\trace\left(\matr{\Lambda}\T\matr{\Psi}^{-1}\matr{\Lambda}\vectGreek{\mu}^{(i)}\left(\vectGreek{\mu}^{(i)}\right)\T\right)
-\right]+c_1
-\end{multline*}
-\begin{multline*}
-H = -\frac{1}{2}\sum_{i=1}^{n}\left[
-\ln\|2\pi\matr{\Psi}\|+\left(\vect{x}^{(i)}\right)\T\matr{\Psi}^{-1}\vect{x}^{(i)}-2\left(\vect{x}^{(i)}\right)\T\matr{\Psi}^{-1}\matr{\Lambda}\vectGreek{\mu}^{(i)}\right.\\
-\left.+\trace\left(\matr{\Lambda}\T\matr{\Psi}^{-1}\matr{\Lambda}\left(\matr{\Sigma}_{\vect{Y}}+\vectGreek{\mu}^{(i)}\left(\vectGreek{\mu}^{(i)}\right)\T\right)\right)
-\right]+c_1
-\end{multline*}
-\begin{multline*}
-H = -\frac{n}{2}
-\ln\|\matr{\Psi}\|
--\frac{1}{2}\sum_{i=1}^{n}\left(\vect{x}^{(i)}\right)\T\matr{\Psi}^{-1}\vect{x}^{(i)}
-+\sum_{i=1}^{n}\left(\vect{x}^{(i)}\right)\T\matr{\Psi}^{-1}\matr{\Lambda}\vectGreek{\mu}^{(i)}\\
--\frac{1}{2}\sum_{i=1}^{n}\trace\left(\matr{\Lambda}\T\matr{\Psi}^{-1}\matr{\Lambda}\left(\matr{\Sigma}_{\vect{Y}}+\vectGreek{\mu}^{(i)}\left(\vectGreek{\mu}^{(i)}\right)\T\right)\right)
-+c_2
-\end{multline*}
-
-Taking the derivative with respect to $\matr{\Lambda}$
-\begin{equation*}
-\matr{D}_{\matr{\Lambda}}H=
-\matr{D}_{\matr{\Lambda}}\left[
-\sum_{i=1}^n\left(\vect{x}^{(i)}\right)\T\matr{\Psi}^{-1}\matr{\Lambda}\vectGreek{\mu}^{(i)}
--\frac{1}{2}\sum_{i=1}^{n}\trace\left(\matr{\Lambda}\T\matr{\Psi}^{-1}\matr{\Lambda}\left(\matr{\Sigma}_{\vect{Y}}+\vectGreek{\mu}^{(i)}\left(\vectGreek{\mu}^{(i)}\right)\T\right)\right)
-\right]
-\end{equation*}
-\begin{equation*}
-\matr{D}_{\matr{\Lambda}}H=
-\matr{D}_{\matr{\Lambda}}\left[
-\sum_{i=1}^n\trace\left(\left(\vectGreek{\mu}^{(i)}\right)\T\matr{\Lambda}\T\matr{\Psi}^{-1}\vect{x}^{(i)}\right)
--\frac{1}{2}\sum_{i=1}^{n}\trace\left(\matr{\Lambda}\T\matr{\Psi}^{-1}\matr{\Lambda}\left(\matr{\Sigma}_{\vect{Y}}+\vectGreek{\mu}^{(i)}\left(\vectGreek{\mu}^{(i)}\right)\T\right)\right)
-\right]
-\end{equation*}
-\begin{equation*}
-\matr{D}_{\matr{\Lambda}}H=
-\matr{D}_{\matr{\Lambda}}\left[
-\sum_{i=1}^n\trace\left(\matr{\Lambda}\T\matr{\Psi}^{-1}\vect{x}^{(i)}\left(\vectGreek{\mu}^{(i)}\right)\T\right)
--\frac{1}{2}\sum_{i=1}^{n}\trace\left(\matr{\Lambda}\T\matr{\Psi}^{-1}\matr{\Lambda}\left(\matr{\Sigma}_{\vect{Y}}+\vectGreek{\mu}^{(i)}\left(\vectGreek{\mu}^{(i)}\right)\T\right)\right)
-\right]
-\end{equation*}
-\begin{equation*}
-\matr{D}_{\matr{\Lambda}}H=
-\sum_{i=1}^n\matr{\Psi}^{-1}\vect{x}^{(i)}\left(\vectGreek{\mu}^{(i)}\right)\T
--\sum_{i=1}^{n}\matr{\Psi}^{-1}\matr{\Lambda}\left(\matr{\Sigma}_{\vect{Y}}+\vectGreek{\mu}^{(i)}\left(\vectGreek{\mu}^{(i)}\right)\T\right) \ .
-\end{equation*}
-Setting the derivative to zero
-\begin{equation*}
-\matr{0}=
-\sum_{i=1}^n\matr{\Psi}^{-1}\vect{x}^{(i)}\left(\vectGreek{\mu}^{(i)}\right)\T
--\sum_{i=1}^{n}\matr{\Psi}^{-1}\matr{\Lambda}\left(\matr{\Sigma}_{\vect{Y}}+\vectGreek{\mu}^{(i)}\left(\vectGreek{\mu}^{(i)}\right)\T\right) \ .
-\end{equation*}
-\begin{equation*}
-\matr{0}=
-\sum_{i=1}^n\vect{x}^{(i)}\left(\vectGreek{\mu}^{(i)}\right)\T
--\matr{\Lambda}\left(n\matr{\Sigma}_{\vect{Y}}+\sum_{i=1}^{n}\vectGreek{\mu}^{(i)}\left(\vectGreek{\mu}^{(i)}\right)\T\right)
-\end{equation*}
-\begin{equation}
-\matr{\Lambda}
-=
-\left(\sum_{i=1}^n\vect{x}^{(i)}\left(\vectGreek{\mu}^{(i)}\right)\T\right)\left(n\matr{\Sigma}_{\vect{Y}}+\sum_{i=1}^{n}\vectGreek{\mu}^{(i)}\left(\vectGreek{\mu}^{(i)}\right)\T\right)^{-1}\ .
-\end{equation}
-
-The objective can be re-parametrised using $\matr{T}=\matr{\Psi}^{-1}$ so that
-\begin{multline*}
-H = -\frac{n}{2}
-\ln\|\matr{T^{-1}}\|
--\frac{1}{2}\sum_{i=1}^{n}\left(\vect{x}^{(i)}\right)\T\matr{T}\vect{x}^{(i)}
-+\sum_{i=1}^{n}\left(\vect{x}^{(i)}\right)\T\matr{T}\matr{\Lambda}\vectGreek{\mu}^{(i)}\\
--\frac{1}{2}\sum_{i=1}^{n}\trace\left(\matr{\Lambda}\T\matr{T}\matr{\Lambda}\left(\matr{\Sigma}_{\vect{Y}}+\vectGreek{\mu}^{(i)}\left(\vectGreek{\mu}^{(i)}\right)\T\right)\right)
-+c_2
-\end{multline*}
-\begin{multline*}
-H = -\frac{n}{2}
-\ln\|\matr{T^{-1}}\|
--\frac{1}{2}\sum_{i=1}^{n}\left(\vect{x}^{(i)}\right)\T\matr{T}\vect{x}^{(i)}
-+\sum_{i=1}^{n}\left(\vect{x}^{(i)}\right)\T\matr{T}\matr{\Lambda}\vectGreek{\mu}^{(i)}\\
--\frac{1}{2}\sum_{i=1}^{n}\trace\left(\matr{\Lambda}\T\matr{T}\matr{\Lambda}\left(\matr{\Sigma}_{\vect{Y}}+\vectGreek{\mu}^{(i)}\left(\vectGreek{\mu}^{(i)}\right)\T\right)\right)
-+c_2 \ .
-\end{multline*}
-$\|\matr{T}^{-1}\| = 1/\|\matr{T}\|$ and using the properties of the trace
-\begin{multline*}
-H = \frac{n}{2}
-\ln\|\matr{T}\|
--\frac{1}{2}\sum_{i=1}^{n}\trace\left(\matr{T}\vect{x}^{(i)}\left(\vect{x}^{(i)}\right)\T\right)
-+\sum_{i=1}^{n}\trace\left(\matr{T}\matr{\Lambda}\vectGreek{\mu}^{(i)}\left(\vect{x}^{(i)}\right)\T\right)\\
--\sum_{i=1}^{n}\frac{1}{2}\trace\left(\matr{T}\matr{\Lambda}\left(\matr{\Sigma}_{\vect{Y}}+\vectGreek{\mu}^{(i)}\left(\vectGreek{\mu}^{(i)}\right)\T\right)\matr{\Lambda}\T\right)
-+c_2 \ .
-\end{multline*}
-Taking the derivative with respect to $\matr{\Psi}$
-\begin{multline*}
-\matr{D}_{\matr{\Psi}}H = \frac{n}{2}\matr{T}^{-1}
--\frac{1}{2}\sum_{i=1}^{n}\vect{x}^{(i)}\left(\vect{x}^{(i)}\right)\T
-+\sum_{i=1}^{n}\matr{\Lambda}\vectGreek{\mu}^{(i)}\left(\vect{x}^{(i)}\right)\T\\
--\sum_{i=1}^{n}\frac{1}{2}\matr{\Lambda}\left(\matr{\Sigma}_{\vect{Y}}+\vectGreek{\mu}^{(i)}\left(\vectGreek{\mu}^{(i)}\right)\T\right)\matr{\Lambda}\T \ .
-\end{multline*}
-Setting the derivative to zero
-\begin{multline*}
-\matr{0} = \frac{n}{2}\matr{\Psi}
--\frac{1}{2}\sum_{i=1}^{n}\vect{x}^{(i)}\left(\vect{x}^{(i)}\right)\T
-+\sum_{i=1}^{n}\matr{\Lambda}\vectGreek{\mu}^{(i)}\left(\vect{x}^{(i)}\right)\T\\
--\frac{n}{2}\matr{\Lambda}\matr{\Sigma}_{\vect{Y}}\matr{\Lambda}-\frac{1}{2}\matr{\Lambda}\sum_{i=1}^{n}\vectGreek{\mu}^{(i)}\left(\vectGreek{\mu}^{(i)}\right)\T)\matr{\Lambda}\T
-\end{multline*}
-\begin{equation*}
-\matr{0} = \frac{n}{2}\matr{\Psi}
--\frac{1}{2}\sum_{i=1}^{n}\left(
-\left(\vect{x}^{(i)}-\matr{\Lambda}\vectGreek{\mu}^{(i)}\right)
-\left(\vect{x}^{(i)}-\matr{\Lambda}\vectGreek{\mu}^{(i)}\right)\T
-\right)
--\frac{n}{2}\matr{\Lambda}\matr{\Sigma}_{\vect{Y}}\matr{\Lambda}
-\end{equation*}
-\begin{equation}
-\matr{\Psi} =
+\widehat{\matr{\Psi}} =\text{diag}\left[
 \frac{1}{n}\sum_{i=1}^{n}\left(
-\left(\vect{x}^{(i)}-\matr{\Lambda}\vectGreek{\mu}^{(i)}\right)
-\left(\vect{x}^{(i)}-\matr{\Lambda}\vectGreek{\mu}^{(i)}\right)\T
+\left(\vect{x}^{(i)}-\matr{\Lambda}\vect{y}^{(i)}\right)
+\left(\vect{x}^{(i)}-\matr{\Lambda}\vect{y}^{(i)}\right)\T
 \right)
-+\matr{\Lambda}\matr{\Sigma}_{\vect{Y}}\matr{\Lambda}\ .
++\matr{\Lambda}\matr{\Sigma}_{\vect{Y}}\matr{\Lambda}\right]\ .
 \end{equation}
-Because $\matr{\Psi}$ is a diagonal matrix, only the diagonal entries need to be updated.
+The proofs for the M step can be found in Appendix \ref{chapter:mStep_factorAnalysis}.
+
 \subsection{Methods}
 The data was centred so that the mean of each pixel's gray value was zero. By doing this, factor analysis focuses on modelling the variance of the pixel's gray values.
 
@@ -1110,25 +852,25 @@ The data was bootstrapped to assess the uncertainty in the model selection.
 \subsection{Results}
 $k=1,2,\dotdotdot,15$ were investigated. The EM algorithm was repeated 81 times for each $k$ with a stopping condition of 100 EM steps. The BIC for each $k$ is as shown in Figure \ref{fig:initial_factor_BIC}. The number of factors with the lowest BIC was found to be 8.
 
-The 8 factor variances were isolated and as shown in Figure \ref{fig:initial_factor_factorNoise}, together with the intrinsic variance as shown in Figure \ref{fig:initial_factor_instrinicNoise}. It was interesting to note that in Figure \ref{fig:initial_factor_factorNoise}, there are clusters of high variance in most of the factors. This suggest clusters of high variance can appear in the data randomly, thus the variance of each of the pixel's gray values can depend on each other spatially. In Figure \label{fig:initial_factor_instrinicNoise}, the shape of the sample can be seen represented by the low intrinsic variance. This was evidence that they may well be a mean and variance relationship.
+The 8 factor variances were isolated and as shown in Figure \ref{fig:initial_factor_factorNoise}, together with the intrinsic variance as shown in Figure \ref{fig:initial_factor_instrinicNoise}. It was interesting to note that in Figure \ref{fig:initial_factor_factorNoise}, there are clusters of high variance in most of the factors. This suggest clusters of high variance can appear in the data randomly, thus the variance of each of the pixel's gray values can depend on each other spatially. In Figure \ref{fig:initial_factor_instrinicNoise}, the shape of the sample can be seen represented by the low intrinsic variance. This was evidence that they may well be a mean and variance relationship.
 
 \begin{figure}
 	\centering
-	\includegraphics[width=\textwidth]{figures/initial_factor_BIC.eps}
+	\includegraphics[width=0.75\textwidth]{figures/initial_factor_BIC.eps}
 	\caption{BIC for fitting different number of factors onto the data. 81 different initials were used for each $k$ with a stopping condition of 100 EM steps.}
 	\label{fig:initial_factor_BIC}
 \end{figure}
 
 \begin{figure}
 	\centering
-	\includegraphics[width=\textwidth]{figures/initial_factor_factorNoise.eps}
+	\includegraphics[width=0.75\textwidth]{figures/initial_factor_factorNoise.eps}
 	\caption{The 8 individual factor variances with the lowest log likelihood found.}
 	\label{fig:initial_factor_factorNoise}
 \end{figure}
 
 \begin{figure}
 	\centering
-	\includegraphics[width=\textwidth]{figures/initial_factor_instrinicNoise.eps}
+	\includegraphics[width=0.75\textwidth]{figures/initial_factor_instrinicNoise.eps}
 	\caption{The intrinsic variances with the lowest log likelihood found.}
 	\label{fig:initial_factor_instrinicNoise}
 \end{figure}
@@ -1139,7 +881,7 @@ The main source of error was down to the small sample size. The experiments can 
 
 \begin{figure}
 	\centering
-	\includegraphics[width=\textwidth]{figures/initial_factor_BIC_bootstrap.eps}
+	\includegraphics[width=0.75\textwidth]{figures/initial_factor_BIC_bootstrap.eps}
 	\caption{BIC for fitting different number of factors onto the data. 99 bootstrap samples were used and only 1 initial value was used for each $k$. A stopping condition of 100 EM steps was used.}
 	\label{fig:initial_factor_BIC_bootstrap}
 \end{figure}
@@ -1591,32 +1333,34 @@ The figures show that the EM algorithm works because for different initial value
 For high $\nu\tau$, problems arises as more and more terms are needed in the truncated sum. Too many terms in the truncated sum slow down the program a lot.
 
 \begin{figure}
-	\begin{subfigure}{0.5\textwidth}
+	\centering
+	\begin{subfigure}{0.45\textwidth}
 		\includegraphics[width=\textwidth]{figures/hierarchicalModel/EM_initial_mean.eps}
 	\end{subfigure}
-	\begin{subfigure}{0.5\textwidth}
+	\begin{subfigure}{0.45\textwidth}
 		\includegraphics[width=\textwidth]{figures/hierarchicalModel/EM_initial_var.eps}
 	\end{subfigure}
-	\begin{subfigure}{0.5\textwidth}
+	\begin{subfigure}{0.45\textwidth}
 		\includegraphics[width=\textwidth]{figures/hierarchicalModel/EM_initial_rate.eps}
 	\end{subfigure}
-	\begin{subfigure}{0.5\textwidth}
+	\begin{subfigure}{0.45\textwidth}
 		\includegraphics[width=\textwidth]{figures/hierarchicalModel/EM_initial_lnL.eps}
 	\end{subfigure}
 	\caption{The parameters and log likelihood at each step of EM. The EM algorithm was used to estimate the parameters of a single simulated $n=100$ dataset. The latent variables were initialized $\poisson(\phi)$ 50 times. Blue: $\phi=1$, Red: $\phi=4$, Green: $\phi=9$. Dotted line: true value}
 \end{figure}
 
 \begin{figure}
-	\begin{subfigure}{0.5\textwidth}
+	\centering
+	\begin{subfigure}{0.45\textwidth}
 		\includegraphics[width=\textwidth]{figures/hierarchicalModel/EM_repeat_mean.eps}
 	\end{subfigure}
-	\begin{subfigure}{0.5\textwidth}
+	\begin{subfigure}{0.45\textwidth}
 		\includegraphics[width=\textwidth]{figures/hierarchicalModel/EM_repeat_variance.eps}
 	\end{subfigure}
-	\begin{subfigure}{0.5\textwidth}
+	\begin{subfigure}{0.45\textwidth}
 		\includegraphics[width=\textwidth]{figures/hierarchicalModel/EM_repeat_rate.eps}
 	\end{subfigure}
-	\begin{subfigure}{0.5\textwidth}
+	\begin{subfigure}{0.45\textwidth}
 		\includegraphics[width=\textwidth]{figures/hierarchicalModel/EM_repeat_lnL.eps}
 	\end{subfigure}
 	\caption{The parameters and log likelihood at each step of EM. The EM algorithm was used to estimate the parameters of 50 different simulated $n=100$ dataset. The latent variables were initialized $\poisson(4)$. Dotted line: true value}
@@ -1661,6 +1405,352 @@ Because a vector is a special case of a matrix, these results can be extended to
 
 \chapter{Proofs and Calculations}
 
+\section{M Step for Mixture of Linear Regression} \label{section:Mstep}
+The likelihood for a general mixture model is
+\begin{equation*}
+\ln{L}=\sum_{i=1}^m\ln\left[
+\sum_{j=1}^qp_{Y|S}\left(y_i|S_i=j\right)\pi_j
+\right]
+\end{equation*}
+In the M step, the parameters $\vectGreek{\beta}_j$, $\sigma_j^2$ and $\pi_j$ for $j=1,2,\dotdotdot,q$ are updated given the posterior distribution of $S_i$ for $i=1,2,\dotdotdot,m$. Consider some arbitrary parameter $\theta_j$ which model $j$ depends on. Then
+\begin{equation*}
+\frac{\partial\ln{L}}{\partial\theta_j}=
+\sum_{i=1}^m\frac{\pi_j}{\sum_{j'=1}^qp_{Y|S}\left(y_i|S_i=j'\right)\pi_j}
+\frac{\partial p_{Y|S}\left(y_i|S_i=j\right)}{\partial\theta_j}
+\end{equation*}
+\begin{equation*}
+\frac{\partial\ln{L}}{\partial\theta_j}=
+\sum_{i=1}^m\frac{p_{Y|S}\left(y_i|S_i=j\right)\pi_j}{\sum_{j'=1}^qp_{Y|S}\left(y_i|S_i=j'\right)\pi_j}
+\frac{\partial \ln\left[p_{Y|S}\left(y_i|S_i=j\right)\right]}{\partial\theta_j}
+\end{equation*}
+which is just
+\begin{equation}
+\frac{\partial\ln{L}}{\partial\theta_j}=
+\sum_{i=1}^mr_{i,j}
+\frac{\partial \ln\left[p_{Y|S}\left(y_i|S_i=j\right)\right]}{\partial\theta_j} \ .
+\end{equation}
+Using the above result
+\begin{equation*}
+\nabla_{\vectGreek{\beta}_j}\ln{L}
+=\sum_{i=1}^{m}
+r_{i,j}
+\nabla_{\vectGreek{\beta}_j}
+\ln\left[
+	\frac{1}{\sqrt{2\pi}\sigma_j}\exp\left(-\frac{1}{2}\left(\frac{y_i-\left(\vect{x}_i\right)\T\vectGreek{\beta}_j}{\sigma_j}\right)^2\right)
+\right]
+\end{equation*}
+\begin{equation*}
+\nabla_{\vectGreek{\beta}_j}\ln{L}
+=\sum_{i=1}^{m}
+r_{i,j}
+\nabla_{\vectGreek{\beta}_j}
+\left[
+	-\frac{1}{2}\ln(2\pi) - \frac{1}{2}\ln\left(\sigma_j^2\right)-\frac{1}{2}\left(\frac{y_i-\left(\vect{x}_i\right)\T\vectGreek{\beta}_j}{\sigma_j}\right)^2
+\right] \ .
+\end{equation*}
+Expanding it out
+\begin{equation*}
+\nabla_{\vectGreek{\beta}_j}\ln{L}
+=\sum_{i=1}^{m}
+r_{i,j}
+\nabla_{\vectGreek{\beta}_j}
+\left[-\frac{1}{2\sigma_j^2}\left(-2y_i\vectGreek{\beta}_j\T\vect{x}_i
++\vectGreek{\beta}_j\T\vect{x}_i\left(\vect{x}_i\right)\T\vectGreek{\beta}_j
+\right)
++c_1
+\right]
+\end{equation*}
+and using the properties of the trace
+\begin{equation*}
+\nabla_{\vectGreek{\beta}_j}\ln{L}
+=\sum_{i=1}^{m}
+r_{i,j}
+\nabla_{\vectGreek{\beta}_j}
+\left[-\frac{1}{2\sigma_j^2}\left(-2y_i\trace\left(\vectGreek{\beta}_j\T\vect{x}_i\right)
++\trace\left(\vectGreek{\beta}_j\T\vect{x}_i\left(\vect{x}_i\right)\T\vectGreek{\beta}_j
+\right)\right)
++c_1
+\right]
+\end{equation*}
+together with the results in Appendix \ref{chapter:matrixCalculus}
+\begin{equation}
+\nabla_{\vectGreek{\beta}_j}\ln{L}
+=\sum_{i=1}^{m}
+-\frac{r_{i,j}}{2\sigma_j^2}
+\left(-2y_i\vect{x}_i
++2\vect{x}_i\left(\vect{x}_i\right)\T\vectGreek{\beta}_j
+\right) \ .
+\end{equation}
+Setting this to zero
+\begin{equation*}
+\sum_{i=1}^{m}
+r_{i,j}
+y_i\vect{x}_i
+=
+\sum_{i=1}^{m}r_{i,j}
+\vect{x}_i\left(\vect{x}_i\right)\T\widehat{\vectGreek{\beta}}_j
+\end{equation*}
+\begin{equation}
+\widehat{\vectGreek{\beta}}_j
+=
+\left[\sum_{i=1}^{m}r_{i,j}
+\vect{x}_i\left(\vect{x}_i\right)\T\right]^{-1}
+\left[\sum_{i=1}^{m}
+r_{i,j}
+y_i\vect{x}_i\right]
+\end{equation}
+and this is just weighted least squares where the weights are the responsibilities on model $j$.
+
+By re-parametrise $1/\sigma_j^2=\tau_j$
+\begin{equation*}
+\frac{\partial\ln{L}}{\partial\tau_j}
+=\sum_{i=1}^{m}
+r_{i,j}
+\frac{\partial}{\partial\tau_j}
+\left[
+	-\frac{1}{2}\ln(2\pi) + \frac{1}{2}\ln\left(\tau_j\right)-\frac{\tau_j}{2}\left({y_i-\left(\vect{x}_i\right)\T\vectGreek{\beta}_j}\right)^2
+\right]
+\end{equation*}
+\begin{equation}
+\frac{\partial\ln{L}}{\partial\tau_j}
+=\sum_{i=1}^{m}
+r_{i,j}
+\left[\frac{1}{2\tau_j}-\frac{1}{2}\left({y_i-\left(\vect{x}_i\right)\T\vectGreek{\beta}_j}\right)^2
+\right] \ .
+\end{equation}
+Setting this to zero
+\begin{equation}
+\widehat{\sigma}_j^2
+=
+\frac{\sum_{i=1}^{m}
+r_{i,j}\left({y_i-\left(\vect{x}_i\right)\T\vectGreek{\beta}_j}\right)^2}
+{\sum_{i=1}^{m}r_{i,j}}
+\end{equation}
+and this is the weighted mean squared error.
+
+To obtain the maximum log likelihood estimator for $\pi_j$, a Lagrange multiplier must be used to put a constraint that $\sum_{j=1}^q\pi_j=1$. The objective is then
+\begin{equation*}
+T = \ln{L} + \lambda\left(\sum_{j=1}^q\pi_j-1\right)
+\end{equation*}
+\begin{equation*}
+\frac{\partial T}{\partial\pi_j}=\frac{\partial}{\partial\pi_j}\sum_{i=1}^m\ln\left[
+\sum_{j'=1}^qp_{Y|S}\left(y_i|S_i=j'\right)\pi_{j'}
+\right] + \lambda
+\end{equation*}
+\begin{equation*}
+\frac{\partial T}{\partial\pi_j}=\sum_{i=1}^m\frac{p_{Y|S}\left(y_i|S_i=j\right)}{\sum_{j'=1}^qp_{Y|S}\left(y_i|S_i=j'\right)\pi_{j'}} + \lambda
+\end{equation*}
+\begin{equation}
+\frac{\partial T}{\partial\pi_j}=\sum_{i=1}^m\frac{r_{i,j}}{\pi_j} + \lambda \ .
+\end{equation}
+Setting this to zero
+\begin{equation}
+\widehat{\pi}_j = \sum_{i=1}^m\frac{r_{i,j}}{\lambda} \ .
+\end{equation}
+$\lambda$ can be determined by putting a constraint on the estimators of $\pi_j$ for $j=1,2,\dotdotdot,q$
+\begin{equation*}
+\sum_{j=1}^q\sum_{i=1}^m\frac{r_{i,j}}{\lambda}=1
+\end{equation*}
+\begin{equation*}
+\sum_{i=1}^m\sum_{j=1}^qr_{i,j}=\lambda
+\end{equation*}
+\begin{equation*}
+\sum_{i=1}^m1=\lambda
+\end{equation*}
+\begin{equation}
+m=\lambda
+\end{equation}
+therefore
+\begin{equation}
+\widehat{\pi}_j = \sum_{i=1}^m\frac{r_{i,j}}{m} \ .
+\end{equation}
+This is the average responsibility.
+
+\section{M Step for Factor Analysis}\label{chapter:mStep_factorAnalysis}
+The objective is to maximise is the condition expectation of the log joint likelihood, that is
+\begin{equation*}
+H = \expectation_{\vect{Y}|\vect{X}}\left[\sum_{i=1}^{n}\ln p_{\vect{X},\vect{Y}}\left(\vect{x}^{(i)},\vect{Y}^{(i)}\right)\right] \ .
+\end{equation*}
+This can be expressed as
+\begin{equation*}
+H = \expectation_{\vect{Y}|\vect{X}}\left[
+\sum_{i=1}^{n}\left(\ln p_{\vect{X}|\vect{Y}}\left(\vect{x}^{(i)}|\vect{Y}^{(i)}\right)+\ln p_{\vect{Y}}\left(\vect{Y}^{(i)}\right)\right)
+\right]
+\end{equation*}
+Because the marginal distribution of the latent variables do not depend on $\matr{\Lambda}$ and $\matr{\Psi}$, the last term can be ignored. Using Equation \eqref{eq:factor_analysis_x_given_y_dist}
+\begin{multline*}
+H = \expectation_{\vect{Y}|\vect{X}}\left[
+\sum_{i=1}^{n}\ln\left(\frac{1}{\|2\pi\matr{\Psi}\|^{1/2}}
+\right.\right.
+\\
+\left.\left.
+\exp\left(-\frac{1}{2}\left(\vect{x}^{(i)}-\matr{\Lambda}\vect{Y}^{(i)}\right)\T\matr{\Psi}^{-1}\left(\vect{x}^{(i)}-\matr{\Lambda}\vect{Y}^{(i)}\right)\right)\right)
+\right]
++c_1
+\end{multline*}
+\begin{multline*}
+H = \expectation_{\vect{Y}|\vect{X}}\left[
+\sum_{i=1}^{n}\left(-\frac{1}{2}\ln{\|2\pi\matr{\Psi}\|}
+\right.\right.
+\\
+\left.\left.
+-\frac{1}{2}\left(\vect{x}^{(i)}-\matr{\Lambda}\vect{Y}^{(i)}\right)\T\matr{\Psi}^{-1}\left(\vect{x}^{(i)}-\matr{\Lambda}\vect{Y}^{(i)}\right)\right)
+\right]
++c_1
+\end{multline*}
+\begin{multline*}
+H = -\frac{1}{2}\expectation_{\vect{Y}|\vect{X}}\left[
+\sum_{i=1}^{n}\left(\ln{\|2\pi\matr{\Psi}\|}+\left(\vect{x}^{(i)}\right)\T\matr{\Psi}^{-1}\matr{\Lambda}\vect{Y}^{(i)}
+\right.\right.
+\\
+\left.\left.
+-2\left(\vect{x}^{(i)}\right)\T\matr{\Psi}^{-1}\matr{\Lambda}\vect{Y}^{(i)}+\left(\vect{Y}^{(i)}\right)\T\matr{\Lambda}\T\matr{\Psi}^{-1}\matr{\Lambda}\vect{Y}^{(i)}\right)
+\right]
++c_1
+\end{multline*}
+By defining
+\begin{equation}
+\expectation_{\vect{Y}|\vect{X}}\left[\vect{Y}^{(i)}|\vect{X}^{(i)}=\vect{x}^{(i)}\right]=\vect{y}^{(i)}
+\end{equation}
+and
+\begin{equation}
+\cov\left[\vect{Y}^{(i)}|\vect{X}^{(i)}=\vect{x}^{(i)}\right] = \matr{\Sigma}_{\vect{Y}}
+\end{equation}
+then when taking the conditional expectation
+\begin{multline*}
+H = -\frac{1}{2}\sum_{i=1}^{n}\left[
+\ln\|2\pi\matr{\Psi}\|+\left(\vect{x}^{(i)}\right)\T\matr{\Psi}^{-1}\vect{x}^{(i)}-2\left(\vect{x}^{(i)}\right)\T\matr{\Psi}^{-1}\matr{\Lambda}\vect{y}^{(i)}\right.\\
+\left.+\trace\left(\matr{\Lambda}\T\matr{\Psi}^{-1}\matr{\Lambda}\matr{\Sigma}_{\vect{Y}}\right)+\left(\vect{y}^{(i)}\right)\T\matr{\Lambda}\T\matr{\Psi}^{-1}\matr{\Lambda}\vect{y}^{(i)}
+\right]+c_1
+\end{multline*}
+\begin{multline*}
+H = -\frac{1}{2}\sum_{i=1}^{n}\left[
+\ln\|2\pi\matr{\Psi}\|+\left(\vect{x}^{(i)}\right)\T\matr{\Psi}^{-1}\vect{x}^{(i)}-2\left(\vect{x}^{(i)}\right)\T\matr{\Psi}^{-1}\matr{\Lambda}\vect{y}^{(i)}\right.\\
+\left.+\trace\left(\matr{\Lambda}\T\matr{\Psi}^{-1}\matr{\Lambda}\matr{\Sigma}_{\vect{Y}}\right)+\trace\left(\matr{\Lambda}\T\matr{\Psi}^{-1}\matr{\Lambda}\vect{y}^{(i)}\left(\vect{y}^{(i)}\right)\T\right)
+\right]+c_1
+\end{multline*}
+\begin{multline*}
+H = -\frac{1}{2}\sum_{i=1}^{n}\left[
+\ln\|2\pi\matr{\Psi}\|+\left(\vect{x}^{(i)}\right)\T\matr{\Psi}^{-1}\vect{x}^{(i)}-2\left(\vect{x}^{(i)}\right)\T\matr{\Psi}^{-1}\matr{\Lambda}\vect{y}^{(i)}\right.\\
+\left.+\trace\left(\matr{\Lambda}\T\matr{\Psi}^{-1}\matr{\Lambda}\left(\matr{\Sigma}_{\vect{Y}}+\vect{y}^{(i)}\left(\vect{y}^{(i)}\right)\T\right)\right)
+\right]+c_1
+\end{multline*}
+\begin{multline*}
+H = -\frac{n}{2}
+\ln\|\matr{\Psi}\|
+-\frac{1}{2}\sum_{i=1}^{n}\left(\vect{x}^{(i)}\right)\T\matr{\Psi}^{-1}\vect{x}^{(i)}
++\sum_{i=1}^{n}\left(\vect{x}^{(i)}\right)\T\matr{\Psi}^{-1}\matr{\Lambda}\vect{y}^{(i)}\\
+-\frac{1}{2}\sum_{i=1}^{n}\trace\left(\matr{\Lambda}\T\matr{\Psi}^{-1}\matr{\Lambda}\left(\matr{\Sigma}_{\vect{Y}}+\vect{y}^{(i)}\left(\vect{y}^{(i)}\right)\T\right)\right)
++c_2
+\end{multline*}
+
+Taking the derivative with respect to $\matr{\Lambda}$
+\begin{equation*}
+\matr{D}_{\matr{\Lambda}}H=
+\matr{D}_{\matr{\Lambda}}\left[
+\sum_{i=1}^n\left(\vect{x}^{(i)}\right)\T\matr{\Psi}^{-1}\matr{\Lambda}\vect{y}^{(i)}
+-\frac{1}{2}\sum_{i=1}^{n}\trace\left(\matr{\Lambda}\T\matr{\Psi}^{-1}\matr{\Lambda}\left(\matr{\Sigma}_{\vect{Y}}+\vect{y}^{(i)}\left(\vect{y}^{(i)}\right)\T\right)\right)
+\right]
+\end{equation*}
+\begin{multline*}
+\matr{D}_{\matr{\Lambda}}H=
+\matr{D}_{\matr{\Lambda}}\left[
+\sum_{i=1}^n\trace\left(\left(\vect{y}^{(i)}\right)\T\matr{\Lambda}\T\matr{\Psi}^{-1}\vect{x}^{(i)}\right)
+\right.
+\\
+\left.
+-\frac{1}{2}\sum_{i=1}^{n}\trace\left(\matr{\Lambda}\T\matr{\Psi}^{-1}\matr{\Lambda}\left(\matr{\Sigma}_{\vect{Y}}+\vect{y}^{(i)}\left(\vect{y}^{(i)}\right)\T\right)\right)
+\right]
+\end{multline*}
+\begin{multline*}
+\matr{D}_{\matr{\Lambda}}H=
+\matr{D}_{\matr{\Lambda}}\left[
+\sum_{i=1}^n\trace\left(\matr{\Lambda}\T\matr{\Psi}^{-1}\vect{x}^{(i)}\left(\vect{y}^{(i)}\right)\T\right)
+\right.
+\\
+\left.
+-\frac{1}{2}\sum_{i=1}^{n}\trace\left(\matr{\Lambda}\T\matr{\Psi}^{-1}\matr{\Lambda}\left(\matr{\Sigma}_{\vect{Y}}+\vect{y}^{(i)}\left(\vect{y}^{(i)}\right)\T\right)\right)
+\right]
+\end{multline*}
+\begin{equation*}
+\matr{D}_{\matr{\Lambda}}H=
+\sum_{i=1}^n\matr{\Psi}^{-1}\vect{x}^{(i)}\left(\vect{y}^{(i)}\right)\T
+-\sum_{i=1}^{n}\matr{\Psi}^{-1}\matr{\Lambda}\left(\matr{\Sigma}_{\vect{Y}}+\vect{y}^{(i)}\left(\vect{y}^{(i)}\right)\T\right) \ .
+\end{equation*}
+Setting the derivative to zero
+\begin{equation*}
+\matr{0}=
+\sum_{i=1}^n\matr{\Psi}^{-1}\vect{x}^{(i)}\left(\vect{y}^{(i)}\right)\T
+-\sum_{i=1}^{n}\matr{\Psi}^{-1}\matr{\Lambda}\left(\matr{\Sigma}_{\vect{Y}}+\vect{y}^{(i)}\left(\vect{y}^{(i)}\right)\T\right) \ .
+\end{equation*}
+\begin{equation*}
+\matr{0}=
+\sum_{i=1}^n\vect{x}^{(i)}\left(\vect{y}^{(i)}\right)\T
+-\matr{\Lambda}\left(n\matr{\Sigma}_{\vect{Y}}+\sum_{i=1}^{n}\vect{y}^{(i)}\left(\vect{y}^{(i)}\right)\T\right)
+\end{equation*}
+\begin{equation}
+\matr{\Lambda}
+=
+\left(\sum_{i=1}^n\vect{x}^{(i)}\left(\vect{y}^{(i)}\right)\T\right)\left(n\matr{\Sigma}_{\vect{Y}}+\sum_{i=1}^{n}\vect{y}^{(i)}\left(\vect{y}^{(i)}\right)\T\right)^{-1}\ .
+\end{equation}
+
+The objective can be re-parametrised using $\matr{T}=\matr{\Psi}^{-1}$ so that
+\begin{multline*}
+H = -\frac{n}{2}
+\ln\|\matr{T^{-1}}\|
+-\frac{1}{2}\sum_{i=1}^{n}\left(\vect{x}^{(i)}\right)\T\matr{T}\vect{x}^{(i)}
++\sum_{i=1}^{n}\left(\vect{x}^{(i)}\right)\T\matr{T}\matr{\Lambda}\vect{y}^{(i)}\\
+-\frac{1}{2}\sum_{i=1}^{n}\trace\left(\matr{\Lambda}\T\matr{T}\matr{\Lambda}\left(\matr{\Sigma}_{\vect{Y}}+\vect{y}^{(i)}\left(\vect{y}^{(i)}\right)\T\right)\right)
++c_2
+\end{multline*}
+\begin{multline*}
+H = -\frac{n}{2}
+\ln\|\matr{T^{-1}}\|
+-\frac{1}{2}\sum_{i=1}^{n}\left(\vect{x}^{(i)}\right)\T\matr{T}\vect{x}^{(i)}
++\sum_{i=1}^{n}\left(\vect{x}^{(i)}\right)\T\matr{T}\matr{\Lambda}\vect{y}^{(i)}\\
+-\frac{1}{2}\sum_{i=1}^{n}\trace\left(\matr{\Lambda}\T\matr{T}\matr{\Lambda}\left(\matr{\Sigma}_{\vect{Y}}+\vect{y}^{(i)}\left(\vect{y}^{(i)}\right)\T\right)\right)
++c_2 \ .
+\end{multline*}
+$\|\matr{T}^{-1}\| = 1/\|\matr{T}\|$ and using the properties of the trace
+\begin{multline*}
+H = \frac{n}{2}
+\ln\|\matr{T}\|
+-\frac{1}{2}\sum_{i=1}^{n}\trace\left(\matr{T}\vect{x}^{(i)}\left(\vect{x}^{(i)}\right)\T\right)
++\sum_{i=1}^{n}\trace\left(\matr{T}\matr{\Lambda}\vect{y}^{(i)}\left(\vect{x}^{(i)}\right)\T\right)\\
+-\sum_{i=1}^{n}\frac{1}{2}\trace\left(\matr{T}\matr{\Lambda}\left(\matr{\Sigma}_{\vect{Y}}+\vect{y}^{(i)}\left(\vect{y}^{(i)}\right)\T\right)\matr{\Lambda}\T\right)
++c_2 \ .
+\end{multline*}
+Taking the derivative with respect to $\matr{\Psi}$
+\begin{multline*}
+\matr{D}_{\matr{\Psi}}H = \frac{n}{2}\matr{T}^{-1}
+-\frac{1}{2}\sum_{i=1}^{n}\vect{x}^{(i)}\left(\vect{x}^{(i)}\right)\T
++\sum_{i=1}^{n}\matr{\Lambda}\vect{y}^{(i)}\left(\vect{x}^{(i)}\right)\T\\
+-\sum_{i=1}^{n}\frac{1}{2}\matr{\Lambda}\left(\matr{\Sigma}_{\vect{Y}}+\vect{y}^{(i)}\left(\vect{y}^{(i)}\right)\T\right)\matr{\Lambda}\T \ .
+\end{multline*}
+Setting the derivative to zero
+\begin{multline*}
+\matr{0} = \frac{n}{2}\matr{\Psi}
+-\frac{1}{2}\sum_{i=1}^{n}\vect{x}^{(i)}\left(\vect{x}^{(i)}\right)\T
++\sum_{i=1}^{n}\matr{\Lambda}\vect{y}^{(i)}\left(\vect{x}^{(i)}\right)\T\\
+-\frac{n}{2}\matr{\Lambda}\matr{\Sigma}_{\vect{Y}}\matr{\Lambda}-\frac{1}{2}\matr{\Lambda}\sum_{i=1}^{n}\vect{y}^{(i)}\left(\vect{y}^{(i)}\right)\T)\matr{\Lambda}\T
+\end{multline*}
+\begin{equation*}
+\matr{0} = \frac{n}{2}\matr{\Psi}
+-\frac{1}{2}\sum_{i=1}^{n}\left(
+\left(\vect{x}^{(i)}-\matr{\Lambda}\vect{y}^{(i)}\right)
+\left(\vect{x}^{(i)}-\matr{\Lambda}\vect{y}^{(i)}\right)\T
+\right)
+-\frac{n}{2}\matr{\Lambda}\matr{\Sigma}_{\vect{Y}}\matr{\Lambda}
+\end{equation*}
+\begin{equation}
+\matr{\Psi} =
+\frac{1}{n}\sum_{i=1}^{n}\left(
+\left(\vect{x}^{(i)}-\matr{\Lambda}\vect{y}^{(i)}\right)
+\left(\vect{x}^{(i)}-\matr{\Lambda}\vect{y}^{(i)}\right)\T
+\right)
++\matr{\Lambda}\matr{\Sigma}_{\vect{Y}}\matr{\Lambda}\ .
+\end{equation}
+Because $\matr{\Psi}$ is a diagonal matrix, only the diagonal entries need to be updated.
 
 \bibliographystyle{unsrt}
 \bibliography{bib}
