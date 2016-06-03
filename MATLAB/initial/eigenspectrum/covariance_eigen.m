@@ -96,7 +96,7 @@ colorbar;
 figure;
 boxplot(eigenvalue_array);
 xlabel('Eigenvalue number');
-ylabel('Eigenvalue (AU)');
+ylabel('Eigenvalue (arb. unit)');
 
 %for each eigenvector, plot the non-bootstrap eigenimage
 figure('Position', [100, 100, 800, 400]);
