@@ -812,7 +812,7 @@ The E step estimates the values of the latent variables, $\vect{Y}^{(1)},\vect{Y
 \end{equation}
 for $i=1,2,\dotdotdot,n$. The covariance of the latent variables are estimated by
 \begin{equation}
-\matr{\Sigma}_{\vect{Y}} = \left(\matr{\Lambda}\T\matr{\Psi}^{-1}\matr{\Lambda}+\matr{1}\right)^{-1}
+\cov\left[\vect{Y}^{(i)}|\vect{X}^{(i)}=\vect{x}^{(i)}\right]=\matr{\Sigma}_{\vect{Y}} = \left(\matr{\Lambda}\T\matr{\Psi}^{-1}\matr{\Lambda}+\matr{1}\right)^{-1}
 \end{equation}
 
 In the E step, the parameters $\matr{\Lambda}$ and $\matr{\Psi}$ are varied to maximise the log likelihood, assuming the latent variables are known and fixed. The objective is to maximise is the condition expectation of the log joint likelihood, that is
@@ -887,166 +887,32 @@ The main source of error was down to the small sample size. The experiments can 
 \end{figure}
 
 \section{Compound Poisson}
-Consider photons emitted from an X-ray tube. These photons have a board energy spectrum as a result of Bremsstrahlung and characteristic radiation. An experiment can be conducted by measuring the energy of each photon, over some exposure time, to obtain a histogram of photon energies, similar to the one in Figure \ref{fig:x_ray_spectrum2}.
+Consider photons emitted from an X-ray tube as a Poisson process. These photons have a board energy spectrum as a result of Bremsstrahlung and characteristic radiation. A Compound Poisson model was used to model the grey values of each pixel by considering the sum of the energies of each photon detected.
 
-\begin{figure}
-\centering
-\includegraphics[width=0.8\textwidth]{figures/x_ray_spectrum.png}
-\caption{A typical energy spectrum of X-ray photons emitted from an X-ray tube. The continuous spectrum is the result of Bremmsstrahlung radiation. The peaks are the result of characteristic radiation. \emph{Source: G.~Michael (2001) \cite{michael2001x}}}
-\label{fig:x_ray_spectrum2}
-\end{figure}
-
-In order to model the number of photons detected in some exposure time as a Poisson process, the rate of photons emitted is an important variable. However it is nonsense to talk about the rate of photons with energy exactly $E$. This is because energy is a continuous variable and cannot be modelled discretely. Instead the rate of photons with energy $E_1<E<E_2$ should be considered.
-
-To take into consideration the continuous nature of energy, the histogram of photon energies should be normalised in such a way that the area of the histogram is the rate of photons, with any energy, detected. This will produce an approximation to the rate density function $\lambda(E)$. The rate density function has units of $\textup{s}^{-1}\cdot\textup{keV}^{-1}$.
-
-The rate density function has the following properties.
-\begin{equation}
-\text{rate of photons with energy }E_1<E<E_2=
-\int_{E_1}^{E_2}\lambda(E)\diff E
-\end{equation}
-\begin{equation}
-\text{rate of photons with any energy }=
-\int_{0}^{\infty}\lambda(E)\diff E
-\end{equation}
-
-The expected energy can be calculated by splitting the rate density function into $n$ equal intervals, of size $\Delta E$, $E_1,E_2,\dotdotdot,E_n$. A weighted mean can be used to estimate the expected energy
-\begin{equation}
-\expectation[E]=\frac{\sum_{i=1}^nE_i\lambda(E_i)\Delta E}{\sum_{i=1}^n\lambda(E_i)\Delta E} \ .
-\end{equation}
-Taking the limit $\Delta E\rightarrow0$ and $n\rightarrow\infty$, the sum becomes an integral and can be generalised to
-\begin{equation}
-\expectation[E]=\frac{\int_{0}^{\infty}E\lambda(E)\diff E}{\int_{0}^{\infty}\lambda(E)\diff E} \ .
-\end{equation}
-This can be extended to the expected function of energy, for example
-\begin{equation}
-\expectation[E^2]=\frac{\int_{0}^{\infty}E^2\lambda(E)\diff E}{\int_{0}^{\infty}\lambda(E)\diff E} \ .
-\end{equation}
-The variance of the energy then can be computed
-\begin{equation}
-\variance[E]=\expectation[E^2]-\left(\expectation[E]\right)^2 \ .
-\end{equation}
-
-The intensity $I$ is the rate of energy per unit area. Again, by splitting the rate density function into $n$ equal intervals, the intensity can be approximated by summing energy $\times$ rate for each interval
-\begin{equation}
-I = \frac{1}{A}\sum_{i=1}^nE_i\lambda(E_i)\Delta E
-\end{equation}
-where $A$ is the area of the detector.
-Taking the limit $\Delta E\rightarrow0$ and $n\rightarrow\infty$, the sum becomes an integral and can be generalised to
-\begin{equation}
-I = \frac{1}{A}\int_{0}^{\infty}E\lambda(E)\diff E \ .
-\end{equation}
-Thus intensity is proportional to the average energy.
-
-\subsection{Attenuation}
-Consider an incident pencil beam of X-ray photons, with intensity $I_0$, random energy $E_0$ and rate density $\lambda_0(E)$. The beam penetrates through an object with attenuation constant $\mu$ and length $L$. It is given that the intensity of the transmitted beam $I_1$ is
-\begin{equation}
-I_1 = I_0 \euler^{-\mu L} \ .
-\end{equation}
-Then
-\begin{equation}
-I_1 = \frac{\euler^{-\mu L}}{A}\int_{0}^{\infty}E\lambda_0(E)\diff E
-\end{equation}
-where $A$ is the area of the pencil beam. Substituting the rate density for the transmitted beam $\lambda_1(E)$
-\begin{equation}
-\int_{0}^{\infty}E\lambda_1(E)\diff E = \euler^{-\mu L}\int_{0}^{\infty}E\lambda_0(E)\diff E
-\end{equation}
-\begin{equation}
-\frac{\int_{0}^{\infty}E\lambda_1(E)\diff E}{\int_{0}^{\infty}\lambda_1(E)\diff E}= \euler^{-\mu L}\frac{\int_{0}^{\infty}E\lambda_0(E)\diff E}{\int_{0}^{\infty}\lambda_1(E)\diff E}
-\end{equation}
-\begin{equation}
-\expectation[E_1]= \euler^{-\mu L}\frac{\int_{0}^{\infty}E\lambda_0(E)\diff E}{\int_{0}^{\infty}\lambda_1(E)\diff E}
-\end{equation}
-\begin{equation}
-\expectation[E_1]= \euler^{-\mu L}\frac{\int_{0}^{\infty}\lambda_0(E)\diff E}{\int_{0}^{\infty}\lambda_1(E)\diff E}\expectation[E_0] \ .
-\end{equation}
-Thus the expected photon energy will shift by a factor when transmitting through an object.
-
-Unfortunately Beer's law only seem to capture the shift in expectation. It would be interesting to see how the total rate $\int_{0}^{\infty}\lambda_1(E)\diff E$ and variance varied after transmission.
-
-It is given that the attenuation varies with different photon energies. To consider this, the attenuation should be a function of energy, that is $\mu=\mu(E)$. By splitting the rate density function into $n$ equal intervals, the intensity of the transmitted beam is
-\begin{equation}
-I_1=\frac{1}{A}\sum_{i=1}^n\euler^{-\mu(E_i)L}E_i\lambda_0(E_i)\Delta E \ .
-\end{equation}
-Taking the limit $\Delta E\rightarrow0$ and $n\rightarrow\infty$, the sum becomes an integral and can be generalised to
-\begin{equation}
-I_1=\frac{1}{A}\int_0^{\infty}\euler^{-\mu(E)L}E\lambda_0(E)\diff E
-\end{equation}
-and
-\begin{equation}
-I_1=\frac{1}{A}\int_0^{\infty}\lambda_0(E)\diff E \times \expectation\left[E_0\euler^{-\mu(E_0)L}\right] \ .
-\end{equation}
-Such a relationship is considerably more complicated.
-
-\subsection{Intensity}
-Let $U_i$ be the energy of photon $i$. Let $T$ be the sum of all the $N$ photons' energy detected after some exposure time $t$. These can be modelled as
-\begin{equation}
-N\sim\poisson\left(t\int_0^{\infty}\lambda_1(E)\diff E\right)
-\end{equation}
-\begin{equation}
-T|N = U_1 + U_2 + \dotdotdot + U_N
-\end{equation}
-where $U_i$ are i.i.d.~and has distribution
-\begin{equation}
-p_{U_i}(u) = \frac{\lambda_1(u)}{\int_0^{\infty}\lambda_1(E)\diff E}
-\end{equation}
-with mean $\mu_U$ and variance $\sigma_U^2$.
-
-The expectation of $T$ is
-\begin{equation}
-\expectation[T] = \expectation[\expectation[T|N]]
-\end{equation}
-\begin{equation}
-\expectation[T] = \expectation[N\mu_U]
-\end{equation}
-\begin{equation}
-\expectation[T] = \mu_U t\int_0^{\infty}\lambda_1(E)\diff E \ .
-\end{equation}
-The variance of $T$ is
-\begin{equation}
-\variance[T] = \variance[\expectation[T|N]] + \expectation[\variance[T|N]]
-\end{equation}
-\begin{equation}
-\variance[T] = \variance[N\mu_U] + \expectation[N\sigma_U^2]
-\end{equation}
-\begin{equation}
-\variance[T] = \left(\mu_U^2+\sigma_U^2\right)t\int_0^{\infty}\lambda_1(E)\diff E \ .
-\end{equation}
-
-The transmitted intensity $I_1$ is the rate of energy per unit area. This can be modelled as
-\begin{equation}
-I_1 = \frac{\alpha}{t}T + \epsilon
-\end{equation}
-where $\alpha$ is some constant with dimensions $\left[\text{L}^{-2}\right]$ and $\epsilon$ is some zero-mean noise with variance $\beta^2$.
-The expectation of $I_1$ is
-\begin{equation}
-\expectation[I_1] = \alpha\mu_U \int_0^{\infty}\lambda_1(E)\diff E \ .
-\end{equation}
-The variance of $I_1$ is
-\begin{equation}
-\variance[I_1] = \frac{\alpha^2}{t}\left(\mu_U^2+\sigma_U^2\right)\int_0^{\infty}\lambda_1(E)\diff E+\beta^2 \ .
-\end{equation}
-
-\subsection{Hierarchical Model}
-Suppose $n$ images have been obtained and each image has $p$ pixels. Each pixel has a corresponding intensity $X_i$ for $i=1,2,\dotdotdot,p$. The following hierarchical model was proposed to model the intensity of each pixel where $\alpha$ and $\tau$ are known constants.
+\subsection{Theory}
+Suppose $n$ images have been obtained and each image has $m$ pixels. Each pixel has a corresponding grey value $X_i$ for $i=1,2,\dotdotdot,m$. Let $Y_i$ be the number of photons detected in pixel $i$ and each photon has energy randomly distributed with mean $\mu_i$ and variance $\sigma_i^2$. The number of photons detected can be modelled as a Poisson process such that
 \begin{equation}
 Y_i\sim\poisson(\nu_i \tau)
 \end{equation}
+where $\nu_i$ is the post-attenuation rate and $\tau$ is the exposure time. The total amount of energy collected $U_i$ is then the sum of the energies of $Y_i$ photons. For large $Y_i$, the central limit theorem can be used so that $U_i$ is approximately Normally distributed so that
 \begin{equation}
 U_i|Y_i\sim\normal\left(
 Y_i\mu_i,Y_i\sigma_i^2
-\right)
+\right) \ .
 \end{equation}
+Assuming the grey value is modelling the intensity, rate of energy per unit area, then $X_i$ can be modelled using
 \begin{equation}
 X_i|U_i\sim\normal\left(
 \frac{\alpha}{\tau}U_i,\beta_i^2
 \right)
 \end{equation}
+where $\alpha$ is some positive constant and $\beta_i^2$ is the variance of some other external factors.
+ 
 The full joint probability density function is
-\begin{equation}
+\begin{equation*}
 p_{X_i,U_i,Y_i}\left(x_i,u_i,y_i\right)=
 p_{X_i|U_i}(x_i|u_i)p_{U_i|Y_i}(u_i|y_i)\prob(Y_i=y_i)
-\end{equation}
+\end{equation*}
 \begin{multline}
 p_{X_i,U_i,Y_i}\left(x_i,u_i,y_i\right)=
 \frac{1}{\sqrt{2\pi}\beta_i}\exp\left[-\frac{1}{2}\left(\frac{x_i-\alpha u_i /\tau}{\beta_i}\right)^2\right]
@@ -1054,24 +920,7 @@ p_{X_i,U_i,Y_i}\left(x_i,u_i,y_i\right)=
 \frac{1}{\sqrt{2\pi}\sqrt{y_i\sigma_i^2}}\exp\left[-\frac{1}{2}\left(\frac{u_i-y_i\mu_i}{\sqrt{y_i\sigma_i^2}}\right)^2\right]
 \euler^{-\nu_i\tau}\frac{(\nu_i\tau)^{y_i}}{y_i!} \ .
 \end{multline}
-
-By marginalising out $U_i$, a one layer latent variable model can be obtained and the unknown parameters $\nu_i,\mu_i,\sigma_i^2,\beta_i^2$ can be estimated using the EM algorithm. This can be shown by integrating the full joint probability density function with respect to $u_i$
-\begin{multline}
-p_{X_i,Y_i}\left(x_i,y_i\right)=\int_{u_i=-\infty}^{u_i=\infty}
-\frac{1}{\sqrt{2\pi}\beta_i}\exp\left[-\frac{1}{2}\left(\frac{x_i-\alpha u_i /\tau}{\beta_i}\right)^2\right]
-\\
-\frac{1}{\sqrt{2\pi}\sqrt{y_i\sigma_i^2}}\exp\left[-\frac{1}{2}\left(\frac{u_i-y_i\mu_i}{\sqrt{y_i\sigma_i^2}}\right)^2\right]
-\euler^{-\nu_i\tau}\frac{(\nu_i\tau)^{y_i}}{y_i!} \diff u_i
-\end{multline}
-to get
-\begin{multline}
-p_{X_i,Y_i}\left(x_i,y_i\right)=
-\frac{\euler^{-\nu_i\tau}(\nu_i\tau)^{y_i}}{y_i!}
-\\
-\frac{1}{\sqrt{2\pi}\sqrt{\beta_i^2+\alpha^2y_i\sigma_i^2/\tau^2}}
-\exp\left[-\frac{1}{2}\left(\frac{x_i-y_i\mu_i\alpha/\tau}{\sqrt{\beta_i^2+\alpha^2y_i\sigma_i^2/\tau^2}}\right)^2\right] \ .
-\end{multline}
-By inspection the one layer latent model is
+By marginalising out $U_i$, a one layer latent variable model can be obtained and the unknown parameters $\nu_i,\mu_i,\sigma_i^2,\beta_i^2$ can be estimated using the EM algorithm. The one layer latent variable is given as
 \begin{equation}
 Y_i\sim\poisson(\nu_i\tau)
 \end{equation}
@@ -1080,39 +929,35 @@ X_i|Y_i\sim\normal\left(
 \frac{\alpha\mu_i}{\tau}Y_i,\frac{\alpha^2\sigma_i^2}{\tau^2}Y_i+\beta_i^2
 \right) \ .
 \end{equation}
+The proof of this can be found in Appendix \ref{chapter:oneLayer_compoundPoisson}. Because this is a one layer latent variable model, the EM algorithm can be used to estimate the parameters $\nu_i$,$\mu_i$,$\sigma_i^2$ and $\beta_i^2$.
 
 The marginal expectation and variance can be calculated
-\begin{equation}
+\begin{equation*}
 \expectation[X_i]=\expectation[\expectation[X_i|Y_i]]
-\end{equation}
-\begin{equation}
+\end{equation*}
+\begin{equation*}
 \expectation[X_i]=\expectation\left[\frac{\alpha\mu_i}{\tau}Y_i\right]
-\end{equation}
+\end{equation*}
 \begin{equation}
 \expectation[X_i] = \alpha \mu_i \nu_i
 \end{equation}
 and
-\begin{equation}
+\begin{equation*}
 \variance[X_i] = \expectation[\variance[X_i|Y_i]] + \variance[\expectation[X_i|Y_i]]
-\end{equation}
-\begin{equation}
+\end{equation*}
+\begin{equation*}
 \variance[X_i] = \expectation\left[\frac{\alpha^2\sigma_i^2}{\tau^2}Y_i+\beta_i^2\right] + \variance\left[\frac{\alpha\mu_i}{\tau}Y_i\right]
-\end{equation}
-\begin{equation}
+\end{equation*}
+\begin{equation*}
 \variance[X_i] =
 \frac{\alpha^2\sigma_i^2}{\tau^2}\nu_i\tau+\beta_i^2\
 +\frac{\alpha^2\mu_i^2}{\tau^2}\nu_i\tau
-\end{equation}
-\begin{equation}
-\variance[X_i] =
-\frac{\alpha^2\sigma_i^2}{\tau^2}\nu_i\tau+\beta_i^2\
-+\frac{\alpha^2\mu_i^2}{\tau^2}\nu_i\tau
-\end{equation}
+\end{equation*}
 \begin{equation}
 \variance[X_i] = \frac{\alpha^2\nu_i}{\tau}\left(\mu_i^2+\sigma_i^2\right)+\beta_i^2 \ .
 \end{equation}
 
-This model can be made simpler by setting $\beta_i=0$ because by doing so the joint probability density function is in the exponential family. However for the case of $\beta_i=0$, the joint probability density function much consider the special case of $Y_i=0$ because such a case will drive the variance of $X_i|Y_i$ to zero.
+This model can be made simpler by setting $\beta_i=0$ because by doing so the joint probability density function is in the exponential family with sufficient statistics $X_i^2/Y_i,X_i$ and $Y_i$. This is proven in Appendix \ref{chapter:compoundPoisson_expFamily}. However the joint probability density function much consider the special case of $Y_i=0$ because such a case will drive the variance of $X_i|Y_i$ to zero. This can be dealt with by using the Dirac delta function
 \begin{equation}
 p_{X_i,Y_i}\left(x_i,y_i\right)=
 \begin{cases}
@@ -1120,67 +965,24 @@ p_{X_i,Y_i}\left(x_i,y_i\right)=
 \\
 \dfrac{\euler^{-\nu_i\tau}(\nu_i\tau)^{y_i}\tau}{y_i!\sqrt{2\pi y_i}\alpha\sigma_i}
 \exp\left[-\dfrac{1}{2}\dfrac{\left(x_i-y_i\mu_i\alpha/\tau\right)^2}{\alpha^2y_i\sigma_i^2/\tau^2}\right] & \text{for }y=1,2,\dotdotdot
-\end{cases}
+\end{cases} \ .
 \end{equation}
-For the $y=1,2,\dotdotdot$ case, the joint probability density function can be rewritten as
-\begin{equation}
-p_{X_i,Y_i}\left(x_i,y_i\right)=\dfrac{\euler^{-\nu_i\tau}(\nu_i\tau)^{y_i}\tau}{y_i!\sqrt{2\pi y_i}\alpha\sigma_i}
-\exp\left[-\dfrac{1}{2}\dfrac{\left(x_i-y_i\mu_i\alpha/\tau\right)^2}{\alpha^2y_i\sigma_i^2/\tau^2}\right]
-\end{equation}
-\begin{multline}
-p_{X_i,Y_i}\left(x_i,y_i\right)=\dfrac{\euler^{-\nu_i\tau}\tau}{\sqrt{2\pi}\alpha\sigma_i}
-\exp\left[-\dfrac{1}{2}\dfrac{\left(x_i-y_i\mu_i\alpha/\tau\right)^2}{\alpha^2y_i\sigma_i^2/\tau^2}
-\right.
-\\
-\left.
--y_i\ln(\nu_i\tau) -\frac{1}{2}\ln{y_i} - \ln{y_i!}\right]
-\end{multline}
-\begin{multline}
-p_{X_i,Y_i}\left(x_i,y_i\right)=\dfrac{\euler^{-\nu_i\tau}\tau}{\sqrt{2\pi}\alpha\sigma_i}
-\exp\left[-\dfrac{\tau^2}{2\alpha^2\sigma_i^2}\dfrac{x_i^2-2\alpha\mu_ix_iy_i/\tau+\alpha^2\mu_i^2y_i^2/\tau^2}{y_i}
-\right.
-\\
-\left.
--y_i\ln(\nu_i\tau) -\frac{1}{2}\ln{y_i} - \ln{y_i!}\right]
-\end{multline}
-\begin{multline}
-p_{X_i,Y_i}\left(x_i,y_i\right)=\dfrac{\euler^{-\nu_i\tau}\tau}{\sqrt{2\pi}\alpha\sigma_i}
-\exp\left[-\dfrac{\tau^2}{2\alpha^2\sigma_i^2}\left(\frac{x_i^2}{y_i}-\frac{2\alpha\mu_ix_i}{\tau}+\frac{\alpha^2\mu_i^2y_i}{\tau^2}\right)
-\right.
-\\
-\left.
--y_i\ln(\nu_i\tau) -\frac{1}{2}\ln{y_i} - \ln{y_i!}\right]
-\end{multline}
-\begin{multline}
-p_{X_i,Y_i}\left(x_i,y_i\right)=\dfrac{\euler^{-\nu_i\tau}\tau}{\sqrt{2\pi}\alpha\sigma_i}
-\exp\left[
--\frac{\tau^2}{2\alpha^2\sigma_i^2}\frac{x_i^2}{y_i}
-+\frac{\tau\mu_i}{\alpha\sigma_i^2}x_i
-\right.
-\\
-\left.
--\left(\frac{\mu_i^2}{2\sigma^2}+\ln(\nu_i\tau)\right)y_i
--\frac{1}{2}\ln{y_i}
--\ln{y_i!}
-\right] \ .
-\end{multline}
-This shows that the joint probability density function is in the exponential family where the sufficient statistics are $X_i^2/Y_i,X_i$ and $Y_i$.
 
 For the E step, $Y_i$ and $1/Y_i$ are estimated given all the parameters using the conditional expectation $y_i=\expectation\left[Y_i|X_i=x_i\right]$ and $\zeta_i=\expectation\left[1/Y_i|X_i=x_i\right]$ respectively. The conditional probability mass function can be obtained by
-\begin{equation}
+\begin{equation*}
 \prob\left(Y_i=y_i|X_i=x_i\right)=\frac{p_{X_i,Y_i}\left(x_i,y_i\right)}{p_{X_i}(x_i)}
-\end{equation}
+\end{equation*}
 where $p_{X_i}(x_i)$ is the normalization constant.
 For the special cases
-\begin{equation}
+\begin{equation*}
 \prob\left(Y_i=0|X_i=0\right) \propto \delta(0)
-\end{equation}
-\begin{equation}
+\end{equation*}
+\begin{equation*}
 \prob\left(Y_i=y|X_i=0\right) \propto
 \dfrac{(\nu_i\tau)^{y_i}}{y_i!\sqrt{y_i}}
 \exp\left[-\dfrac{1}{2}\dfrac{\left(x_i-y_i\mu_i\alpha/\tau\right)^2}{\alpha^2y_i\sigma_i^2/\tau^2}\right]
 \quad \text{for }y=1,2,\dotdotdot \ .
-\end{equation}
+\end{equation*}
 But because $\delta(0)$ is infinite,
 \begin{equation}
 \prob\left(Y_i=y|X_i=0\right) =
@@ -1194,12 +996,12 @@ and
 \begin{equation}
 \expectation[Y_i|X_i=0] = 0 \ .
 \end{equation}
-$\expectation[1/Y_i|X_i=0]$ does not exist.
+$\expectation[1/Y_i|X_i=0]$ cannot be defined in a sensible manner.
 
 Another special case is
-\begin{equation}
+\begin{equation*}
 \prob\left(Y_i=0|X_i=x\right) \propto \delta(x) \quad \text{for }x\neq0
-\end{equation}
+\end{equation*}
 then
 \begin{equation}
 \prob\left(Y_i=0|X_i=x\right) = 0 \quad \text{for }x\neq0
@@ -1211,9 +1013,9 @@ For the general case $y_i=1,2,\dotdotdot$ and $x_i\neq0$
 \exp\left[-\dfrac{1}{2}\dfrac{\left(x_i-y_i\mu_i\alpha/\tau\right)^2}{\alpha^2y_i\sigma_i^2/\tau^2}\right]
 \end{equation}
 where
-\begin{equation}
+\begin{equation*}
 p_{X_i}(x_i)=\sum_{y=0}^{\infty}p_{X_i,Y_i}(x_i,y_i)
-\end{equation}
+\end{equation*}
 \begin{equation}
 p_{X_i}(x_i)=\sum_{y_i=1}^{\infty}\dfrac{\euler^{-\nu_i\tau}(\nu_i\tau)^{y_i}\tau}{y_i!\sqrt{2\pi y_i}\alpha\sigma_i}
 \exp\left[-\dfrac{1}{2}\dfrac{\left(x_i-y_i\mu_i\alpha/\tau\right)^2}{\alpha^2y_i\sigma_i^2/\tau^2}\right] \ .
@@ -1240,89 +1042,29 @@ In the M step the parameters $\nu_i,\mu_i,\sigma_i^2$ are estimated given the la
 \begin{equation}
 H_i=\sum_{j=1}^n\expectation_{Y_i|X_i}\left[\ln p_{X_i,Y_i}\left(x_i^{(j)},Y_i^{(j)}\right)\right]
 \end{equation}
-\begin{multline}
-H_i=\sum_{j=1}^n\expectation_{Y_i|X_i}\left[
--\nu_i\tau+Y_i^{(j)}\ln(\nu_i\tau)-\frac{1}{2}\ln\left(\frac{\alpha^2\sigma_i^2}{\tau^2}Y_i^{(j)}\right)
-\right.
-\\
-\left.
--\frac{1}{2}\frac{\left(x_i^{(j)}-Y_i^{(j)}\mu_i\alpha/\tau\right)^2}{\alpha^2Y_i^{(j)}\sigma_i^2/\tau^2}
-\right] + c_1 \ .
-\end{multline}
-\begin{multline}
-H_i= -n\nu_i\tau+\ln(\nu_i\tau)\sum_{j=1}^n\expectation_{Y_i|X_i}\left[Y_i^{(j)}\right]-\frac{n}{2}\ln\left(\frac{\alpha^2\sigma_i^2}{\tau^2}\right)
-\\
--\frac{1}{2}\sum_{j=1}^n\expectation_{Y_i|X_i}\left[\frac{\left(x_i^{(j)}-Y_i^{(j)}\mu_i\alpha/\tau\right)^2}{\alpha^2Y_i^{(j)}\sigma_i^2/\tau^2}\right]
- + c_2 \ .
-\end{multline}
-\begin{multline}
-H_i= -n\nu_i\tau+\ln(\nu_i\tau)\sum_{j=1}^n\expectation_{Y_i|X_i}\left[Y_i^{(j)}\right]-\frac{n}{2}\ln\left(\frac{\alpha^2\sigma_i^2}{\tau^2}\right)
-\\
--\frac{1}{2}\sum_{j=1}^n\expectation_{Y_i|X_i}\left[\frac{\left(x_i^{(j)}\right)^2-2x_i^{(j)}Y_i^{(j)}\mu_i\alpha/\tau+\left(Y_i^{(j)}\mu_i\alpha/\tau\right)^2}{\alpha^2Y_i^{(j)}\sigma_i^2/\tau^2}\right]
- + c_2 \ .
-\end{multline}
-\begin{multline}
-H_i= -n\nu_i\tau+\ln(\nu_i\tau)\sum_{j=1}^n\expectation_{Y_i|X_i}\left[Y_i^{(j)}\right]-\frac{n}{2}\ln\left(\frac{\alpha^2\sigma_i^2}{\tau^2}\right)
-\\
--\frac{\tau^2}{2\alpha^2\sigma_i^2}\sum_{j=1}^n\left(x_i^{(j)}\right)^2\expectation_{Y_i|X_i}\left[1/Y_i^{(j)}\right]
-+ \frac{\tau\mu_i}{\alpha\sigma_i^2}\sum_{j=1}^nx_i^{(j)}
--\frac{\mu_i^2}{2\sigma_i^2}\sum_{j=1}^n\expectation_{Y_i|X_i}\left[Y_i^{(j)}\right]
-\ .
-\end{multline}
-
-Let $\expectation_{Y_i|X_i}\left[Y_i^{(j)}\right]=y_i^{(j)}$ and $\expectation_{Y_i|X_i}\left[1/Y_i^{(j)}\right]=\zeta_i^{(j)}$which was obtained from from the E step. Then
-\begin{multline}
-H_i= -n\nu_i\tau+\ln(\nu_i\tau)\sum_{j=1}^ny_i^{(j)}-\frac{n}{2}\ln\left(\frac{\alpha^2\sigma_i^2}{\tau^2}\right)
-\\
--\frac{\tau^2}{2\alpha^2\sigma_i^2}\sum_{j=1}^n\left(x_i^{(j)}\right)^2\zeta_i^{(j)}
-+ \frac{\tau\mu_i}{\alpha\sigma_i^2}\sum_{j=1}^nx_i^{(j)}
--\frac{\mu_i^2}{2\sigma_i^2}\sum_{j=1}^ny_i^{(j)}
-\ .
-\end{multline}
-By setting the partial differentials to zero with respect to $\mu_i$, $\sigma_i^2$ and $\nu_i$ to zero, then the following M step estimators can be obtained:
+It is given that the following M step estimators can be obtained:
 \begin{equation}
-\mu_i=\frac{\tau\sum_{j=1}^nx_i^{(j)}}{\alpha\sum_{j=1}^ny_i^{(j)}}
+\widehat{\mu}_i=\frac{\tau\sum_{j=1}^nx_i^{(j)}}{\alpha\sum_{j=1}^ny_i^{(j)}}
 \end{equation}
 \begin{equation}
-\sigma_i^2=\frac{1}{n}\left[
+\widehat{\sigma}_i^2=\frac{1}{n}\left[
 \frac{\tau^2}{\alpha^2}\sum_{j=1}^n\left(x_i^{(j)}\right)^2\zeta_i^{(j)}
 -\frac{2\tau\mu_i}{\alpha}\sum_{j=1}^nx_i^{(j)}
 +\mu_i^2\sum_{j=1}^ny_i^{(j)}
 \right]
 \end{equation}
 \begin{equation}
-\nu_i=\frac{\sum_{j=1}^ny_i^{(j)}}{n\tau}
+\widehat{\nu}_i=\frac{\sum_{j=1}^ny_i^{(j)}}{n\tau}
 \end{equation}
-where $\left(x_i^{(j)}\right)^2\zeta_i^{(j)}=0$ if $\left(x_i^{(j)}\right)^2=0$.
+where $\left(x_i^{(j)}\right)^2\zeta_i^{(j)}=0$ if $\left(x_i^{(j)}\right)^2=0$. This is proven in Appendix \ref{chapter:mStep_compoundPoisson}.
 
-The constant $\alpha$ only sets the scale of $\mu_i$ and $\sigma_i^2$ but can be calibrated so that it has units of keV. The following properties of the X-ray tube follows (\textbf{NO UNCERTAINTY CALCULATIONS SO FAR}):
-\begin{itemize}
-	\item Voltage = $V$ = 100 kV
-	\item Power = $P$ = 33.0 W
-	\item Exposure time = $\tau$ = 500 ms
-	\item Target material is tungsten.
-\end{itemize}
-The efficiency $\eta$ of photon production is given as
-\begin{equation}
-\eta = aVZ
-\end{equation}
-where $a=1.1\times10^{-9}\text{ V}^{-1}$ and $Z$ is the atomic number of the target material. For tungsten, $Z=74$. Thus $\eta=8.1\times10^{-3}$.
-
-Assume the X-ray spreads out and targets the detector with $1996^2$ pixels only and nothing else, then the total energy detected in one pixel is
+The constant $\alpha$ only sets the scale of $\mu_i$ and $\sigma_i^2$ but can be calibrated so that it has units of keV. Assume, very crudely, the X-ray spreads out and targets the detector with $1996^2$ pixels only and nothing else, then the total energy detected in one pixel is
 \begin{equation}
 U=\frac{\eta P\tau}{1996^2}=2.1\times10^{8}\text{ keV}\cdot\text{pixel}^{-1} \ .
 \end{equation}
 Assuming the air has attenuation coefficient of zero, then $\alpha$ can be crudely estimated by
 \begin{equation}
 \alpha = \frac{60\,000 \tau}{U} = 1.4\times10^{-4}\text{ s}\cdot\text{keV}^{-1}\cdot\text{pixel} \ .
-\end{equation}
-
-Other parameters for air such as the rate and energy of photons can be calculated.
-\begin{equation}
-\nu = \eta \frac{\diff N}{\diff Q} \frac{\diff Q}{\diff t}=\frac{\eta P}{V e}=1.7\times10^{13}\text{ s}^{-1}
-\end{equation}
-\begin{equation}
-\frac{\diff E}{\diff N} = \frac{\diff E}{\diff Q} \frac{\diff Q}{\diff N} = Ve = 1.0\times10^{2}\text{ keV}
 \end{equation}
 
 \subsection{Small example}
@@ -1365,6 +1107,9 @@ For high $\nu\tau$, problems arises as more and more terms are needed in the tru
 	\end{subfigure}
 	\caption{The parameters and log likelihood at each step of EM. The EM algorithm was used to estimate the parameters of 50 different simulated $n=100$ dataset. The latent variables were initialized $\poisson(4)$. Dotted line: true value}
 \end{figure}
+
+\chapter{Conclusion}
+\section{Evaluation}
 
 \appendix
 
@@ -1751,6 +1496,320 @@ Setting the derivative to zero
 +\matr{\Lambda}\matr{\Sigma}_{\vect{Y}}\matr{\Lambda}\ .
 \end{equation}
 Because $\matr{\Psi}$ is a diagonal matrix, only the diagonal entries need to be updated.
+
+\section{Obtaining a One-Layer Compound Poisson Model}\label{chapter:oneLayer_compoundPoisson}
+The full joint probability density function is
+\begin{equation*}
+p_{X_i,U_i,Y_i}\left(x_i,u_i,y_i\right)=
+p_{X_i|U_i}(x_i|u_i)p_{U_i|Y_i}(u_i|y_i)\prob(Y_i=y_i)
+\end{equation*}
+\begin{multline}
+p_{X_i,U_i,Y_i}\left(x_i,u_i,y_i\right)=
+\frac{1}{\sqrt{2\pi}\beta_i}\exp\left[-\frac{1}{2}\left(\frac{x_i-\alpha u_i /\tau}{\beta_i}\right)^2\right]
+\\
+\frac{1}{\sqrt{2\pi}\sqrt{y_i\sigma_i^2}}\exp\left[-\frac{1}{2}\left(\frac{u_i-y_i\mu_i}{\sqrt{y_i\sigma_i^2}}\right)^2\right]
+\euler^{-\nu_i\tau}\frac{(\nu_i\tau)^{y_i}}{y_i!} \ .
+\end{multline}
+
+By marginalising out $U_i$, a one layer latent variable model can be obtained and the unknown parameters $\nu_i,\mu_i,\sigma_i^2,\beta_i^2$ can be estimated using the EM algorithm. This can be shown by integrating the full joint probability density function with respect to $u_i$
+\begin{multline*}
+p_{X_i,Y_i}\left(x_i,y_i\right)=\int_{u_i=-\infty}^{u_i=\infty}
+\frac{1}{\sqrt{2\pi}\beta_i}\exp\left[-\frac{1}{2}\left(\frac{x_i-\alpha u_i /\tau}{\beta_i}\right)^2\right]
+\\
+\frac{1}{\sqrt{2\pi}\sqrt{y_i\sigma_i^2}}\exp\left[-\frac{1}{2}\left(\frac{u_i-y_i\mu_i}{\sqrt{y_i\sigma_i^2}}\right)^2\right]
+\euler^{-\nu_i\tau}\frac{(\nu_i\tau)^{y_i}}{y_i!} \diff u_i
+\end{multline*}
+\begin{multline*}
+p_{X_i,Y_i}\left(x_i,y_i\right)=\frac{\euler^{-\nu_i\tau}(\nu_i\tau)^{y_i}}{2\pi\beta_iy_i!\sqrt{y_i}\sigma_i}\int_{u_i=-\infty}^{u_i=\infty}
+\exp\left[-\frac{1}{2}\left(\frac{x_i-\alpha u_i /\tau}{\beta_i}\right)^2
+\right.
+\\
+\left.
+-\frac{1}{2}\left(\frac{u_i-y_i\mu_i}{\sqrt{y_i\sigma_i^2}}\right)^2\right] \diff u_i
+\end{multline*}
+\begin{multline*}
+p_{X_i,Y_i}\left(x_i,y_i\right)=\frac{\euler^{-\nu_i\tau}(\nu_i\tau)^{y_i}}{2\pi\beta_iy_i!\sqrt{y_i}\sigma_i}\int_{u_i=-\infty}^{u_i=\infty}
+\exp\left[-\frac{x_i^2-2\alpha x_i u_i /\tau + \alpha^2 u_i^2/\tau^2}{2\beta_i^2}
+\right.
+\\
+\left.
+-\frac{u_i^2-2y\mu_i u_i + y_i^2\mu_i^2}{2y_i\sigma_i^2}\right] \diff u_i
+\end{multline*}
+\begin{multline*}
+p_{X_i,Y_i}\left(x_i,y_i\right)=\frac{\euler^{-\nu_i\tau}(\nu_i\tau)^{y_i}}{2\pi\beta_iy_i!\sqrt{y_i}\sigma_i}\int_{u_i=-\infty}^{u_i=\infty}
+\exp\left[-\frac{1}{2y_i\sigma_i^2\beta_i^2}
+\right.
+\\
+\left.\vphantom{\frac{1}{2y_i\sigma_i^2\beta_i^2}}\left(
+x_i^2y_i\sigma_i^2-2\alpha x_i u_i y_i\sigma_i^2 /\tau + \alpha^2 u_i^2 y_i\sigma_i^2/\tau^2+u_i^2\beta_i^2
+\right.\right.
+\\
+\left.
+-2y_i\mu_i u_i\beta_i^2 + y_i^2\mu_i^2\beta_i^2\right)
+\left.\vphantom{\frac{1}{2y_i\sigma_i^2\beta_i^2}}\right] \diff u_i
+\end{multline*}
+\begin{multline*}
+p_{X_i,Y_i}\left(x_i,y_i\right)=\frac{\euler^{-\nu_i\tau}(\nu_i\tau)^{y_i}}{2\pi\beta_iy_i!\sqrt{y_i}\sigma_i}\int_{u_i=-\infty}^{u_i=\infty}
+\exp\left[-\frac{1}{2y_i\sigma_i^2\beta_i^2}
+\right.
+\\
+\left.\vphantom{-\frac{1}{2y_i\sigma_i^2\beta_i^2}}\left(
+u_i^2\left(\beta_i^2+\alpha^2y_i\sigma_i^2/\tau^2\right)-2u_i\left(\alpha x_iy_i\sigma_i^2/\tau+y_i\mu_i\beta_i^2\right)
+\right.\right.
+\\
+\left.
++y_i^2\mu_i^2\beta_i^2+x_i^2y_i\sigma_i^2
+ \right)\left.\vphantom{-\frac{1}{2y_i\sigma_i^2\beta_i^2}}\right] \diff u_i \ .
+\end{multline*}
+The terms inside the exponential is a quadratic in terms of $u_i$. The following substitutions are made to make completing the square easier
+\begin{align}
+a_1 &= \beta_i^2+\alpha^2y_i\sigma_i^2/\tau^2 \label{eq:appendix_a}\\
+b_1 &= \alpha x_iy_i\sigma_i^2/\tau+y_i\mu_i\beta_i^2 \label{eq:appendix_b}\\
+c_1 &= y_i^2\mu_i^2\beta_i^2+x_i^2y_i\sigma_i^2 \label{eq:appendix_c}
+\end{align}
+so that
+\begin{equation*}
+p_{X_i,Y_i}\left(x_i,y_i\right)=\frac{\euler^{-\nu_i\tau}(\nu_i\tau)^{y_i}}{2\pi\beta_iy_i!\sqrt{y_i}\sigma_i}\int_{u_i=-\infty}^{u_i=\infty}
+\exp\left[-\frac{u_i^2a_1-2u_ib_1+c_1}{2y_i\sigma_i^2\beta_i^2}
+\right] \diff u_i \ .
+\end{equation*}
+Completing the square is done by
+\begin{multline*}
+p_{X_i,Y_i}\left(x_i,y_i\right)=\frac{\euler^{-\nu_i\tau}(\nu_i\tau)^{y_i}}{2\pi\beta_iy_i!\sqrt{y_i}\sigma_i}
+\\\int_{u_i=-\infty}^{u_i=\infty}
+\exp\left[-\frac{u_i^2-2u_ib_1/a_1+c_1/a_1+b_1^2/a_1^2-b_1^2/a_1^2}{2y_i\sigma_i^2\beta_i^2/a_1}
+\right] \diff u_i
+\end{multline*}
+\begin{multline*}
+p_{X_i,Y_i}\left(x_i,y_i\right)=\frac{\euler^{-\nu_i\tau}(\nu_i\tau)^{y_i}}{2\pi\beta_iy_i!\sqrt{y_i}\sigma_i}
+\\
+\int_{u_i=-\infty}^{u_i=\infty}
+\exp\left[-\frac{(u_i-b_1/a_1)^2-b_1^2/a_1^2+c_1/a_1}{2y_i\sigma_i^2\beta_i^2/a_1}
+\right] \diff u_i
+\end{multline*}
+\begin{multline*}
+p_{X_i,Y_i}\left(x_i,y_i\right)=\frac{\euler^{-\nu_i\tau}(\nu_i\tau)^{y_i}}{2\pi\beta_iy_i!\sqrt{y_i}\sigma_i}
+\exp\left[-\frac{-b_1^2/a_1^2+c_1/a_1}{2y_i\sigma_i^2\beta_i^2/a_1}
+\right]
+\\
+\int_{u_i=-\infty}^{u_i=\infty}
+\exp\left[-\frac{(u_i-b_1/a_1)^2}{2y_i\sigma_i^2\beta_i^2/a_1}
+\right] \diff u_i \ .
+\end{multline*}
+The integral is now a Gaussian integral which can be evaluated
+\begin{equation*}
+p_{X_i,Y_i}\left(x_i,y_i\right)=\frac{\euler^{-\nu_i\tau}(\nu_i\tau)^{y_i}}{2\pi\beta_iy_i!\sqrt{y_i}\sigma_i}
+\exp\left[-\frac{-b_1^2/a_1^2+c_1/a_1}{2y_i\sigma_i^2\beta_i^2/a_1}
+\right]
+\sqrt{\frac{2\pi y_i\sigma_i^2\beta_i^2}{a_1}}
+\end{equation*}
+\begin{equation*}
+p_{X_i,Y_i}\left(x_i,y_i\right)=\frac{\euler^{-\nu_i\tau}(\nu_i\tau)^{y_i}}{y_i!\sqrt{2\pi}\sqrt{a_1}}
+\exp\left[-\frac{1}{2a_1}\left(\frac{-b_1^2+a_1c_1}{y_i\sigma_i^2\beta_i^2}\right)
+\right] \ .
+\end{equation*}
+Substituting in Equations \eqref{eq:appendix_a}, \eqref{eq:appendix_b} and \eqref{eq:appendix_c}
+\begin{multline*}
+p_{X_i,Y_i}\left(x_i,y_i\right)=\frac{\euler^{-\nu_i\tau}(\nu_i\tau)^{y_i}}{y_i!\sqrt{2\pi}\sqrt{a_1}}
+\exp\left[-\frac{1}{2a_1}
+\right.
+\\
+\left.
+\left(\frac{-\left(\alpha x_iy_i\sigma_i^2/\tau+y_i\mu_i\beta_i^2\right)^2+\left(\beta_i^2+\alpha^2y_i\sigma_i^2/\tau^2\right)\left(y_i^2\mu_i^2\beta_i^2+x_i^2y_i\sigma_i^2\right)}{y_i\sigma_i^2\beta_i^2}\right)
+\right]
+\end{multline*}
+\begin{multline*}
+p_{X_i,Y_i}\left(x_i,y_i\right)=\frac{\euler^{-\nu_i\tau}(\nu_i\tau)^{y_i}}{y_i!\sqrt{2\pi}\sqrt{a_1}}
+\exp\left[-\frac{1}{2a_1}
+\right.
+\\
+\left.
+\left(\frac{-\alpha^2 x_i^2y_i^2\sigma_i^4/\tau^2-2\alpha x_iy_i^2\sigma_i^2\mu_i\beta_i^2/\tau-y_i^2\mu_i^2\beta_i^4}{y_i\sigma_i^2\beta_i^2}
+\right.\right.
+\\
+\left.\left.
++\frac{y_i^2\mu_i^2\beta_i^4+x_i^2y_i\sigma_i^2\beta_i^2+\alpha^2y_i^3\sigma_i^2\mu_i^2\beta_i^2/\tau^2+\alpha^2x_i^2y_i^2\sigma_i^4/\tau^2}{y_i\sigma_i^2\beta_i^2}\right)
+\right]
+\end{multline*}
+\begin{multline*}
+p_{X_i,Y_i}\left(x_i,y_i\right)=\frac{\euler^{-\nu_i\tau}(\nu_i\tau)^{y_i}}{y_i!\sqrt{2\pi}\sqrt{a_1}}
+\exp\left[-\frac{1}{2a_1}
+\right.
+\\
+\left.
+\left(\frac{-2\alpha x_iy_i^2\sigma_i^2\mu_i\beta_i^2/\tau+x_i^2y_i\sigma_i^2\beta_i^2+\alpha^2y_i^3\sigma_i^2\mu_i^2\beta_i^2/\tau^2}{y_i\sigma_i^2\beta_i^2}\right)
+\right] \ .
+\end{multline*}
+As before, completing the square can be done by making the following substitutions
+\begin{align}
+a_2 &= y_i\sigma_i^2\beta_i^2 \\
+b_2 &= \alpha y_i^2\sigma_i^2\mu_i\beta_i^2/\tau \\
+c_2 &= \alpha^2y_i^3\sigma_i^2\mu_i^2\beta_i^2/\tau^2
+\end{align}
+so that
+\begin{equation*}
+p_{X_i,Y_i}\left(x_i,y_i\right)=\frac{\euler^{-\nu_i\tau}(\nu_i\tau)^{y_i}}{y_i!\sqrt{2\pi}\sqrt{a_1}}
+\exp\left[-\frac{1}{2a_1}
+\left(\frac{-2b_2x_i+a_2x_i^2+c_2}{a_2}\right)
+\right]
+\end{equation*}
+\begin{multline*}
+p_{X_i,Y_i}\left(x_i,y_i\right)=\frac{\euler^{-\nu_i\tau}(\nu_i\tau)^{y_i}}{y_i!\sqrt{2\pi}\sqrt{a_1}}
+\exp\left[-\frac{1}{2a_1}
+\right.
+\\
+\left(x_i^2-2b_2x_i/a_2+b_2^2/a_2^2-b_2^2/a_2^2+c_2/a_2\right)
+\left.\vphantom{-\frac{1}{2a_1}}\right]
+\end{multline*}
+\begin{equation*}
+p_{X_i,Y_i}\left(x_i,y_i\right)=\frac{\euler^{-\nu_i\tau}(\nu_i\tau)^{y_i}}{y_i!\sqrt{2\pi}\sqrt{a_1}}
+\exp\left[-\frac{-b_2^2/a_2^2+c_2/a_2}{2a_1}\right]
+\exp\left[-\frac{(x_i-b_2/a_2)^2}{2a_1}
+\right] \ .
+\end{equation*}
+Next is to note that $-b_2^2/a_2^2+c_2/a_2=0$, this can be shown by
+\begin{equation*}
+-b_2^2/a_2^2+c_2/a_2 = 
+\frac{\alpha^2 y_i^4\sigma_i^4\mu_i^2\beta_i^4/\tau^2}{y_i^2\sigma_i^4\beta_i^4}
+-
+\frac{\alpha^2y_i^3\sigma_i^2\mu_i^2\beta_i^2/\tau^2}{y_i\sigma_i^2\beta_i^2}
+\end{equation*}
+\begin{equation*}
+-b_2^2/a_2^2+c_2/a_2 = 
+\frac{\alpha^2 y_i^2\mu_i^2}{\tau^2}
+-
+\frac{\alpha^2y_i^2\mu_i^2}{\tau^2}
+\end{equation*}
+\begin{equation}
+-b_2^2/a_2^2+c_2/a_2 = 0 \ .
+\end{equation}
+In addition, the following equation can be obtained as well
+\begin{equation}
+b_2/a_2 = \frac{\alpha y_i \mu_i}{\tau} \ .
+\end{equation}
+As a result by substituting back in Equation \eqref{eq:appendix_a}, the following can be obtained
+\begin{multline}
+p_{X_i,Y_i}\left(x_i,y_i\right)=
+\frac{\euler^{-\nu_i\tau}(\nu_i\tau)^{y_i}}{y_i!}
+\\
+\frac{1}{\sqrt{2\pi}\sqrt{\beta_i^2+\alpha^2y_i\sigma_i^2/\tau^2}}
+\exp\left[-\frac{1}{2}\left(\frac{x_i-y_i\mu_i\alpha/\tau}{\sqrt{\beta_i^2+\alpha^2y_i\sigma_i^2/\tau^2}}\right)^2\right] \ .
+\end{multline}
+This is the product of a Poisson probability mass function and a Normal probability density function. Finally by inspection the one layer latent model is
+\begin{equation}
+Y_i\sim\poisson(\nu_i\tau)
+\end{equation}
+\begin{equation}
+X_i|Y_i\sim\normal\left(
+\frac{\alpha\mu_i}{\tau}Y_i,\frac{\alpha^2\sigma_i^2}{\tau^2}Y_i+\beta_i^2
+\right) \ .
+\end{equation}
+
+\section{Joint Compound Poisson Distribution is in the Exponential Family} \label{chapter:compoundPoisson_expFamily}
+For the $y=1,2,\dotdotdot$ case, the joint probability density function can be rewritten as
+\begin{equation*}
+p_{X_i,Y_i}\left(x_i,y_i\right)=\dfrac{\euler^{-\nu_i\tau}(\nu_i\tau)^{y_i}\tau}{y_i!\sqrt{2\pi y_i}\alpha\sigma_i}
+\exp\left[-\dfrac{1}{2}\dfrac{\left(x_i-y_i\mu_i\alpha/\tau\right)^2}{\alpha^2y_i\sigma_i^2/\tau^2}\right]
+\end{equation*}
+\begin{multline*}
+p_{X_i,Y_i}\left(x_i,y_i\right)=\dfrac{\euler^{-\nu_i\tau}\tau}{\sqrt{2\pi}\alpha\sigma_i}
+\exp\left[-\dfrac{1}{2}\dfrac{\left(x_i-y_i\mu_i\alpha/\tau\right)^2}{\alpha^2y_i\sigma_i^2/\tau^2}
+\right.
+\\
+\left.
+-y_i\ln(\nu_i\tau) -\frac{1}{2}\ln{y_i} - \ln{y_i!}\right]
+\end{multline*}
+\begin{multline*}
+p_{X_i,Y_i}\left(x_i,y_i\right)=\dfrac{\euler^{-\nu_i\tau}\tau}{\sqrt{2\pi}\alpha\sigma_i}
+\exp\left[-\dfrac{\tau^2}{2\alpha^2\sigma_i^2}\dfrac{x_i^2-2\alpha\mu_ix_iy_i/\tau+\alpha^2\mu_i^2y_i^2/\tau^2}{y_i}
+\right.
+\\
+\left.
+-y_i\ln(\nu_i\tau) -\frac{1}{2}\ln{y_i} - \ln{y_i!}\right]
+\end{multline*}
+\begin{multline*}
+p_{X_i,Y_i}\left(x_i,y_i\right)=\dfrac{\euler^{-\nu_i\tau}\tau}{\sqrt{2\pi}\alpha\sigma_i}
+\exp\left[-\dfrac{\tau^2}{2\alpha^2\sigma_i^2}\left(\frac{x_i^2}{y_i}-\frac{2\alpha\mu_ix_i}{\tau}+\frac{\alpha^2\mu_i^2y_i}{\tau^2}\right)
+\right.
+\\
+\left.
+-y_i\ln(\nu_i\tau) -\frac{1}{2}\ln{y_i} - \ln{y_i!}\right]
+\end{multline*}
+\begin{multline*}
+p_{X_i,Y_i}\left(x_i,y_i\right)=\dfrac{\euler^{-\nu_i\tau}\tau}{\sqrt{2\pi}\alpha\sigma_i}
+\exp\left[
+-\frac{\tau^2}{2\alpha^2\sigma_i^2}\frac{x_i^2}{y_i}
++\frac{\tau\mu_i}{\alpha\sigma_i^2}x_i
+\right.
+\\
+\left.
+-\left(\frac{\mu_i^2}{2\sigma^2}+\ln(\nu_i\tau)\right)y_i
+-\frac{1}{2}\ln{y_i}
+-\ln{y_i!}
+\right] \ .
+\end{multline*}
+This shows that the joint probability density function is in the exponential family where the sufficient statistics are $X_i^2/Y_i,X_i$ and $Y_i$.
+
+\section{M Step for Compound Poisson Model}\label{chapter:mStep_compoundPoisson}
+In the M step the parameters $\nu_i,\mu_i,\sigma_i^2$ are estimated given the latent variables. This is done by maximising the conditional expectation of the log likelihood function, that is
+\begin{equation*}
+H_i=\sum_{j=1}^n\expectation_{Y_i|X_i}\left[\ln p_{X_i,Y_i}\left(x_i^{(j)},Y_i^{(j)}\right)\right]
+\end{equation*}
+\begin{multline*}
+H_i=\sum_{j=1}^n\expectation_{Y_i|X_i}\left[
+-\nu_i\tau+Y_i^{(j)}\ln(\nu_i\tau)-\frac{1}{2}\ln\left(\frac{\alpha^2\sigma_i^2}{\tau^2}Y_i^{(j)}\right)
+\right.
+\\
+\left.
+-\frac{1}{2}\frac{\left(x_i^{(j)}-Y_i^{(j)}\mu_i\alpha/\tau\right)^2}{\alpha^2Y_i^{(j)}\sigma_i^2/\tau^2}
+\right] + c_1 \ .
+\end{multline*}
+\begin{multline*}
+H_i= -n\nu_i\tau+\ln(\nu_i\tau)\sum_{j=1}^n\expectation_{Y_i|X_i}\left[Y_i^{(j)}\right]-\frac{n}{2}\ln\left(\frac{\alpha^2\sigma_i^2}{\tau^2}\right)
+\\
+-\frac{1}{2}\sum_{j=1}^n\expectation_{Y_i|X_i}\left[\frac{\left(x_i^{(j)}-Y_i^{(j)}\mu_i\alpha/\tau\right)^2}{\alpha^2Y_i^{(j)}\sigma_i^2/\tau^2}\right]
+ + c_2 \ .
+\end{multline*}
+\begin{multline*}
+H_i= -n\nu_i\tau+\ln(\nu_i\tau)\sum_{j=1}^n\expectation_{Y_i|X_i}\left[Y_i^{(j)}\right]-\frac{n}{2}\ln\left(\frac{\alpha^2\sigma_i^2}{\tau^2}\right)
+\\
+-\frac{1}{2}\sum_{j=1}^n\expectation_{Y_i|X_i}\left[\frac{\left(x_i^{(j)}\right)^2-2x_i^{(j)}Y_i^{(j)}\mu_i\alpha/\tau+\left(Y_i^{(j)}\mu_i\alpha/\tau\right)^2}{\alpha^2Y_i^{(j)}\sigma_i^2/\tau^2}\right]
+ + c_2 \ .
+\end{multline*}
+\begin{multline}
+H_i= -n\nu_i\tau+\ln(\nu_i\tau)\sum_{j=1}^n\expectation_{Y_i|X_i}\left[Y_i^{(j)}\right]-\frac{n}{2}\ln\left(\frac{\alpha^2\sigma_i^2}{\tau^2}\right)
+\\
+-\frac{\tau^2}{2\alpha^2\sigma_i^2}\sum_{j=1}^n\left(x_i^{(j)}\right)^2\expectation_{Y_i|X_i}\left[1/Y_i^{(j)}\right]
++ \frac{\tau\mu_i}{\alpha\sigma_i^2}\sum_{j=1}^nx_i^{(j)}
+-\frac{\mu_i^2}{2\sigma_i^2}\sum_{j=1}^n\expectation_{Y_i|X_i}\left[Y_i^{(j)}\right]
+\ .
+\end{multline}
+
+Let $\expectation_{Y_i|X_i}\left[Y_i^{(j)}\right]=y_i^{(j)}$ and $\expectation_{Y_i|X_i}\left[1/Y_i^{(j)}\right]=\zeta_i^{(j)}$which was obtained from from the E step. Then
+\begin{multline}
+H_i= -n\nu_i\tau+\ln(\nu_i\tau)\sum_{j=1}^ny_i^{(j)}-\frac{n}{2}\ln\left(\frac{\alpha^2\sigma_i^2}{\tau^2}\right)
+\\
+-\frac{\tau^2}{2\alpha^2\sigma_i^2}\sum_{j=1}^n\left(x_i^{(j)}\right)^2\zeta_i^{(j)}
++ \frac{\tau\mu_i}{\alpha\sigma_i^2}\sum_{j=1}^nx_i^{(j)}
+-\frac{\mu_i^2}{2\sigma_i^2}\sum_{j=1}^ny_i^{(j)}
+\ .
+\end{multline}
+By setting the partial differentials to zero with respect to $\mu_i$, $\sigma_i^2$ and $\nu_i$ to zero, then the following M step estimators can be obtained:
+\begin{equation}
+\mu_i=\frac{\tau\sum_{j=1}^nx_i^{(j)}}{\alpha\sum_{j=1}^ny_i^{(j)}}
+\end{equation}
+\begin{equation}
+\sigma_i^2=\frac{1}{n}\left[
+\frac{\tau^2}{\alpha^2}\sum_{j=1}^n\left(x_i^{(j)}\right)^2\zeta_i^{(j)}
+-\frac{2\tau\mu_i}{\alpha}\sum_{j=1}^nx_i^{(j)}
++\mu_i^2\sum_{j=1}^ny_i^{(j)}
+\right]
+\end{equation}
+\begin{equation}
+\nu_i=\frac{\sum_{j=1}^ny_i^{(j)}}{n\tau}
+\end{equation}
+where $\left(x_i^{(j)}\right)^2\zeta_i^{(j)}=0$ if $\left(x_i^{(j)}\right)^2=0$.
+
 
 \bibliographystyle{unsrt}
 \bibliography{bib}
