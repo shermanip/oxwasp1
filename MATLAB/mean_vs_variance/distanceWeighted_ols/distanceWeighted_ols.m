@@ -112,7 +112,10 @@ for j = 1:numel(width_select)
     beta_array(2,:) = beta_array(2,:)*std_Y/std_X;
 
     %plot heatmap of the histogram
-    plotHistogramHeatmap(sample_mean,sample_var);
+    ax = plotHistogramHeatmap(sample_mean,sample_var);
+    set(ax, 'Position', [600,800,400,300]);
+    xlabel('Sample mean (arb. unit)');
+    ylabel('Sample variance {(arb. unit^2)}');
     hold on;
 
     %for each model

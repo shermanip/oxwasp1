@@ -16,12 +16,12 @@ function [ax] = plotHistogramHeatmap(sample_mean,sample_var,nbin)
     
     %plot the heatmap
     ax = figure;
-    imagesc([2E4,0.05E6],[5E4,4E5],zeros(2));
+    imagesc([2E4,0.05E6],[5.3E4,4E5],zeros(2));
     hold on;
     %normalize N so that the colormap is the frequency density
     imagesc(cell2mat(c(2)),cell2mat(c(1)),N/( (c{2}(2)-c{2}(1))*(c{1}(2)-c{1}(1)) ) );
     axis xy; %switch the y axis
-    xlim([2E4,5E4]);
+    xlim([2E4,5.3E4]);
     ylim([0.05E6,4E5]); %set the y limit
     colorbar; %display the colour bar
     xlabel('Sample grey value mean (arb. unit)'); %label the axis

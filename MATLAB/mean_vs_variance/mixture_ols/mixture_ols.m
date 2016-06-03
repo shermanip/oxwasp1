@@ -84,7 +84,7 @@ end
 %un-normalize the regression parameters
 beta_array(1,:) = beta_array(1,:)*std_Y + mean_Y - mean_X*beta_array(2,:)*std_Y/std_X;
 beta_array(2,:) = beta_array(2,:)*std_Y/std_X;
-
+prediction_error = sqrt(variance_array.*std_Y^2);
 
 %plot heatmap of the histogram
 plotHistogramHeatmap(sample_mean,sample_var);
@@ -99,7 +99,9 @@ x_plot = x_min:(x_length/1000):x_max;
 for i = 1:m
     %using the values in x_plot, plot the model
     y_hat = [ones(numel(x_plot),1),x_plot']*beta_array(:,i);
-    plot(x_plot,y_hat,'r--');
+    plot(x_plot,y_hat,'r-');
+    plot(x_plot,y_hat+norminv(0.975)*prediction_error(i),'r:');
+    plot(x_plot,y_hat-norminv(0.975)*prediction_error(i),'r:');
 end
 hold off;
 
