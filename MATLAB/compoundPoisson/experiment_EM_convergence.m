@@ -48,7 +48,7 @@ parfor i = 1:n_repeat
 end
 
 %plot the mean parameter for each EM step
-figure;
+figure('Position', [400, 400, 400, 300]);
 plot(m_array,'r');
 hold on;
 plot([0,n_EM],[mu_actual,mu_actual],'k--','LineWidth',2);
@@ -57,7 +57,7 @@ xlabel('Number of EM Steps');
 ylabel('Mean estimate (arb. unit)');
 
 %plot the variance parameter for each EM step
-figure;
+figure('Position', [400, 400, 400, 300]);
 semilogy(v_array,'r');
 hold on;
 semilogy([0,n_EM],[var_actual,var_actual],'k--','LineWidth',2);
@@ -66,7 +66,7 @@ xlabel('Number of EM Steps');
 ylabel('Variance estimate (arb. unit)');
 
 %plot the rate parameter for each EM step
-figure;
+figure('Position', [400, 400, 400, 300]);
 plot(rate_array,'r');
 hold on;
 plot([0,n_EM],[rate_actual,rate_actual],'k--','LineWidth',2);
@@ -75,7 +75,7 @@ xlabel('Number of EM Steps');
 ylabel('Rate estimate (arb. unit)');
 
 %plot the likelihood for each EM step
-figure;
+figure('Position', [400, 400, 400, 300]);
 plot(lnL_array,'b');
 xlabel('Number of EM Steps');
 ylabel('Log likelihood (nats)');

@@ -51,7 +51,7 @@ for j = 1:3
 end
 
 %plot the mean parameter for each EM step
-figure;
+figure('Position', [400, 400, 400, 300]);
 plot(m_array(:,:,1),'b');
 hold on;
 plot(m_array(:,:,2),'r');
@@ -62,7 +62,7 @@ xlabel('Number of EM Steps');
 ylabel('Mean estimate (arb. unit)');
 
 %plot the variance parameter for each EM step
-figure;
+figure('Position', [400, 400, 400, 300]);
 semilogy(v_array(:,:,1),'b');
 hold on;
 semilogy(v_array(:,:,2),'r');
@@ -73,7 +73,7 @@ xlabel('Number of EM Steps');
 ylabel('Variance estimate (arb. unit)');
 
 %plot the rate parameter for each EM step
-figure;
+figure('Position', [400, 400, 400, 300]);
 plot(rate_array(:,:,1),'b');
 hold on;
 plot(rate_array(:,:,2),'r');
@@ -84,7 +84,7 @@ xlabel('Number of EM Steps');
 ylabel('Rate estimate (arb. unit)');
 
 %plot the likelihood for each EM step
-figure;
+figure('Position', [400, 400, 400, 300]);
 plot(lnL_array(:,:,1),'b');
 hold on;
 plot(lnL_array(:,:,2),'r');
