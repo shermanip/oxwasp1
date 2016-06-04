@@ -10,6 +10,7 @@
 \usepackage{url}
 \usepackage{subcaption}
 \usepackage[nottoc]{tocbibind}
+\usepackage{hyperref}
 
 \DeclareMathOperator{\expfamily}{ExpFamily}
 \DeclareMathOperator{\expectation}{\mathbb{E}}
@@ -1058,6 +1059,28 @@ It is given that the following M step estimators can be obtained:
 \widehat{\nu}_i=\frac{\sum_{j=1}^ny_i^{(j)}}{n\tau}
 \end{equation}
 where $\left(x_i^{(j)}\right)^2\zeta_i^{(j)}=0$ if $\left(x_i^{(j)}\right)^2=0$. This is proven in Appendix \ref{chapter:mStep_compoundPoisson}.
+
+Using the Cram\'er-Rao lower bound, the variance for such estimators can be found from the diagonal elements of the inverse of the Fisher's information matrix, that is
+\begin{multline}
+\cov\left[
+\begin{pmatrix}
+\widehat{\nu_i} \\ \widehat{\mu_i} \\ \widehat{\sigma}_i^2
+\end{pmatrix}
+\right]
+=
+\left(\begin{matrix}
+\dfrac{\sum_{j=1}^ny_i^{(j)}}{\nu_i^2} & 0 \\
+0 & \dfrac{\sum_{j=1}^ny_i^{(j)}}{\sigma_i^2} & \\
+0 & \dfrac{\tau\sum_{j=1}^nx_i^{(j)}}{\alpha\sigma_i^4}-\dfrac{\mu_i\sum_{j=1}^ny_i^{(j)}}{\sigma_i^4}
+\end{matrix}\right.
+\\
+\left.\begin{matrix}\vphantom{\dfrac{\sum_{j=1}^ny_i^{(j)}}{\nu_i^2}}
+0 \\
+\dfrac{\tau\sum_{j=1}^nx_i^{(j)}}{\alpha\sigma_i^4}-\dfrac{\mu_i\sum_{j=1}^ny_i^{(j)}}{\sigma_i^4}
+\\
+-\dfrac{n}{2\sigma_i^4}+\dfrac{\tau^2}{\alpha^2\sigma_i^6}\sum_{j=1}^n\left(x_i^{(j)}\right)^2\zeta_i^{(j)}-\dfrac{2\tau\mu_i}{\alpha\sigma_i^6}\sum_{j=1}^nx_i^{(j)}+\dfrac{\mu_i^2}{\sigma_i^2}\sum_{j=1}^ny_i^{(j)}
+\end{matrix}\right)^{-1} \ .
+\end{multline}
 
 The constant $\alpha$ only sets the scale of $\mu_i$ and $\sigma_i^2$ but can be calibrated so that it has units of keV. From Chapter \ref{chapter:about_the_data}, the following properties of the X-ray tube were stated or calculated:
 \begin{itemize}
