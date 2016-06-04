@@ -72,7 +72,7 @@
 
 %======ABSTRACT=========
 \begin{abstract}
-I did this. This happened. I should of done that.
+X-ray computed tomography can be used to do quality control on 3D printed samples. However there are sources of error in the 3D printing, how the photons behave and in the X-ray detector. This projects aims to find a relationship between the mean and variance of the grey values of each pixel in images obtained from the X-ray detector by fitting linear regressions. In addition, latent variable models such as principle component analysis, factor analysis and the compound Poisson were attempted to be fitted to find sources of variance.
 \end{abstract}
 
 %======ACKNOWLEDGEMENT=========
@@ -93,13 +93,14 @@ I did this. This happened. I should of done that.
 
 %======INTRODUCTION========
 \chapter{Introduction}
+
+3D printing, formally additive manufacturing, has recently became state of the art technology which manufactures objects of complicated shapes with very high precision. Recently it was commercialised and is used in medical science and engineering. Because of such a wide range of application, there has been a need for quality control and this can be done by scanning the 3D printed sample using X-ray computed tomography.
+
 The Inside-Out group at the University of Warwick aims to develop statistical methodology for using CT scans to do quality control on 3D printed samples. Recent research include how the penumbra can be modelled \cite{kueh2014modelling}, simulating and detecting defects and on the behaviour of dead pixels.
 
 The aim of this specific project was to do linear regression on the mean and variance of the grey values in the CT scans to find explanatory relationships. Separately, latent variable models were fitted to the images to find sources of noise.
 
-This report is written in a Master dissertation style and assumes knowledge up to Master level in physics and statistics. Complicated matrix calculus results will be stated without proof in Chapter \ref{chapter:matrixCalculus} in the appendix.
-
-A research paper version of this report is also available.
+This report is written in a Master dissertation style and assumes knowledge up to Master level in physics and statistics. The mathematics used to be reviewed in undergraduate textbooks \cite{riley2006mathematical}, however complicated matrix calculus results will be stated without proof in Chapter \ref{chapter:matrixCalculus} in the appendix.
 
 %======LITERATURE REVIEW========
 \chapter{Literature Review}
@@ -173,7 +174,7 @@ The scale of the 2D images can be calibrated with the use of reference standards
 
 %======ABOUT THE DATA========
 
-\chapter{About the Data}
+\chapter{About the Data}\label{chapter:about_the_data}
 
 A dataset was given for this project. 100 images of a stationary cuboid, with its vertices in the middle, were taken using a Perkin Elmer XRD 1621 digital X-ray detector. These greyscale images were 1\,996$\times$1\,996 pixels in size and have a colour depth of 16 bits. This means each pixel can have grey values which take integer values from 0 to $2^{16}-1$ inclusive. In addition, these images were calibrated so that the air has grey value of 60\,000. As a result, the units of the grey values have arbitrary units. Unfortunately a scale, in terms of distance, cannot be established because no calibration was performed. A sample of the images can be viewed in Figure \ref{fig:block_montage}.
 
@@ -1058,11 +1059,19 @@ It is given that the following M step estimators can be obtained:
 \end{equation}
 where $\left(x_i^{(j)}\right)^2\zeta_i^{(j)}=0$ if $\left(x_i^{(j)}\right)^2=0$. This is proven in Appendix \ref{chapter:mStep_compoundPoisson}.
 
-The constant $\alpha$ only sets the scale of $\mu_i$ and $\sigma_i^2$ but can be calibrated so that it has units of keV. Assume, very crudely, the X-ray spreads out and targets the detector with $1996^2$ pixels only and nothing else, then the total energy detected in one pixel is
+The constant $\alpha$ only sets the scale of $\mu_i$ and $\sigma_i^2$ but can be calibrated so that it has units of keV. From Chapter \ref{chapter:about_the_data}, the following properties of the X-ray tube were stated or calculated:
+\begin{itemize}
+	\item Voltage = $V$ = 100 kV
+	\item Power = $P$ = 33.0 W
+	\item Exposure time = $\tau$ = 500 ms
+	\item Efficiency = $\eta = 8.1\times10^{-3}$
+	\item Target material is tungsten.
+\end{itemize}
+Assume, very crudely, the X-ray spreads out and targets the detector with $1996^2$ pixels only and nothing else, then the total energy detected in one pixel is
 \begin{equation}
 U=\frac{\eta P\tau}{1996^2}=2.1\times10^{8}\text{ keV}\cdot\text{pixel}^{-1} \ .
 \end{equation}
-Assuming the air has attenuation coefficient of zero, then $\alpha$ can be crudely estimated by
+The images were calibrated so that the background has grey value of 60\,000. Assuming the air has attenuation coefficient of zero, then $\alpha$ can be crudely estimated by
 \begin{equation}
 \alpha = \frac{60\,000 \tau}{U} = 1.4\times10^{-4}\text{ s}\cdot\text{keV}^{-1}\cdot\text{pixel} \ .
 \end{equation}
@@ -1108,12 +1117,26 @@ For high $\nu\tau$, problems arises as more and more terms are needed in the tru
 	\caption{The parameters and log likelihood at each step of EM. The EM algorithm was used to estimate the parameters of 50 different simulated $n=100$ dataset. The latent variables were initialized $\poisson(4)$. Dotted line: true value}
 \end{figure}
 
+%=======CONCLUSION===============
 \chapter{Conclusion}
-\section{Evaluation}
+
+\section{Mean and Variance Relationship}
+The relationship between the sample mean and sample variance of the grey values was modelled by fitting a weighted linear regression. Less weights were given to bigger sample variance as a simple method for robust regression. It was found that the mean and variance relationship depended on the material. To take into account the different mean and variance relationships, a mixture of linear regression was fitted but it failed to capture the different behaviours from the different materials. Weighted linear regression, where the weights depended on the different between the sample mean grey value and some $k$ mean sample mean grey value, was fitted and only captured 2 out of the 3 material mean variance relationship.
+
+There is further work to do in the mean and variance relationship. Firstly it should be investigated whenever transforming the variance will produce a more linear model. For example the log variance or the standard deviation could be used. Furthermore, more features then just polynomials should be used for the sample mean grey values. Lastly, it was established that the sample variance has a scaled $\chi^2$ distribution. Because the $\chi^2$ distribution is in the exponential family, generalised linear models should be used as well to open up more possibilities to model the relationship between the mean and variance.
+
+\section{Latent Variable Model}
+In order to be able to find sources of variance, latent variable models were used as a way to develop explanatory models. PCA and factor analysis were used on a shrunken down dataset and found the sample does have a lower sample variance. It was also found that the background variance was not uniform and there are patches of high variance. However shrinking the images down could be a problem because this could of affected the variance of the dataset. In order to improve the data analysis, the computational algorithms should be improved so that PCA and factor analysis can be done directly on the full size dataset.
+
+Another explanatory model developed under the light of physics was the compound Poisson distribution. While the compound Poisson distribution was used in the medical physics community, fitting the distribution was extremely difficult because conditional and marginal distribution cannot be written down in closed form. A toy example was provided in this report. In order for the fitting to work computationally, approximations which are cheap to run must be made.
 
 \appendix
 
-\chapter{Matrix Calculus}\label{chapter:matrixCalculus}
+\chapter{Source Code}
+
+\chapter{Proofs and Identities}
+
+\section{Matrix Calculus}\label{chapter:matrixCalculus}
 Let $\matr{A},\matr{B},\matr{C}$ be matrices with elements
 \begin{equation*}
 \matr{A}=
@@ -1148,7 +1171,6 @@ then it can be shown that \cite{petersen2008matrix}
 \end{equation}
 Because a vector is a special case of a matrix, these results can be extended to vectors.
 
-\chapter{Proofs and Calculations}
 
 \section{M Step for Mixture of Linear Regression} \label{section:Mstep}
 The likelihood for a general mixture model is
@@ -1830,6 +1852,7 @@ and the estimator for $\sigma_i^2$ is
 +\mu_i^2\sum_{j=1}^ny_i^{(j)}
 \right] \ .
 \end{equation}
+Care should be taken because for $y_i^{(j)}=0$, $\zeta_i^{(j)}$ is undefined. For this special case it is easiest to just to $\zeta_i^{(j)}=0$ as though that data point was removed.
 
 
 \bibliographystyle{unsrt}
