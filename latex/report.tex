@@ -115,11 +115,11 @@ Figure \ref{fig:x_ray_ct} shows a diagram on how CT scanning works. A 2D image i
 \begin{figure}
 \centering
 \includegraphics[width=0.7\textwidth]{figures/x_ray_ct.png}
-\caption{X-ray computed tomography reconstructs the sample by projecting photons onto a rotating sample. The photon are then detected by the detector. \emph{Source: http://www.phoenix-xray.com/}}
+\caption{X-ray computed tomography reconstructs the sample by projecting photons onto a rotating sample. The photons are then detected by the detector. \emph{Source: http://www.phoenix-xray.com/}}
 \label{fig:x_ray_ct}
 \end{figure}
 
-CT scanning was invented by G. Hounsfield \cite{hounsfield1980computed} in the 1980's and it was mainly used for medical imaging. The setup for CT scanning is different when scanning patients because the detector and X-ray source rotates around the patient \cite{cantatore2011introduction}. Recently CT has been used industrially for non-destructive testing in manufacturing \cite{cantatore2011introduction}. One possible application would be inspecting 3D printed (additive layer manufactured) samples.
+CT scanning was invented by G. Hounsfield \cite{hounsfield1980computed} in the 1980's and it was mainly used for medical imaging. The setup for CT scanning is different when scanning patients because the detector and X-ray source rotates around the patient \cite{cantatore2011introduction}. Recently CT has been used industrially for non-destructive testing in manufacturing \cite{cantatore2011introduction}. One possible application would be inspecting 3D printed samples.
 
 There are many sources of error in CT scanning \cite{cantatore2011introduction} and this can cause problems when reconstructing the geometry of the sample. Sources of error include: defects in the detector, environmental noise and the behaviour of photons.
 
@@ -160,7 +160,7 @@ The voltage and current can be varied in the X-ray tube to produce different ene
 \section{X-Ray Interactions}
 Photons emitted by the X-ray tube are projected onto the sample and interacts with it in a number of ways \cite{cantatore2011introduction}.
 
-The sample can effectively absorb photons via the photoelectric effect or pair production \cite{cantatore2011introduction}. In the photoelectric effect, the photons transfers all its energy to a bounded electron and ejects it from the atom \cite{millikan1916direct}. In pair production, the photons convert into electron-position pairs by interacting with the Coulomb field of the sample's atomic nucleus \cite{hubbell2006electron}. In addition to getting absorbed, photons can be scattered by the sample. This happens when photons collide inelastically with and transfers it's energy to the sample's electrons. This process is know as Compton scattering \cite{compton1923quantum}.
+The sample can effectively absorb photons via the photoelectric effect or pair production \cite{cantatore2011introduction}. In the photoelectric effect, the photons transfers all its energy to a bounded electron and ejects it from the atom \cite{millikan1916direct}. In pair production, the photons convert into electron-position pairs by interacting with the Coulomb field of the sample's atomic nucleus \cite{hubbell2006electron}. In addition to getting absorbed, photons can be scattered by the sample. This happens when photons collide inelastically with and transfers its energy to the sample's electrons. This process is know as Compton scattering \cite{compton1923quantum}.
 
 Suppose a mono-energetic X-ray pencil beam attenuating through an object with varying attenuation coefficient in position $\mu=\mu(x)$. The beam starts at $x=0$ and is detected at $x=L$, then the attenuation (decrease in X-ray intensity from $I_0$ to $I_1$) is given as \cite{cantatore2011introduction}
 \begin{equation}
@@ -200,7 +200,7 @@ From this, some additional properties of the X-ray can be estimated. It is given
 \begin{equation}
 \eta = aVZ =8.1\times10^{-3}
 \end{equation}
-where $a=1.1\times 10^{-1}\text{ V}^{-1}$ is a constant and $Z=74$ is the atomic number of tungsten. The rate $\nu$ and energy per photon $E$ can be calculated
+where $a=1.1\times 10^{-1}\text{ V}^{-1}$ is a constant and $Z=74$ is the atomic number of tungsten. The rate of photon $\nu$ and energy per photon $E$ can be calculated
 \begin{equation}
 \nu =\frac{\eta P}{V e}=1.7\times10^{13}\text{ s}^{-1}
 \end{equation}
@@ -210,18 +210,18 @@ E = Ve = 1.0\times10^{2}\text{ keV}
 where $e$ is the charge per electron.
 
 \section{Histogram}
-The distribution of the grey values of all the pixels in the data set is shown in Figure \ref{fig:block_histogram}. It was observed that there were 3 distinct peaks in the histogram at grey values:
+The distribution of the grey values of all the pixels in the dataset is shown in Figure \ref{fig:block_histogram}. It was observed that there were 3 distinct peaks in the histogram at grey values:
 \begin{itemize}
 	\item$\sim2\times10^4$ arb.~unit
 	\item$\sim4\times10^4$ arb.~unit
 	\item$\sim5\times10^4$ arb.~unit.
 \end{itemize}
-By doing a threshold, as shown in Figure \ref{fig:block_threshold}, it was clear that the main 3 sources of the grey values were the sample, the background and the foam holder at the bottom of the image.
+By doing a threshold, as shown in Figure \ref{fig:block_threshold}, it was clear that the main 3 sources of the grey values were the 3D printed sample, the background and the foam holder at the bottom of the image.
 
 \begin{figure}[htp]
 \centering
 \includegraphics[width=0.75\textwidth]{figures/block_histogram.eps}
-\caption{Histogram of the grey values of all the pixels in the 100 images in the dataset. The grey values range from 18\,286 to 60\,045.}
+\caption{Histogram of the grey values of all the pixels in the 100 images from the dataset. The grey values ranged from 18\,286 to 60\,045.}
 \label{fig:block_histogram}
 \end{figure}
 
@@ -243,7 +243,7 @@ By doing a threshold, as shown in Figure \ref{fig:block_threshold}, it was clear
 
 \section{Normality}
 
-For a given pixel, a Normal distribution was fitted on the 100 grey values and the $\chi^2$ goodness of fit test was conducted, as shown in Figure \ref{fig:initial_fit_normal_test} for each pixel in the image. When considering the Bonferoni correction \cite{weisstein2004bonferroni} for multiple hypothesis testing, the Normal distribution appeared to be a good fit because only 9 pixels have $p$ values less than 10\%. In addition, these significant pixels did not seem to cluster and appear random in space. When ignoring the Bonferoni correction, there was a suspicious patch of low $p$ values on the bottom right.
+For a given pixel, a Normal distribution was fitted on the 100 grey values and the $\chi^2$ goodness of fit test was conducted. This was done on all $1\,996^2$ pixels as shown in Figure \ref{fig:initial_fit_normal_test}. When considering the Bonferoni correction \cite{weisstein2004bonferroni} for multiple hypothesis testing, the Normal distribution appeared to be a good fit because only 9 pixels have $p$ values less than 10\%. In addition, these significant pixels did not seem to cluster and appear random in space. When ignoring the Bonferoni correction, there was a suspicious patch of low $p$ values on the bottom right.
 
 \begin{figure}[p]
 \centering
@@ -287,11 +287,11 @@ The sample mean and standard error of the grey values for each of the 100 images
 
 \chapter{Mean and Variance Relationship}
 
-The aim of this chapter was to do supervised learning on predicting the variance of the pixel's grey values given its sample mean. This can be done by fitting a linear regression to obtain a explanatory model. Once a good model is found, a single CT scan can be used to quantify the uncertainty on each pixel's grey values. This uncertainty then can be carried forward when doing volumetric reconstruction.
+The aim of this chapter was to do supervised learning on predicting the variance of the pixel's grey values given its sample mean. This was done by fitting a linear regression to obtain a explanatory model. Once a good model was found, a single CT scan can be used to quantify the uncertainty on each pixel's grey values. This uncertainty then can be carried forward when doing volumetric reconstruction.
 
-Figure \ref{fig:histogramHeatmap} shows the sample variance and sample mean of all the pixel's grey values. It can be seen that for sample means of $(4.5\pm0.5)\times 10^4$, the range of sample variances does increase. In addition, there were a few outliers with extremely large sample variance, one example can be seen in Figure \ref{fig:scatterMeanVar}.
+Figure \ref{fig:histogramHeatmap} shows the sample variance and sample mean of all the pixel's grey values. It can be seen that for sample means of $(4.5\pm0.5)\times 10^4$, the range of sample variances increased. In addition, there were a few outliers with extremely large sample variances, one example can be seen in Figure \ref{fig:scatterMeanVar}.
 
-To take into consideration outliers, a simple weighted least squares regression can be done to give less weight on outliers.
+To take into consideration outliers, a simple weighted least squares regression was done to give less weight on outliers.
 
 \begin{figure}
 	\centering
@@ -318,7 +318,7 @@ To take into consideration outliers, a simple weighted least squares regression 
 \subsection{Theory}
 The sample variance of the grey values is a random variable, thus itself has uncertainty. Weighted least squares can be used to take into consideration the uncertainty of the sample variance. This can be done by giving low weights to data points with high uncertainty on the grey value variance.
 
-Let $S_i^2$ and $\sigma_i^2$ be the sample variance and true variance, respectively, of the $i$th pixel's grey value for $i=1,2,\dotdotdot,m$ and $m=1\,996^2$. The sample variance has a sampling distribution such that
+Let $S_i^2$ and $\sigma_i^2$ be the sample variance and true variance, respectively, of the $i$th pixel's grey value for $i=1,2,\dotdotdot,m$ and $m=1\,996^2$. The sample variance has a sampling distribution such that \cite[pp.~195-198]{rice2009mathematical}
 \begin{equation}
 U_i=\frac{(n-1)S_i^2}{\sigma_i^2}\sim\chi_{n-1}^2
 \end{equation}
@@ -347,7 +347,7 @@ Let $Y_i$ and $x_i$ have a linear relationship such that
 \begin{equation}
 Y_i = \left(\vect{x}_i\right)\T\vectGreek{\beta} + \epsilon_i
 \end{equation}
-where $\vectGreek{\beta}$ is a $p$ length parameter vector and $\epsilon_i\sim\normal(0,\sigma_{\epsilon}^2)$ for i.i.d.~$i=1,2,\dotdotdot,m$. The weighted least squares is an optimization problem where the objective $T$ is minimized by varying $\vectGreek{\beta}$
+where $\vectGreek{\beta}$ is a $p$ length parameter vector and $\epsilon_i\sim\normal(0,\sigma_{\epsilon}^2)$ for i.i.d.~$i=1,2,\dotdotdot,m$. The weighted least squares is an optimisation problem where the objective $T$ is minimized by varying $\vectGreek{\beta}$
 \begin{equation}
 T =
 \frac{\sum_{i=1}^mw_i\left(Y_i-\left(\vect{x}_i\right)\T\vectGreek{\beta}\right)^2}
@@ -376,7 +376,7 @@ Setting the differential to $\vect{0}$, the value of $\vectGreek{\beta}$ which m
 
 Assuming $Y_1,Y_2,\dotdotdot,Y_m$ are independent and have constant variance $\sigma_\epsilon^2$, the covariance of $\widehat{\vectGreek{\beta}}$ is
 \begin{multline}
-\cov(\widehat{\vectGreek{\beta}})=\matr{\Sigma}_{\widehat{\vectGreek{\beta}}}=
+\cov\left[\widehat{\vectGreek{\beta}}\right]=\matr{\Sigma}_{\widehat{\vectGreek{\beta}}}=
 \sigma_\epsilon^2\left[\sum_{i=1}^mw_i\vect{x}_i\left(\vect{x}_i\right)\T\right]^{-1}\left[\sum_{i=1}^mw_i\vect{x}_i\right]
 \\
 \left[\sum_{i=1}^mw_i\left(\vect{x}_i\right)\T\right]\left[\sum_{i=1}^mw_i\vect{x}_i\left(\vect{x}_i\right)\T\right]^{-1} \ .
@@ -392,11 +392,11 @@ After estimating $\vectGreek{\beta}$ and $\sigma_\epsilon^2$ and given a data po
 \end{equation}
 with expectation
 \begin{equation}
-\expectation\left({\widehat{Y}}\right)=\left(\vect{x}_{\textup{test}}\right)\T\widehat{\vectGreek{\beta}}
+\expectation\left[{\widehat{Y}}\right]=\left(\vect{x}_{\textup{test}}\right)\T\widehat{\vectGreek{\beta}}
 \end{equation}
 and variance
 \begin{equation}
-\variance\left(\widehat{Y}\right)=\left(\vect{x}_{\textup{test}}\right)\T\matr{\Sigma}_{\widehat{\vectGreek{\beta}}}\vect{x}_{\textup{test}}+\sigma_\epsilon^2
+\variance\left[\widehat{Y}\right]=\left(\vect{x}_{\textup{test}}\right)\T\matr{\Sigma}_{\widehat{\vectGreek{\beta}}}\vect{x}_{\textup{test}}+\sigma_\epsilon^2
 \end{equation}
 where $\widehat{\sigma}_\epsilon^2$ can be used in the estimation of $\variance\left(\widehat{Y}\right)$.
 
@@ -410,7 +410,7 @@ In addition, the BIC was calculated given as
 for each polynomial order and repeated for 40 different bootstrap samples. A bootstrap sample was obtained by sampling $m$ times without replacement from the original dataset. 
 
 \subsection{Results}
-The weighted least squares with polynomial features were fitted successfully as shown in Figure \ref{fig:weightedLS_polynomials}. It appears successful because the regression goes through the majority of the mean and variance pairs. It was unusual to note that the prediction variance for the 6th order polynomial blew up, further investigate will be needed to explain such behaviour.
+The weighted least squares with polynomial features were fitted successfully as shown in Figure \ref{fig:weightedLS_polynomials}. It appeared successful because the regression goes through the majority of the mean and variance pairs. It was unusual to note that the prediction variance for the 6th order polynomial blew up, further investigation will be needed to explain such behaviour.
 
 The BIC, as shown in Figure \ref{fig:weightedLS_BIC}, favoured high order polynomials. Because the BIC favoured more complicated models, this suggested that fitting polynomial features was not a good model. The BIC aimed to seek more and more polynomials so that the model becomes more similar to the true model. 
 
@@ -453,15 +453,15 @@ The BIC, as shown in Figure \ref{fig:weightedLS_BIC}, favoured high order polyno
 
 \section{Subsampling Least Squares}
 \subsection{Methods}
-From the previous chapter, it was clear there were 3 materials, the sample, background and foam, which contributed to the peaks in the histogram of the grey values.
+From the previous chapter, it was clear there were 3 materials, the 3D printed sample, background and foam, which contributed to the peaks in the histogram of the grey values.
 
-The sample mean sample variance pairs were sub-sampled from each of the 3 materials. A 1st and 2nd order weighted linear regression was fitted for each sub-sample. In addition, the BIC was calculated when fitting such weighted regression on 40 bootstrap samples, for each material.
+The sample mean sample variance pairs were sub-sampled from each of the 3 materials. A 1st and 2nd order weighted linear regression were fitted for each sub-sample. In addition, the BIC was calculated when fitting such weighted regression on 40 bootstrap samples, for each material.
 
 \subsection{Results}
 
-It was clear the mean-variance relationship is material dependent, this can be seen by the different gradients of the separate regressions in Figure \ref{fig:subsample_meanVar}. The BIC, as shown in Table \ref{table:subsample_BIC}, showed that for the sample and foam the BIC favours higher order models. However for the background, when taking into consideration the uncertainty, the BIC can favour the 1st order model.
+It was clear the mean-variance relationship is material dependent, this can be seen by the different gradients of the separate regressions in Figure \ref{fig:subsample_meanVar}. The BIC, as shown in Table \ref{table:subsample_BIC}, showed that for the 3D printed sample and foam the BIC favours higher order models. However for the background, when taking into consideration the uncertainty, the BIC can favour the 1st order model.
 
-It was unusual to see the prediction variance to blow for the 2nd order model in the background and foam data.
+It was unusual to see the prediction variance to blow for the 2nd order model in the background and foam sub-sample data.
 
 \begin{figure}
 	\centering
@@ -511,7 +511,7 @@ It was unusual to see the prediction variance to blow for the 2nd order model in
 In order to take into consideration the different mean-variance relationship for different materials, a mixture of linear regression was tried to see if it captures the different behaviours.
 
 \subsection{Theory}
-In order to consider the 3 different materials, a mixture of linear regression was used of the form
+A mixture of linear regression was used of the form
 \begin{equation}
 Y_i\sim
 \begin{cases}
@@ -538,7 +538,7 @@ thus the log likelihood is
 \sum_{j=1}^q \frac{\pi_j}{\sqrt{2\pi}\sigma_j}\exp\left(-\frac{1}{2}\left(\frac{y_i-\left(\vect{x}_i\right)\T\vectGreek{\beta}_j}{\sigma_j}\right)^2\right) 
 \right] \ .
 \end{equation}
-Such a log likelihood can be maximised by using the EM algorithm, treating $S_i$ as a random latent variable.
+Such a log likelihood can be maximised by using the EM algorithm \cite{dempster1977maximum}, by treating $S_i$ as a random latent variable \cite[pp.~260-261]{barber2012bayesian}.
 
 In the E step, the posterior distribution is used to put a prediction on the latent variables $S_i$ for $i=1,2,\dotdotdot,m$ given estimates of the parameters $\vectGreek{\beta}_j$, $\sigma_j^2$ and $\pi_j$ for $j=1,2,\dotdotdot,q$. The posterior distribution is given as
 \begin{equation*}
@@ -604,14 +604,14 @@ The resulting fit, as shown in Figure \ref{fig:mixture_histogram}, did not captu
 
 \section{Distance Weighted Least Squares}
 \subsection{Methods}
-To consider the 3 different sources, weighted least squares was used where the weights depends on some distance from some particular sample-mean grey value. 3 independent weighted least squares were used where the weights are
+Weighted least squares was used where the weights depended on some distance from some particular grey value. 3 independent weighted least squares were used where the weights are
 \begin{equation}
 w_i=\exp\left[-\frac{1}{2}\left(\frac{x_i-\mu_j}{\sigma_j}\right)^2\right] \ ,
 \end{equation}
 $\mu_j$ was found using $k$-means in the sample-mean grey value space and $\sigma_j$ is a predefined constant, called the Gaussian width.
 
 \subsection{Results}
-The model captured the sample and foam well because the regression captured the shape of the histogram. However for the background, the regression can be negative as a result of being influenced by lower sample grey values from the foam and sample.
+The model captured the 3D printed sample and foam well because the regression captured the shape of the histogram. However for the background, the regression had a negative gradient as a result of being influenced by lower sample grey values from the foam and 3D printed sample.
 
 For higher Gaussian widths, the regression became an ordinary least squares regression because all the data points have approximately equal weights.
 
@@ -633,7 +633,7 @@ For higher Gaussian widths, the regression became an ordinary least squares regr
 		\includegraphics[width=\textwidth]{figures/meanVar/gaussian_4.eps}
 		\caption{$\sigma=10^5$}
 	\end{subfigure}
-	\caption{3 independent Gaussian weighted least squares regressions. The weights depend on the distance from the $k$-means sample mean grey values and some width $\sigma$.}
+	\caption{3 independent Gaussian weighted least squares regressions. The weights depended on the distance from the $k$-means sample mean grey values and some width $\sigma$.}
 \end{figure}
 
 \chapter{Latent Variable Model}
@@ -726,7 +726,7 @@ This is just a weighted sum of the outer products of the eigenvectors, therefore
 Because this is a weighted sum, the eigenvectors with the biggest eigenvalue will be most responsible for the covariance matrix. $\vectGreek{\phi}_i$ are called the principle components.
 
 \subsection{Methods}
-The 100 images were shrunk with averaging to a size of $100\times100$ pixels using ImageJ. The sample covariance matrix, of the pixel's grey values, was calculated using the maximum likelihood estimator so that the 6 eigenvectors with the biggest eigenvalues can be obtained. Using 1\,600 bootstrap samples, the sampling distribution of the 6 eigenvalues were sampled.
+The 100 images were shrunk with averaging to a size of $100\times100$ pixels using ImageJ \cite{schindelin2012fiji}. The sample covariance matrix, of the pixel's grey values, was calculated using the maximum likelihood estimator so that the 6 eigenvectors with the biggest eigenvalues can be obtained. Using 1\,600 bootstrap samples, the sampling distribution of the 6 eigenvalues were sampled.
 
 \subsection{Results}
 Figure \ref{fig:initial_PC_eigenvalues} shows the first 6 of the diagonal of the outer product of the individual principle components, they represent the normalised main sources of variance. It was observed that on the first and second principle components, there are sources of variance in the bottom right and top right of the image. This could imply that the sources of variance are not uniformly distributed in the background.
