@@ -889,7 +889,7 @@ The main source of error was down to the small sample size. The experiments can 
 \end{figure}
 
 \section{Compound Poisson}
-Consider photons emitted from an X-ray tube as a Poisson process. These photons have a board energy spectrum as a result of Bremsstrahlung and characteristic radiation. A Compound Poisson model was used to model the grey values of each pixel by considering the sum of the energies of each photon detected.
+Consider photons emitted from an X-ray tube as a Poisson process. There has been Poisson latent models developed to consider such behaviour. For example the number of photons detected can be modelled as $Y\sim\poisson(\lambda)$ and then the grey value can be modelled as $X|Y\sim\normal(\alpha Y,\beta)$ \cite{jin2014investigating}. However this does not consider that these photons have a board energy spectrum as a result of Bremsstrahlung and characteristic radiation. It can be shown that a compound Poisson model performs better \cite{whiting2006properties} because it considers the board energy spectrum of the photons. However fitting the model is very difficult using the EM algorithm and approximations have to be made \cite{xie2008x}.
 
 \subsection{Theory}
 Suppose $n$ images have been obtained and each image has $m$ pixels. Each pixel has a corresponding grey value $X_i$ for $i=1,2,\dotdotdot,m$. Let $Y_i$ be the number of photons detected in pixel $i$ and each photon has energy randomly distributed with mean $\mu_i$ and variance $\sigma_i^2$. The number of photons detected can be modelled as a Poisson process such that
