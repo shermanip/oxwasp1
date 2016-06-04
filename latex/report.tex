@@ -56,7 +56,10 @@
 		\large        
         
         \vspace{2cm}
-        {OxWaSP 2015-16 Warwick Cohort - Mini-project 1}
+        {OxWaSP 2015-16 University of Warwick Cohort}
+        
+        \vspace{1cm}
+        {Mini-Project 1 Report}
         
         \vspace{1cm}
         {Sherman Ip}
@@ -73,7 +76,7 @@
 
 %======ABSTRACT=========
 \begin{abstract}
-X-ray computed tomography can be used to do quality control on 3D printed samples. However there are sources of error in the 3D printing, how the photons behave and in the X-ray detector. This projects aims to find a relationship between the mean and variance of the grey values of each pixel in images obtained from the X-ray detector by fitting linear regressions. In addition, latent variable models such as principle component analysis, factor analysis and the compound Poisson were attempted to be fitted to find sources of variance.
+X-ray computed tomography can be used to do quality control on 3D printed samples. However there are sources of error in the 3D printing, how the photons behave and in the X-ray detector. This project aims to find a relationship between the mean and variance of the grey values of each pixel in images obtained from the X-ray detector by fitting linear regressions. In addition, latent variable models such as principle component analysis, factor analysis and the compound Poisson were attempted to be fitted to find sources of variance.
 \end{abstract}
 
 %======ACKNOWLEDGEMENT=========
@@ -95,13 +98,13 @@ X-ray computed tomography can be used to do quality control on 3D printed sample
 %======INTRODUCTION========
 \chapter{Introduction}
 
-3D printing, formally additive manufacturing, has recently became state of the art technology which manufactures objects of complicated shapes with very high precision. Recently it was commercialised and is used in medical science and engineering. Because of such a wide range of application, there has been a need for quality control and this can be done by scanning the 3D printed sample using X-ray computed tomography.
+3D printing, formally additive manufacturing \cite{wong2012review}, has recently became state of the art technology which manufactures objects of complicated shapes with very high precision. It was developed in the 1980's \cite{kodama1981automatic} but recently it has been commercialised and is used in medical science \cite{kang20163d} and engineering \cite{wong2012review}. Because of such a wide range of applications, there has been a need for quality control and this can be done by scanning the 3D printed sample using X-ray computed tomography.
 
-The Inside-Out group at the University of Warwick aims to develop statistical methodology for using CT scans to do quality control on 3D printed samples. Recent research include how the penumbra can be modelled \cite{kueh2014modelling}, simulating and detecting defects and on the behaviour of dead pixels.
+The Inside-Out group at the University of Warwick aims to develop statistical methodology for using computed tomography scans to do quality control on 3D printed samples. Recent research include how the penumbra can be modelled \cite{kueh2014modelling}, simulating and detecting defects and on the behaviour of dead pixels \cite{brettschneider2014spatial}.
 
-The aim of this specific project was to do linear regression on the mean and variance of the grey values in the CT scans to find explanatory relationships. Separately, latent variable models were fitted to the images to find sources of noise.
+The aim of this specific project was to do linear regression on the mean and variance of the grey values in the computed tomography images to find explanatory relationships. Separately, latent variable models were fitted to the images to find sources of variance. Latent variable models include principle component analysis, factor analysis and compound Poisson.
 
-This report is written in a Master dissertation style and assumes knowledge up to Master level in physics and statistics. The mathematics used to be reviewed in undergraduate textbooks \cite{riley2006mathematical}, however complicated matrix calculus results will be stated without proof in Chapter \ref{chapter:matrixCalculus} in the appendix.
+This report was written in a Master dissertation style and assumes knowledge up to graduate level in physics and statistics. The mathematics and statistics used can be reviewed in undergraduate textbooks \cite{riley2006mathematical} \cite{rice2009mathematical}, however complicated matrix calculus results will be stated without proof in Appendix \ref{chapter:matrixCalculus}.
 
 %======LITERATURE REVIEW========
 \chapter{Literature Review}
@@ -889,10 +892,10 @@ The main source of error was down to the small sample size. The experiments can 
 \end{figure}
 
 \section{Compound Poisson}
-Consider photons emitted from an X-ray tube as a Poisson process. There has been Poisson latent models developed to consider such behaviour. For example the number of photons detected can be modelled as $Y\sim\poisson(\lambda)$ and then the grey value can be modelled as $X|Y\sim\normal(\alpha Y,\beta)$ \cite{jin2014investigating}. However this does not consider that these photons have a board energy spectrum as a result of Bremsstrahlung and characteristic radiation. It can be shown that a compound Poisson model performs better \cite{whiting2006properties} because it considers the board energy spectrum of the photons. However fitting the model is very difficult using the EM algorithm and approximations have to be made \cite{xie2008x}.
+Consider photons emitted from an X-ray tube as a Poisson process. There has been Poisson latent models developed to consider such behaviour. For example the number of photons detected can be modelled as $Y\sim\poisson(\lambda)$ and then the grey value can be modelled as $X|Y\sim\normal(\alpha Y,\beta)$ \cite{jin2014investigating}. Such a model explains that there is a linear relationship between the mean and variance \cite{jin2014investigating}. However this does not consider that these photons have a board energy spectrum as a result of Bremsstrahlung and characteristic radiation. It can be shown that a compound Poisson model performs better \cite{whiting2006properties} because it considers the board energy spectrum of the photons. However fitting the model is very difficult using the EM algorithm and approximations have to be made \cite{xie2008x}.
 
 \subsection{Theory}
-Suppose $n$ images have been obtained and each image has $m$ pixels. Each pixel has a corresponding grey value $X_i$ for $i=1,2,\dotdotdot,m$. Let $Y_i$ be the number of photons detected in pixel $i$ and each photon has energy randomly distributed with mean $\mu_i$ and variance $\sigma_i^2$. The number of photons detected can be modelled as a Poisson process such that
+Suppose an image has $m$ pixels and each pixel has a corresponding grey value $X_i$ for $i=1,2,\dotdotdot,m$. Let $Y_i$ be the number of photons detected in pixel $i$ and each photon has energy randomly distributed with mean $\mu_i$ and variance $\sigma_i^2$. The number of photons detected can be modelled as a Poisson process such that
 \begin{equation}
 Y_i\sim\poisson(\nu_i \tau)
 \end{equation}
@@ -908,7 +911,7 @@ X_i|U_i\sim\normal\left(
 \frac{\alpha}{\tau}U_i,\beta_i^2
 \right)
 \end{equation}
-where $\alpha$ is some positive constant and $\beta_i^2$ is the variance of some other external factors.
+where $\alpha$ is some positive constant and $\beta_i^2$ is the variance of some additive normal noise.
  
 The full joint probability density function is
 \begin{equation*}
@@ -920,9 +923,10 @@ p_{X_i,U_i,Y_i}\left(x_i,u_i,y_i\right)=
 \frac{1}{\sqrt{2\pi}\beta_i}\exp\left[-\frac{1}{2}\left(\frac{x_i-\alpha u_i /\tau}{\beta_i}\right)^2\right]
 \\
 \frac{1}{\sqrt{2\pi}\sqrt{y_i\sigma_i^2}}\exp\left[-\frac{1}{2}\left(\frac{u_i-y_i\mu_i}{\sqrt{y_i\sigma_i^2}}\right)^2\right]
-\euler^{-\nu_i\tau}\frac{(\nu_i\tau)^{y_i}}{y_i!} \ .
+\euler^{-\nu_i\tau}\frac{(\nu_i\tau)^{y_i}}{y_i!}
 \end{multline}
-By marginalising out $U_i$, a one layer latent variable model can be obtained and the unknown parameters $\nu_i,\mu_i,\sigma_i^2,\beta_i^2$ can be estimated using the EM algorithm. The one layer latent variable is given as
+for any real $x_i$, $u_i$ and $y_i=0,1,2,\dotdotdot$.
+By marginalising out $U_i$, a one layer latent variable model can be obtained. Thus the EM algorithm \cite[pp.~260-261]{barber2012bayesian} can be used to estimate the unknown parameters $\nu_i,\mu_i,\sigma_i^2$ and $\beta_i^2$. The one layer latent variable is given as
 \begin{equation}
 Y_i\sim\poisson(\nu_i\tau)
 \end{equation}
@@ -931,9 +935,9 @@ X_i|Y_i\sim\normal\left(
 \frac{\alpha\mu_i}{\tau}Y_i,\frac{\alpha^2\sigma_i^2}{\tau^2}Y_i+\beta_i^2
 \right) \ .
 \end{equation}
-The proof of this can be found in Appendix \ref{chapter:oneLayer_compoundPoisson}. Because this is a one layer latent variable model, the EM algorithm can be used to estimate the parameters $\nu_i$,$\mu_i$,$\sigma_i^2$ and $\beta_i^2$.
+The proof of this can be found in Appendix \ref{chapter:oneLayer_compoundPoisson}.
 
-The marginal expectation and variance can be calculated
+The marginal expectation and variance \cite[pp.~149-151]{rice2009mathematical} can be calculated
 \begin{equation*}
 \expectation[X_i]=\expectation[\expectation[X_i|Y_i]]
 \end{equation*}
@@ -959,7 +963,11 @@ and
 \variance[X_i] = \frac{\alpha^2\nu_i}{\tau}\left(\mu_i^2+\sigma_i^2\right)+\beta_i^2 \ .
 \end{equation}
 
-This model can be made simpler by setting $\beta_i=0$ because by doing so the joint probability density function is in the exponential family with sufficient statistics $X_i^2/Y_i,X_i$ and $Y_i$. This is proven in Appendix \ref{chapter:compoundPoisson_expFamily}. However the joint probability density function much consider the special case of $Y_i=0$ because such a case will drive the variance of $X_i|Y_i$ to zero. This can be dealt with by using the Dirac delta function
+This model can be made simpler by setting $\beta_i=0$ because by doing so the joint probability density function is in the exponential family with sufficient statistics $X_i^2/Y_i,X_i$ and $Y_i$. This is proven in Appendix \ref{chapter:compoundPoisson_expFamily}. However by doing so the joint probability density function must consider the special case of $Y_i=0$ because such a case will drive the variance of $X_i|Y_i$ to zero. This can be dealt with by using the Dirac delta function \cite[pp.~439-443]{riley2006mathematical}
+\begin{equation*}
+p_{X_i,Y_i}\left(x_i,y_i\right)=
+p_{X_i|Y_i}(x_i|y_i)\prob(Y_i=y_i)
+\end{equation*}
 \begin{equation}
 p_{X_i,Y_i}\left(x_i,y_i\right)=
 \begin{cases}
@@ -970,7 +978,7 @@ p_{X_i,Y_i}\left(x_i,y_i\right)=
 \end{cases} \ .
 \end{equation}
 
-For the E step, $Y_i$ and $1/Y_i$ are estimated given all the parameters using the conditional expectation $y_i=\expectation\left[Y_i|X_i=x_i\right]$ and $\zeta_i=\expectation\left[1/Y_i|X_i=x_i\right]$ respectively. The conditional probability mass function can be obtained by
+The conditional probability mass function can be obtained by
 \begin{equation*}
 \prob\left(Y_i=y_i|X_i=x_i\right)=\frac{p_{X_i,Y_i}\left(x_i,y_i\right)}{p_{X_i}(x_i)}
 \end{equation*}
@@ -985,7 +993,7 @@ For the special cases
 \exp\left[-\dfrac{1}{2}\dfrac{\left(x_i-y_i\mu_i\alpha/\tau\right)^2}{\alpha^2y_i\sigma_i^2/\tau^2}\right]
 \quad \text{for }y=1,2,\dotdotdot \ .
 \end{equation*}
-But because $\delta(0)$ is infinite,
+But because $\delta(0)$ is infinite
 \begin{equation}
 \prob\left(Y_i=y|X_i=0\right) =
 \begin{cases}
@@ -998,7 +1006,7 @@ and
 \begin{equation}
 \expectation[Y_i|X_i=0] = 0 \ .
 \end{equation}
-$\expectation[1/Y_i|X_i=0]$ cannot be defined in a sensible manner.
+$\expectation[1/Y_i|X_i=0]$ cannot be defined in this special case.
 
 Another special case is
 \begin{equation*}
@@ -1031,14 +1039,16 @@ The expectation of the sufficient statistics are then
 \end{equation}
 and
 \begin{equation}
-\expectation\left[1/Y_i|X_i=x_i\right]=
+\expectation\left[\dfrac{1}{Y_i}|X_i=x_i\right]=
 \frac{1}{p_{X_i}(x_i)}
 \sum_{y_i=1}^{\infty}\dfrac{\euler^{-\nu_i\tau}(\nu_i\tau)^{y_i}\tau}{y_i!\sqrt{2\pi}\alpha\sigma_i}y_i^{-3/2}
-\exp\left[-\dfrac{1}{2}\dfrac{\left(x_i-y_i\mu_i\alpha/\tau\right)^2}{\alpha^2y_i\sigma_i^2/\tau^2}\right]
+\exp\left[-\dfrac{1}{2}\dfrac{\left(x_i-y_i\mu_i\alpha/\tau\right)^2}{\alpha^2y_i\sigma_i^2/\tau^2}\right] \ .
 \end{equation}
-Unfortunately such a sum cannot be simplified. The fastest (approximate) way to get a value for these expectations is to truncate the sum. Another way to obtain the conditional expectation is to use the sample mean from samples of the conditional.
+Unfortunately such a sum cannot be simplified. The fastest approximate way to get a value for these expectations is to truncate the sum. Another way to obtain the conditional expectation is to use the sample mean from samples of the conditional distribution, however this could be slower depending on the sampling algorithm.
 
-Because the conditional probability mass function is known up to a constant, rejection sampling can be used to draw conditional samples. Rejection sampling samples exactly but a proposal is needed and this influences the rejection rate. Approximate Bayesian computation (ABC) can be used instead because $Y_i$ and $X_i|Y_i$ can be simulated. ABC draws approximate samples without a proposal but can suffer from high rejection rates.
+Because the conditional probability mass function is known up to a constant, rejection sampling can be used to draw conditional samples. Rejection sampling samples exactly but a proposal distribution is needed and this influences the rejection rate, or in other words the efficiency. One possible proposal is the Poisson distribution and there does exist adaptive methods which changes the proposal on the fly \cite{casella2004generalized}. Approximate Bayesian computation (ABC) \cite{marin2012approximate} can be used instead because $Y_i$ and $X_i|Y_i$ can be simulated. ABC draws approximate samples without a proposal but can suffer from high rejection rates.
+
+Suppose for pixel $i$, the follow grey values have been observed $x_i^{(1)}$, $x_i^{(2)}$, $\dotdotdot$, $x_i^{(n)}$. For each corresponding observable let $Y_i^{(1)}$, $Y_i^{(2)}$, $\dotdotdot$, $Y_i^{(n)}$ be the Poisson latent variable. For the E step, $Y_i^{(j)}$ and $1/Y_i^{(j)}$ are estimated given all the parameters using the conditional expectation for $j=1,2,\dotdotdot,n$. That is $y_i^{(j)}=\expectation\left[Y_i^{(j)}|X_i^{(j)}=x_i^{(j)}\right]$ and $\zeta_i^{(j)}=\expectation\left[1/Y_i^{(j)}|X_i^{(j)}=x_i^{(j)}\right]$ respectively. 
 
 In the M step the parameters $\nu_i,\mu_i,\sigma_i^2$ are estimated given the latent variables. This is done by maximising the conditional expectation of the log likelihood function, that is
 \begin{equation}
@@ -1060,28 +1070,6 @@ It is given that the following M step estimators can be obtained:
 \end{equation}
 where $\left(x_i^{(j)}\right)^2\zeta_i^{(j)}=0$ if $\left(x_i^{(j)}\right)^2=0$. This is proven in Appendix \ref{chapter:mStep_compoundPoisson}.
 
-Using the Cram\'er-Rao lower bound, the variance for such estimators can be found from the diagonal elements of the inverse of the Fisher's information matrix, that is
-\begin{multline}
-\cov\left[
-\begin{pmatrix}
-\widehat{\nu_i} \\ \widehat{\mu_i} \\ \widehat{\sigma}_i^2
-\end{pmatrix}
-\right]
-=
-\left(\begin{matrix}
-\dfrac{\sum_{j=1}^ny_i^{(j)}}{\nu_i^2} & 0 \\
-0 & \dfrac{\sum_{j=1}^ny_i^{(j)}}{\sigma_i^2} & \\
-0 & \dfrac{\tau\sum_{j=1}^nx_i^{(j)}}{\alpha\sigma_i^4}-\dfrac{\mu_i\sum_{j=1}^ny_i^{(j)}}{\sigma_i^4}
-\end{matrix}\right.
-\\
-\left.\begin{matrix}\vphantom{\dfrac{\sum_{j=1}^ny_i^{(j)}}{\nu_i^2}}
-0 \\
-\dfrac{\tau\sum_{j=1}^nx_i^{(j)}}{\alpha\sigma_i^4}-\dfrac{\mu_i\sum_{j=1}^ny_i^{(j)}}{\sigma_i^4}
-\\
--\dfrac{n}{2\sigma_i^4}+\dfrac{\tau^2}{\alpha^2\sigma_i^6}\sum_{j=1}^n\left(x_i^{(j)}\right)^2\zeta_i^{(j)}-\dfrac{2\tau\mu_i}{\alpha\sigma_i^6}\sum_{j=1}^nx_i^{(j)}+\dfrac{\mu_i^2}{\sigma_i^2}\sum_{j=1}^ny_i^{(j)}
-\end{matrix}\right)^{-1} \ .
-\end{multline}
-
 The constant $\alpha$ only sets the scale of $\mu_i$ and $\sigma_i^2$ but can be calibrated so that it has units of keV. From Chapter \ref{chapter:about_the_data}, the following properties of the X-ray tube were stated or calculated:
 \begin{itemize}
 	\item Voltage = $V$ = 100 kV
@@ -1094,15 +1082,16 @@ Assume, very crudely, the X-ray spreads out and targets the detector with $1996^
 \begin{equation}
 U=\frac{\eta P\tau}{1996^2}=2.1\times10^{8}\text{ keV}\cdot\text{pixel}^{-1} \ .
 \end{equation}
-The images were calibrated so that the background has grey value of 60\,000. Assuming the air has attenuation coefficient of zero, then $\alpha$ can be crudely estimated by
+The images were calibrated so that the background has grey value of 60\,000. Assuming the air has attenuation coefficient of zero, then $\alpha$ can be estimated by
 \begin{equation}
 \alpha = \frac{60\,000 \tau}{U} = 1.4\times10^{-4}\text{ s}\cdot\text{keV}^{-1}\cdot\text{pixel} \ .
 \end{equation}
+This calculation could be improved if the solid angle of the X-ray beam and the distance between the X-ray tube and X-ray detector were given.
 
-\subsection{Small example}
-A dataset was simulated, with $n=100$ samples, using the follow parameters with arbitrary units: $\alpha=1$, $\tau=1$, $\nu=5$, $\mu=3$ and $\sigma^2=0.1$. The EM algorithm was initialized by assigning each latent variable such that $Y^{(j)}\sim\poisson(\phi)$ for i.i.d.~$j=1,2,\dotdotdot,n$. The sum was truncated to include 100 terms.
+\subsection{Toy Example}
+A dataset was simulated, with $n=100$ samples, using the follow parameters with arbitrary units: $\alpha=1$, $\tau=1$, $\nu=5$, $\mu=3$ and $\sigma^2=0.1$. The EM algorithm was initialized by assigning each latent variable such that $Y^{(j)}\sim\poisson(\phi)$ for i.i.d.~$j=1,2,\dotdotdot,n$. The sums, to work out the expectations and likelihood, were truncated to include 100 terms.
 
-The figures show that the EM algorithm works because for different initial values, the parameters converge towards the true value and the log likelihood always increases.
+The figures showed that the EM algorithm works because for different initial values, the parameters converge towards the true value and the log likelihood always increases.
 
 For high $\nu\tau$, problems arises as more and more terms are needed in the truncated sum. Too many terms in the truncated sum slow down the program a lot.
 
@@ -1144,14 +1133,14 @@ For high $\nu\tau$, problems arises as more and more terms are needed in the tru
 \chapter{Conclusion}
 
 \section{Mean and Variance Relationship}
-The relationship between the sample mean and sample variance of the grey values was modelled by fitting a weighted linear regression. Less weights were given to bigger sample variance as a simple method for robust regression. It was found that the mean and variance relationship depended on the material. To take into account the different mean and variance relationships, a mixture of linear regression was fitted but it failed to capture the different behaviours from the different materials. Weighted linear regression, where the weights depended on the different between the sample mean grey value and some $k$ mean sample mean grey value, was fitted and only captured 2 out of the 3 material mean variance relationship.
+The relationship between the sample mean and sample variance of the grey values was modelled by fitting a weighted linear regression. Less weights were given to bigger sample variance as a simple method for robust regression. It was found that the mean and variance relationship depended on the different materials: the 3D printed sample, the background and the foam holder. To take into account the different mean and variance relationships, a mixture of linear regression was fitted but it failed to capture the different behaviours from the different materials. Weighted linear regression, where the weights depended on the difference between the sample mean grey value and some $k$ mean sample mean grey value, was fitted and only captured 2 out of the 3 material mean variance relationship.
 
-There is further work to do in the mean and variance relationship. Firstly it should be investigated whenever transforming the variance will produce a more linear model. For example the log variance or the standard deviation could be used. Furthermore, more features then just polynomials should be used for the sample mean grey values. Lastly, it was established that the sample variance has a scaled $\chi^2$ distribution. Because the $\chi^2$ distribution is in the exponential family, generalised linear models should be used as well to open up more possibilities to model the relationship between the mean and variance.
+There is further work to do in the mean and variance relationship. Firstly it should be investigated whenever transforming the variance will produce a more linear model. For example the log variance or the standard deviation could be used. Furthermore, more features than just polynomials should be used for the sample mean grey values. Lastly, it was established that the sample variance has a scaled $\chi^2$ distribution. Because the $\chi^2$ distribution is in the exponential family, generalised linear models \cite{mccullagh1989generalized} should be used as well to open up more possibilities to model the relationship between the mean and variance.
 
 \section{Latent Variable Model}
-In order to be able to find sources of variance, latent variable models were used as a way to develop explanatory models. PCA and factor analysis were used on a shrunken down dataset and found the sample does have a lower sample variance. It was also found that the background variance was not uniform and there are patches of high variance. However shrinking the images down could be a problem because this could of affected the variance of the dataset. In order to improve the data analysis, the computational algorithms should be improved so that PCA and factor analysis can be done directly on the full size dataset.
+In order to be able to find sources of variance, latent variable models were used as a way to develop explanatory models. PCA and factor analysis were used on a shrunken down dataset and found the 3D printed sample does have a lower sample variance. It was also found that the background variance was not uniform and there are patches of high variance. However shrinking the images down could be a problem because this could of affected the variance of the dataset. In order to improve the data analysis, the computational algorithms should be improved so that PCA and factor analysis can be done directly on the full size dataset.
 
-Another explanatory model developed under the light of physics was the compound Poisson distribution. While the compound Poisson distribution was used in the medical physics community, fitting the distribution was extremely difficult because conditional and marginal distribution cannot be written down in closed form. A toy example was provided in this report. In order for the fitting to work computationally, approximations which are cheap to run must be made.
+Another explanatory model developed under the light of physics was the compound Poisson distribution. While the compound Poisson distribution was used in the medical physics community \cite{whiting2006properties}, fitting the distribution was extremely difficult because conditional and marginal distribution cannot be written down in closed form. A toy example was provided in this report. In order for the fitting to work computationally, approximations which are cheap to run must be made.
 
 \appendix
 
