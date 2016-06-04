@@ -1794,21 +1794,42 @@ H_i= -n\nu_i\tau+\ln(\nu_i\tau)\sum_{j=1}^ny_i^{(j)}-\frac{n}{2}\ln\left(\frac{\
 -\frac{\mu_i^2}{2\sigma_i^2}\sum_{j=1}^ny_i^{(j)}
 \ .
 \end{multline}
-By setting the partial differentials to zero with respect to $\mu_i$, $\sigma_i^2$ and $\nu_i$ to zero, then the following M step estimators can be obtained:
+This can be maximised by setting the partial differentials to zero with respect to $\nu_i$, $\mu_i$ and $\sigma_i^2$ and  to zero.
+
+Taking the partial derivative with respect to $\nu_i$
 \begin{equation}
-\mu_i=\frac{\tau\sum_{j=1}^nx_i^{(j)}}{\alpha\sum_{j=1}^ny_i^{(j)}}
+\frac{\partial H_i}{\partial \nu_i}=-n\tau+\frac{\sum_{j=1}^ny_i^{(j)}}{\nu_i} \ .
 \end{equation}
+Setting this to zero, the estimator for $\nu_i$ is
 \begin{equation}
-\sigma_i^2=\frac{1}{n}\left[
+\widehat{\nu}_i=\frac{\sum_{j=1}^ny^{(j)}}{n\tau} \ .
+\end{equation}
+
+Taking the partial derivative with respect to $\mu_i$
+\begin{equation}
+\frac{\partial H_i}{\partial \mu_i} = \frac{\tau}{\alpha\sigma_i^2}\sum_{j=1}^nx_i^{(j)}-\frac{\mu_i}{\sigma_i^2}\sum_{j=1}^n y_i^{(j)} \ .
+\end{equation}
+Setting this to zero, the estimator for $\mu_i$ is
+\begin{equation}
+\widehat{\mu}_i=\frac{\tau}{\alpha} \frac{\sum_{j=1}^n x_i^{(j)}}{\sum_{j=1}^n y_i^{(j)}} \ .
+\end{equation}
+
+Finally, taking the partial derivative with respect to $\sigma_i^2$
+\begin{equation}
+\frac{\partial H_i}{\partial \sigma_i^2} = -\frac{n}{2\sigma_i^2}+\frac{\tau^2}{2\alpha^2\sigma_i^4}\sum_{j=1}^n\left(x_i^{(j)}\right)^2\zeta_i^{(j)} - \frac{\tau\mu_i}{\alpha\sigma_i^4}\sum_{j=1}^nx_i^{(j)} + \frac{\mu_i^2}{2\sigma_i^4}\sum_{j=1}^ny_i^{(j)} \ .
+\end{equation}
+Setting this to zero
+\begin{equation*}
+-\frac{n\widehat{\sigma}_i^2}{2}+\frac{\tau^2}{2\alpha^2}\sum_{j=1}^n\left(x_i^{(j)}\right)^2\zeta_i^{(j)} - \frac{\tau\mu_i}{\alpha}\sum_{j=1}^nx_i^{(j)} + \frac{\mu_i^2}{2}\sum_{j=1}^ny_i^{(j)} = 0
+\end{equation*}
+and the estimator for $\sigma_i^2$ is
+\begin{equation}
+\widehat{\sigma}_i^2=\frac{1}{n}\left[
 \frac{\tau^2}{\alpha^2}\sum_{j=1}^n\left(x_i^{(j)}\right)^2\zeta_i^{(j)}
 -\frac{2\tau\mu_i}{\alpha}\sum_{j=1}^nx_i^{(j)}
 +\mu_i^2\sum_{j=1}^ny_i^{(j)}
-\right]
+\right] \ .
 \end{equation}
-\begin{equation}
-\nu_i=\frac{\sum_{j=1}^ny_i^{(j)}}{n\tau}
-\end{equation}
-where $\left(x_i^{(j)}\right)^2\zeta_i^{(j)}=0$ if $\left(x_i^{(j)}\right)^2=0$.
 
 
 \bibliographystyle{unsrt}
