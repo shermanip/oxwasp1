@@ -49,16 +49,16 @@ intrinsic_noise_array = zeros(length,length,4);
 %for factors 1,2,3,...,k_max
 parfor k = 1:k_max
 
-    %declare the loading matrix and the noise
-    [loading,noise_vector] = factorAnalysis_EM_initalize(area,k);
+    %initalize latent variables
+    Y = normrnd(0,1,n,k);
+    Y_cov = cov(Y);
 
     %repeat n_EM times
     for j = 1:n_EM
+        %M STEP
+        [loading,noise_vector] = factorAnalysis_MStep(X,Y,Y_cov,n,area); 
         %E STEP
         [Y,Y_cov] = factorAnalysis_EStep(loading,noise_vector,X,k);
-
-        %M STEP
-        [loading,noise_vector] = factorAnalysis_MStep(X,Y,Y_cov,n,area);   
     end
     
     %save the factor and intrinsic noise

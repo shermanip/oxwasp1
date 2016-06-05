@@ -56,14 +56,15 @@ function factorAnalysis_bootstrapBIC_learn()
         lnL_k = -inf;
         %for n_run times
         for j = 1:n_run
-            %declare the loading matrix and the noise randomly
-            [loading,noise_vector] = factorAnalysis_EM_initalize(area,k);
+            %initalize latent variables
+            Y = normrnd(0,1,n,k);
+            Y_cov = cov(Y);
             %for n_EM times
             for i = 1:n_EM
+                %M STEP
+                [loading,noise_vector] = factorAnalysis_MStep(X,Y,Y_cov,n,area);
                 %E STEP
                 [Y,Y_cov] = factorAnalysis_EStep(loading,noise_vector,X,k);
-                %M STEP
-                [loading,noise_vector] = factorAnalysis_MStep(X,Y,Y_cov,n,area);  
             end
             %get the log liklihood
             lnL = factorAnalysis_lnL(loading,noise_vector,cov_x,n,area);

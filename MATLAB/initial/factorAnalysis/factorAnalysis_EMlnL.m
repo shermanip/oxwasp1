@@ -51,16 +51,18 @@ lnL_array = zeros(n_EM,n_run,k_max);
 for k = 1:k_max
     %n_run times in parallel
     parfor i = 1:n_run
-        %declare the loading matrix and the noise
-        [loading,noise_vector] = factorAnalysis_EM_initalize(area,k);
+        %initalize latent variables
+        Y = normrnd(0,1,n,k);
+        Y_cov = cov(Y);
 
         %repeat n_EM times
         for j = 1:n_EM
-            %E STEP
-            [Y,Y_cov] = factorAnalysis_EStep(loading,noise_vector,X,k);
-
+            
             %M STEP
             [loading,noise_vector] = factorAnalysis_MStep(X,Y,Y_cov,n,area);
+            
+            %E STEP
+            [Y,Y_cov] = factorAnalysis_EStep(loading,noise_vector,X,k);
             
             %save the log likelihood
             lnL_array(j,i,k) = factorAnalysis_lnL(loading,noise_vector,cov_x,n,area);
