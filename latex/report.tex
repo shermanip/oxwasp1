@@ -115,7 +115,7 @@ Figure \ref{fig:x_ray_ct} shows a diagram on how CT scanning works. A 2D image i
 \begin{figure}
 \centering
 \includegraphics[width=0.7\textwidth]{figures/x_ray_ct.png}
-\caption{X-ray computed tomography reconstructs the sample by projecting photons onto a rotating sample. The photons are then detected by the detector. \emph{Source: http://www.phoenix-xray.com/}}
+\caption{X-ray computed tomography reconstructs the sample by projecting photons onto a rotating sample. The photons are then detected by the detector. \emph{Source: {http://www.phoenix-xray.com/}}}
 \label{fig:x_ray_ct}
 \end{figure}
 
@@ -455,7 +455,13 @@ The BIC, as shown in Figure \ref{fig:weightedLS_BIC}, favoured high order polyno
 \subsection{Methods}
 From the previous chapter, it was clear there were 3 materials, the 3D printed sample, background and foam, which contributed to the peaks in the histogram of the grey values.
 
-The sample mean sample variance pairs were sub-sampled from each of the 3 materials. A 1st and 2nd order weighted linear regression were fitted for each sub-sample. In addition, the BIC was calculated when fitting such weighted regression on 40 bootstrap samples, for each material.
+The sample mean sample variance pairs were sub-sampled from each of the 3 materials, as shown in Figure \ref{fig:subsample}. A 1st and 2nd order weighted linear regression were fitted for each sub-sample. In addition, the BIC was calculated when fitting such weighted regression on 40 bootstrap samples, for each material.
+
+\begin{figure}
+	\includegraphics[width=\textwidth]{figures/meanVar/subsample_images.jpg}
+	\caption{Highlighted by a square the sample of pixels from each material. Left: Sample from the background. Middle: Sample from the 3D printed sample. Right: sample from the foam.}
+	\label{fig:subsample}
+\end{figure}
 
 \subsection{Results}
 
@@ -489,7 +495,7 @@ It was unusual to see the prediction variance to blow for the 2nd order model in
 		\includegraphics[width=\textwidth]{figures/meanVar/subsample_foam2.eps}
 		\caption{Foam - Order 2}
 	\end{subfigure}
-	\caption{Frequency density of the sample mean and variance of the grey values. Weighted linear regression with polynomial features was fitted on a subsample of sample mean-variance pairs for each material.}
+	\caption{Frequency density of the sample mean and variance of the grey values. Weighted linear regression with polynomial features was fitted on a subsample of sample mean-variance pairs for each material. The (red) dotted line represent the 95\% prediction interval.}
 	\label{fig:subsample_meanVar}
 \end{figure}
 
@@ -588,17 +594,17 @@ It was verified that the EM algorithm always increased the log likelihood at eve
 
 The resulting fit, as shown in Figure \ref{fig:mixture_histogram}, did not capture the 3 different materials. This is because the mixture probabilities, $\pi_1,\pi_2,\pi_3$, do not depend on the sample-mean of the grey values. For example, low grey values are more likely to be from the sample.
 
-\begin{figure}
+\begin{figure}[p]
 	\centering	
 	\includegraphics[width=0.75\textwidth]{figures/meanVar/mixture_lnL.eps}
 	\caption{The log likelihood of the mixture of linear regressions at every EM step for 10 different initial values.}
 	\label{fig:mixture_lnL}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[p]
 	\centering	
 	\includegraphics[width=0.75\textwidth]{figures/meanVar/mixture_histogram.eps}
-	\caption{Fitting a mixture of 3 linear regressions on the sample mean-variance data.}
+	\caption{Fitting a mixture of 3 linear regressions on the sample mean-variance data. The (red) dotted line represent the 95\% prediction interval.}
 	\label{fig:mixture_histogram}
 \end{figure}
 
@@ -633,16 +639,17 @@ For higher Gaussian widths, the regression became an ordinary least squares regr
 		\includegraphics[width=\textwidth]{figures/meanVar/gaussian_4.eps}
 		\caption{$\sigma=10^5$}
 	\end{subfigure}
-	\caption{3 independent Gaussian weighted least squares regressions. The weights depended on the distance from the $k$-means sample mean grey values and some width $\sigma$.}
+	\caption{3 independent Gaussian weighted least squares regressions. The weights depended on the distance from the $k$-means sample mean grey values and some width $\sigma$. The (red) dotted line represent the 95\% prediction interval.}
 \end{figure}
 
 \chapter{Latent Variable Model}
+Probabilistic latent models was used to model the pixel's grey values. These latent variables can be used to describe the underlining structure, and perhaps sources of variance. In this chapter, principal component analysis and factor analysis was conducted on the 100 images. At the end, the compound Poisson model will be presented with a toy model.
 
 \section{Principal Component Analysis}
-By estimating the covariance matrix of the individual pixel's grey values, sources of (orthgonal) variance can be estimated. This can be done investigating eigendecomposition representation of the sample covariance matrix. A lot of the linear algebra can be reviewed in undergraudate maths text book such as \cite{riley2006mathematical}.
+Each pixel has a grey value which was treated as a random variable. By estimating the covariance matrix of the pixel's grey values, sources of (orthgonal) variance was estimated. This was done by investigating eigendecomposition representation of the sample covariance matrix. Such a technique is called principal component analysis \cite[pp.~329-330]{barber2012bayesian}.
 
 \subsection{Theory}
-Suppose the $p\times p$ covariance matrix $\matr{\Sigma}$ has eigenvalues $\lambda_i$ and eigenvector $\vectGreek{\phi}_i$ for $i=1,2,\dotdotdot,p$. Then the eigenvectors and eigenvalues are related by
+Suppose the $m\times m$ covariance matrix $\matr{\Sigma}$ has eigenvalues $\lambda_i$ and eigenvector $\vectGreek{\phi}_i$ for $i=1,2,\dotdotdot,m$. Then the eigenvectors and eigenvalues are related by
 \begin{equation}
 \matr{\Sigma}\vectGreek{\phi}_i = \lambda_i\vectGreek{\phi}_i \ .
 \label{eq:eigenvector_eigenvalue_forCovariance}
@@ -664,13 +671,13 @@ Equation \eqref{eq:eigenvector_eigenvalue_forCovariance} can be extended to incl
 \matr{\Sigma}
 	\begin{pmatrix}
 		\uparrow & \uparrow & & \uparrow \\
-		\vectGreek{\phi}_1 & \vectGreek{\phi}_2 &\cdots& \vectGreek{\phi}_p \\
+		\vectGreek{\phi}_1 & \vectGreek{\phi}_2 &\cdots& \vectGreek{\phi}_m \\
 		\downarrow & \downarrow & & \downarrow \\
 	\end{pmatrix}
 =
 	\begin{pmatrix}
 		\uparrow & \uparrow & & \uparrow \\
-		\lambda_1\vectGreek{\phi}_1 & \lambda_2\vectGreek{\phi}_2 &\cdots& \lambda_p\vectGreek{\phi}_p \\
+		\lambda_1\vectGreek{\phi}_1 & \lambda_2\vectGreek{\phi}_2 &\cdots& \lambda_p\vectGreek{\phi}_m \\
 		\downarrow & \downarrow & & \downarrow \\
 	\end{pmatrix} \ .
 \end{equation}
@@ -680,7 +687,7 @@ Transposing both sides
 	\leftarrow\vectGreek{\phi}_1\rightarrow \\
 	\leftarrow\vectGreek{\phi}_2\rightarrow \\
 	\vdots \\
-	\leftarrow\vectGreek{\phi}_p\rightarrow
+	\leftarrow\vectGreek{\phi}_m\rightarrow
 \end{pmatrix}
 \matr{\Sigma}
 =
@@ -688,13 +695,13 @@ Transposing both sides
 	\lambda_1 & 0 & \cdots 0 \\
 	0 & \lambda_2 & \cdots 0 \\
 	\vdots & \vdots & \ddots \\
-	0 & 0 & \cdots \lambda_p \\
+	0 & 0 & \cdots \lambda_m \\
 \end{pmatrix}
 \begin{pmatrix}
 	\leftarrow\vectGreek{\phi}_1\rightarrow \\
 	\leftarrow\vectGreek{\phi}_2\rightarrow \\
 	\vdots \\
-	\leftarrow\vectGreek{\phi}_p\rightarrow
+	\leftarrow\vectGreek{\phi}_m\rightarrow
 \end{pmatrix}
 \end{equation*}
 but because all eigenvectors are orthogonal
@@ -703,25 +710,25 @@ but because all eigenvectors are orthogonal
 =
 \begin{pmatrix}
 		\uparrow & \uparrow & & \uparrow \\
-		\vectGreek{\phi}_1 & \vectGreek{\phi}_2 &\cdots& \vectGreek{\phi}_p \\
+		\vectGreek{\phi}_1 & \vectGreek{\phi}_2 &\cdots& \vectGreek{\phi}_m \\
 		\downarrow & \downarrow & & \downarrow \\
 \end{pmatrix}
 \begin{pmatrix}
 	\lambda_1 & 0 & \cdots 0 \\
 	0 & \lambda_2 & \cdots 0 \\
 	\vdots & \vdots & \ddots \\
-	0 & 0 & \cdots \lambda_p \\
+	0 & 0 & \cdots \lambda_m \\
 \end{pmatrix}
 \begin{pmatrix}
 	\leftarrow\vectGreek{\phi}_1\rightarrow \\
 	\leftarrow\vectGreek{\phi}_2\rightarrow \\
 	\vdots \\
-	\leftarrow\vectGreek{\phi}_p\rightarrow
+	\leftarrow\vectGreek{\phi}_m\rightarrow
 \end{pmatrix} \ .
 \end{equation*}
 This is just a weighted sum of the outer products of the eigenvectors, therefore the eigendecomposition is
 \begin{equation}
-\matr{\Sigma} = \sum_{i=1}^{p} \lambda_i \vectGreek{\phi}_i \vectGreek{\phi}_i\T \ .
+\matr{\Sigma} = \sum_{i=1}^{m} \lambda_i \vectGreek{\phi}_i \vectGreek{\phi}_i\T \ .
 \end{equation}
 Because this is a weighted sum, the eigenvectors with the biggest eigenvalue will be most responsible for the covariance matrix. $\vectGreek{\phi}_i$ are called the principle components.
 
@@ -729,17 +736,17 @@ Because this is a weighted sum, the eigenvectors with the biggest eigenvalue wil
 The 100 images were shrunk with averaging to a size of $100\times100$ pixels using ImageJ \cite{schindelin2012fiji}. The sample covariance matrix, of the pixel's grey values, was calculated using the maximum likelihood estimator so that the 6 eigenvectors with the biggest eigenvalues can be obtained. Using 1\,600 bootstrap samples, the sampling distribution of the 6 eigenvalues were sampled.
 
 \subsection{Results}
-Figure \ref{fig:initial_PC_eigenvalues} shows the first 6 of the diagonal of the outer product of the individual principle components, they represent the normalised main sources of variance. It was observed that on the first and second principle components, there are sources of variance in the bottom right and top right of the image. This could imply that the sources of variance are not uniformly distributed in the background.
+Figure \ref{fig:initial_PCvariance} shows the first 6 of the diagonal of the outer product of the individual principle components, they represent the normalised main sources of variance. It was observed that on the first and second principle components, there are sources of variance on the bottom right and top right of the image. This could imply that the sources of variance in the background were not uniformly distributed in space.
 
 The sampling distribution of the eigenvalues are shown in Figure \ref{fig:initial_PC_eigenvalues}. Quite clearly there were 2 significant sources of variance because the eigenvalues of the first 2 principle components were much larger than zero when comparing it with its interquartile range.
 
-\begin{figure}
+\begin{figure}[p]
 	\includegraphics[width=\textwidth]{figures/initial_PCvariance.eps}
 	\caption{Normalised variance due to the principle components (1 to 6). The sum of all the values in each figures equal to 1.}
 	\label{fig:initial_PCvariance}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[p]
 	\centering
 	\includegraphics[width=0.75\textwidth]{figures/initial_PC_eigenvalues.eps}
 	\caption{Eigenvalues of the sample covariance matrix. 1\,600 bootstrap samples were used.}
@@ -747,8 +754,6 @@ The sampling distribution of the eigenvalues are shown in Figure \ref{fig:initia
 \end{figure}
 
 \section{Factor Analysis}
-A probabilistic latent model can be used to model the pixel's grey values. These latent variables then can be used to describe the underlining structure, and perhaps sources of variance.
-
 \subsection{Theory}
 Let $\vect{Y}$ be a random vector containing $k$ latent variables, called factors, and
 \begin{equation}
@@ -768,7 +773,7 @@ thus
 \begin{equation}
 \vect{X}\sim\normal\left(\vect{0},\matr{\Lambda}\matr{\Lambda}\T+\matr{\Psi}\right) \ .
 \end{equation}
-As a result there are two sources of variance, factor noise from the $\matr{\Lambda}\matr{\Lambda}\T$ component and the instrinic noise $\matr{\Psi}$. The model can be extended for non-zero mean easily by adding an arbitrary constant.
+As a result there are two sources of variance, factor noise from the $\matr{\Lambda}\matr{\Lambda}\T$ component and the intrinsic noise $\matr{\Psi}$. Such a model is called factor analysis \cite[pp.~462-469]{barber2012bayesian}. The model can be extended for non-zero mean easily by adding an arbitrary constant. $\vect{X}$ was used to represent the grey values of all pixels in an image.
 
 The conditional distribution of $\vect{X}$ given $\vect{Y}$ can be calculated to be
 \begin{equation}
@@ -809,20 +814,22 @@ and by using the trace and its properties
 \nonumber \\
 \ln{L}&=-\frac{n}{2}\ln{\|2\pi\left(\matr{\Lambda}\matr{\Lambda}\T+\matr{\Psi}\right)\|}-\frac{1}{2}\trace\left[\left(\matr{\Lambda}\matr{\Lambda}\T+\matr{\Psi}\right)^{-1}\sum_{i=1}^{n}\vect{x}^{(i)}\left(\vect{x}^{(i)}\right)\T\right] \ .
 \end{align}
-The loading matrix $\matr{\Lambda}$ and intrinsic noise $\matr{\Psi}$ can be estimated by maximising the log likelihood. This is best done using the expectation maximisation (EM) algorithm. The EM algorithm is an iterative procedure conducting an E step followed by a M step many times till some convergence conditions are met.
+The loading matrix $\matr{\Lambda}$ and intrinsic noise $\matr{\Psi}$ can be estimated by maximising the log likelihood. This is best done using the EM algorithm \cite[pp.~260-261]{barber2012bayesian}.
 
 The E step estimates the values of the latent variables, $\vect{Y}^{(1)},\vect{Y}^{(2)},\dotdotdot,\vect{Y}^{(n)}$, using the expectation of the conditional distribution of the latent variables given the observed data $\vect{x}^{(1)},\vect{x}^{(2)},\dotdotdot,\vect{x}^{(n)}$. The parameters $\matr{\Lambda}$ and $\matr{\Psi}$ are assumed to be know in this step and are fixed. By using Equation \eqref{eq:factor_analysis_y_given_x_dist}, each latent variable are predicted by the conditional expectation
 \begin{equation}
-\expectation\left[\vect{Y}^{(i)}|\vect{X}^{(i)}=\vect{x}^{(i)}\right]=\vect{y}^{(i)} = \left(\matr{\Lambda}\T\matr{\Psi}^{-1}\matr{\Lambda}+\matr{1}\right)^{-1}\matr{\Lambda}\T\matr{\Psi}^{-1}\vect{x}^{(i)}
+\expectation\left[\vect{Y}^{(i)}\right|\left.\vect{X}^{(i)}=\vect{x}^{(i)}\right]=\vect{y}^{(i)} = \left(\matr{\Lambda}\T\matr{\Psi}^{-1}\matr{\Lambda}+\matr{1}\right)^{-1}\matr{\Lambda}\T\matr{\Psi}^{-1}\vect{x}^{(i)}
 \end{equation}
 for $i=1,2,\dotdotdot,n$. The covariance of the latent variables are estimated by
 \begin{equation}
-\cov\left[\vect{Y}^{(i)}|\vect{X}^{(i)}=\vect{x}^{(i)}\right]=\matr{\Sigma}_{\vect{Y}} = \left(\matr{\Lambda}\T\matr{\Psi}^{-1}\matr{\Lambda}+\matr{1}\right)^{-1}
+\cov\left[\vect{Y}^{(i)}\right|\left.\vect{X}^{(i)}=\vect{x}^{(i)}\right]=\matr{\Sigma}_{\vect{Y}} = \left(\matr{\Lambda}\T\matr{\Psi}^{-1}\matr{\Lambda}+\matr{1}\right)^{-1}
 \end{equation}
 
 In the E step, the parameters $\matr{\Lambda}$ and $\matr{\Psi}$ are varied to maximise the log likelihood, assuming the latent variables are known and fixed. The objective is to maximise is the condition expectation of the log joint likelihood, that is
 \begin{equation}
-H = \expectation_{\vect{Y}|\vect{X}}\left[\sum_{i=1}^{n}\ln p_{\vect{X},\vect{Y}}\left(\vect{x}^{(i)},\vect{Y}^{(i)}\right)\right] \ .
+H = \sum_{i=1}^{n}\expectation\left[\ln p_{\vect{X},\vect{Y}}\left(\vect{x}^{(i)},\vect{Y}^{(i)}\right)
+\left|
+\vect{X}^{(i)}=\vect{x}^{(i)}\right. \right] \ .
 \end{equation}
 It is given the $\matr{\Lambda}$ and $\matr{\Psi}$ which maximises $H$ is
 \begin{equation}
@@ -842,22 +849,22 @@ and
 The proofs for the M step can be found in Appendix \ref{chapter:mStep_factorAnalysis}.
 
 \subsection{Methods}
-The data was centred so that the mean of each pixel's gray value was zero. By doing this, factor analysis focuses on modelling the variance of the pixel's gray values.
+The 100 images were shrunk with averaging to a size of $100\times100$ pixels using ImageJ \cite{schindelin2012fiji}. The data was centred so that the mean of each pixel's gray value was zero. By doing this, factor analysis focused on modelling the variance of the pixel's gray values.
 
 For a given $k$ number of factors, the EM algorithm was initialized by randomly assigning each element of $\matr{\Lambda}$ to have distribution $\normal(0,(10^3)^2)$. In addition, each diagonal entry of $\matr{\Psi}$ was initialized by sampling from the $\gammaDist(1,10^{-3})$ distribution. This was chosen to have arbitrary large variance so that it covers as much of the parameter space as possible.
 
-The EM algorithm was run many times with different initial values. Because evaluating the log likelihood was expensive, the stopping condition is met when a certain amount of E and M steps were taken. The parameters with the lowest log likelihood was recorded.
+The EM algorithm ran many times with different initial values. Because evaluating the log likelihood was expensive, the stopping condition was met when a certain amount of E and M steps were taken. The parameters with the highest log likelihood when such condition were met was recorded.
 
-The Bayesian information criterion (BIC) was used to select the best $k$ to use. The BIC is given as
+The BIC was used to select the best $k$ to use. The BIC is given as
 \begin{equation}
 \BIC=-2\ln L + p(k+1)\ln n \ .
 \end{equation}
-The data was bootstrapped to assess the uncertainty in the model selection.
+The data was bootstrapped to assess the uncertainty in the BIC.
 
 \subsection{Results}
 $k=1,2,\dotdotdot,15$ were investigated. The EM algorithm was repeated 81 times for each $k$ with a stopping condition of 100 EM steps. The BIC for each $k$ is as shown in Figure \ref{fig:initial_factor_BIC}. The number of factors with the lowest BIC was found to be 8.
 
-The 8 factor variances were isolated and as shown in Figure \ref{fig:initial_factor_factorNoise}, together with the intrinsic variance as shown in Figure \ref{fig:initial_factor_instrinicNoise}. It was interesting to note that in Figure \ref{fig:initial_factor_factorNoise}, there are clusters of high variance in most of the factors. This suggest clusters of high variance can appear in the data randomly, thus the variance of each of the pixel's gray values can depend on each other spatially. In Figure \ref{fig:initial_factor_instrinicNoise}, the shape of the sample can be seen represented by the low intrinsic variance. This was evidence that they may well be a mean and variance relationship.
+The 8 factor variances were isolated and as shown in Figure \ref{fig:initial_factor_factorNoise}, together with the intrinsic variance as shown in Figure \ref{fig:initial_factor_instrinicNoise}. It was interesting to note that in Figure \ref{fig:initial_factor_factorNoise}, there are clusters of high variance in most of the factors. This suggested clusters of high variance can appear in the data, thus the variance of each of the pixel's gray values can depend on each other spatially. In Figure \ref{fig:initial_factor_instrinicNoise}, the shape of the 3d printed sample can be seen represented by the low intrinsic variance. This was evidence that there may well be a mean and variance relationship because the 3D printed sample has lower sample mean grey values.
 
 \begin{figure}
 	\centering
@@ -880,9 +887,7 @@ The 8 factor variances were isolated and as shown in Figure \ref{fig:initial_fac
 	\label{fig:initial_factor_instrinicNoise}
 \end{figure}
 
-The uncertainty of model selection was assessed by investigating how the BIC and optimal $k$ varied for different bootstrap samples. The BIC for the 99 bootstrap samples is shown in Figure \ref{fig:initial_factor_BIC_bootstrap}. Only one initial value was used for each $k$ to capture the uncertainty if the EM algorithm converges to a global maxima or not. From the figure, quite clearly there was a lot of variability in the BIC and can cause imprecise decisions on model selection. Over all 99 bootstrap samples, the mean and standard deviation optimal $k$ was found to be $10\pm2$ factors.
-
-The main source of error was down to the small sample size. The experiments can be improved if the analysis was done on the full size image rather than downsizing it. When downsizing, there is a risk of tampering the variance of the pixel's grey values.
+The uncertainty of model selection was assessed by investigating how the BIC and optimal $k$ varied for different bootstrap samples. The BIC for the 99 bootstrap samples is shown in Figure \ref{fig:initial_factor_BIC_bootstrap}. Only one initial value was used for each $k$ to capture the uncertainty if the EM algorithm converges to a global maxima or not. From the figure, quite clearly there was a lot of variability in the BIC and can cause imprecise decisions on model selection. Over all 99 bootstrap samples, the mean and standard deviation optimal $k$ was found to be $10\pm2$ factors. The main source of error was down to the small sample size.
 
 \begin{figure}
 	\centering
@@ -1038,21 +1043,22 @@ The expectation of the sufficient statistics are then
 \exp\left[-\dfrac{1}{2}\dfrac{\left(x_i-y_i\mu_i\alpha/\tau\right)^2}{\alpha^2y_i\sigma_i^2/\tau^2}\right]
 \end{equation}
 and
-\begin{equation}
-\expectation\left[\dfrac{1}{Y_i}|X_i=x_i\right]=
+\begin{multline}
+\expectation\left[1/Y_i\right|\left.X_i=x_i\right]=
 \frac{1}{p_{X_i}(x_i)}
+\\
 \sum_{y_i=1}^{\infty}\dfrac{\euler^{-\nu_i\tau}(\nu_i\tau)^{y_i}\tau}{y_i!\sqrt{2\pi}\alpha\sigma_i}y_i^{-3/2}
 \exp\left[-\dfrac{1}{2}\dfrac{\left(x_i-y_i\mu_i\alpha/\tau\right)^2}{\alpha^2y_i\sigma_i^2/\tau^2}\right] \ .
-\end{equation}
+\end{multline}
 Unfortunately such a sum cannot be simplified. The fastest approximate way to get a value for these expectations is to truncate the sum. Another way to obtain the conditional expectation is to use the sample mean from samples of the conditional distribution, however this could be slower depending on the sampling algorithm.
 
 Because the conditional probability mass function is known up to a constant, rejection sampling can be used to draw conditional samples. Rejection sampling samples exactly but a proposal distribution is needed and this influences the rejection rate, or in other words the efficiency. One possible proposal is the Poisson distribution and there does exist adaptive methods which changes the proposal on the fly \cite{casella2004generalized}. Approximate Bayesian computation (ABC) \cite{marin2012approximate} can be used instead because $Y_i$ and $X_i|Y_i$ can be simulated. ABC draws approximate samples without a proposal but can suffer from high rejection rates.
 
-Suppose for pixel $i$, the follow grey values have been observed $x_i^{(1)}$, $x_i^{(2)}$, $\dotdotdot$, $x_i^{(n)}$. For each corresponding observable let $Y_i^{(1)}$, $Y_i^{(2)}$, $\dotdotdot$, $Y_i^{(n)}$ be the Poisson latent variable. For the E step, $Y_i^{(j)}$ and $1/Y_i^{(j)}$ are estimated given all the parameters using the conditional expectation for $j=1,2,\dotdotdot,n$. That is $y_i^{(j)}=\expectation\left[Y_i^{(j)}|X_i^{(j)}=x_i^{(j)}\right]$ and $\zeta_i^{(j)}=\expectation\left[1/Y_i^{(j)}|X_i^{(j)}=x_i^{(j)}\right]$ respectively. 
+Suppose for pixel $i$, the follow grey values have been observed $x_i^{(1)},x_i^{(2)},$ $\dotdotdot,x_i^{(n)}$. For each corresponding observable let $Y_i^{(1)},Y_i^{(2)},\dotdotdot,Y_i^{(n)}$ be the Poisson latent variable. For the E step, $Y_i^{(j)}$ and $1/Y_i^{(j)}$ are estimated given all the parameters using the conditional expectation for $j=1,2,\dotdotdot,n$. That is $y_i^{(j)}=\expectation\left[Y_i^{(j)}\right|\left.X_i^{(j)}=x_i^{(j)}\right]$ and $\zeta_i^{(j)}=\expectation\left[1/Y_i^{(j)}\right|\left.X_i^{(j)}=x_i^{(j)}\right]$ respectively. 
 
 In the M step the parameters $\nu_i,\mu_i,\sigma_i^2$ are estimated given the latent variables. This is done by maximising the conditional expectation of the log likelihood function, that is
 \begin{equation}
-H_i=\sum_{j=1}^n\expectation_{Y_i|X_i}\left[\ln p_{X_i,Y_i}\left(x_i^{(j)},Y_i^{(j)}\right)\right]
+H_i=\sum_{j=1}^n\expectation\left[\ln p_{X_i,Y_i}\left(x_i^{(j)},Y_i^{(j)}\right)\right|\left.X_i^{(j)}=x_i^{(j)}\right]
 \end{equation}
 It is given that the following M step estimators can be obtained:
 \begin{equation}
@@ -1091,9 +1097,11 @@ This calculation could be improved if the solid angle of the X-ray beam and the 
 \subsection{Toy Example}
 A dataset was simulated, with $n=100$ samples, using the follow parameters with arbitrary units: $\alpha=1$, $\tau=1$, $\nu=5$, $\mu=3$ and $\sigma^2=0.1$. The EM algorithm was initialized by assigning each latent variable such that $Y^{(j)}\sim\poisson(\phi)$ for i.i.d.~$j=1,2,\dotdotdot,n$. The sums, to work out the expectations and likelihood, were truncated to include 100 terms.
 
-The figures showed that the EM algorithm works because for different initial values, the parameters converge towards the true value and the log likelihood always increases.
+Figure \ref{fig:compoundPoisson_differentInitial} showed that the EM algorithm worked for different initial values, $\phi=1,4,9$, because the parameters converged towards the true value and the log likelihood always increased. However for $\phi=9$, it appeared the EM algorithm got stuck in a local maxima and needed at least 200 steps for it to converge to the global maxima. This demonstrated that the performance of the EM algorithm depended heavily on the initial values and how many steps were taken.
 
-For high $\nu\tau$, problems arises as more and more terms are needed in the truncated sum. Too many terms in the truncated sum slow down the program a lot.
+The EM algorithm was used on 50 different simulated datasets with initial value $phi=4$. Figure \ref{fig:compoundPoisson_multipleDatasets} verified that the parameters obtained from the EM algorithm converged around the true parameters for this particular toy model.
+
+For high $\nu\tau$, problems arises as more and more terms were needed in the truncated sum. Too many terms in the truncated sum slowed down the E step a lot.
 
 \begin{figure}
 	\centering
@@ -1110,6 +1118,7 @@ For high $\nu\tau$, problems arises as more and more terms are needed in the tru
 		\includegraphics[width=\textwidth]{figures/hierarchicalModel/EM_initial_lnL.eps}
 	\end{subfigure}
 	\caption{The parameters and log likelihood at each step of EM. The EM algorithm was used to estimate the parameters of a single simulated $n=100$ dataset. The latent variables were initialized $\poisson(\phi)$ 50 times. Blue: $\phi=1$, Red: $\phi=4$, Green: $\phi=9$. Dotted line: true value}
+	\label{fig:compoundPoisson_differentInitial}
 \end{figure}
 
 \begin{figure}
@@ -1127,6 +1136,7 @@ For high $\nu\tau$, problems arises as more and more terms are needed in the tru
 		\includegraphics[width=\textwidth]{figures/hierarchicalModel/EM_repeat_lnL.eps}
 	\end{subfigure}
 	\caption{The parameters and log likelihood at each step of EM. The EM algorithm was used to estimate the parameters of 50 different simulated $n=100$ dataset. The latent variables were initialized $\poisson(4)$. Dotted line: true value}
+	\label{fig:compoundPoisson_multipleDatasets}
 \end{figure}
 
 %=======CONCLUSION===============
@@ -1147,6 +1157,7 @@ Another explanatory model developed under the light of physics was the compound 
 \chapter{Source Code}
 
 \chapter{Proofs and Identities}
+Sections \ref{chapter:matrixCalculus}, \ref{section:Mstep} and \ref{chapter:mStep_factorAnalysis} was heavily influenced by the lectures in probabilistic and unsupervised learning at University College London \cite{sahani2014probabilistic}.
 
 \section{Matrix Calculus}\label{chapter:matrixCalculus}
 Let $\matr{A},\matr{B},\matr{C}$ be matrices with elements
@@ -1278,7 +1289,7 @@ y_i\vect{x}_i
 r_{i,j}
 y_i\vect{x}_i\right]
 \end{equation}
-and this is just weighted least squares where the weights are the responsibilities on model $j$.
+and this is weighted least squares where the weights are the responsibilities on model $j$.
 
 By re-parametrise $1/\sigma_j^2=\tau_j$
 \begin{equation*}
@@ -1346,50 +1357,47 @@ therefore
 This is the average responsibility.
 
 \section{M Step for Factor Analysis}\label{chapter:mStep_factorAnalysis}
-The objective is to maximise is the condition expectation of the log joint likelihood, that is
+The objective is to maximise the condition expectation of the log joint likelihood, that is
 \begin{equation*}
-H = \expectation_{\vect{Y}|\vect{X}}\left[\sum_{i=1}^{n}\ln p_{\vect{X},\vect{Y}}\left(\vect{x}^{(i)},\vect{Y}^{(i)}\right)\right] \ .
+H = \sum_{i=1}^{n}\expectation\left[\ln p_{\vect{X},\vect{Y}}\left(\vect{x}^{(i)},\vect{Y}^{(i)}\right)\right|\left.\vect{X}^{(i)}=\vect{x}^{(i)}\right] \ .
 \end{equation*}
 This can be expressed as
 \begin{equation*}
-H = \expectation_{\vect{Y}|\vect{X}}\left[
-\sum_{i=1}^{n}\left(\ln p_{\vect{X}|\vect{Y}}\left(\vect{x}^{(i)}|\vect{Y}^{(i)}\right)+\ln p_{\vect{Y}}\left(\vect{Y}^{(i)}\right)\right)
+H = \sum_{i=1}^{n}\expectation\left[\left(\ln p_{\vect{X}|\vect{Y}}\left(\vect{x}^{(i)}|\vect{Y}^{(i)}\right)+\ln p_{\vect{Y}}\left(\vect{Y}^{(i)}\right)\right)\right|\left.\vect{X}^{(i)}=\vect{x}^{(i)}
 \right]
 \end{equation*}
-Because the marginal distribution of the latent variables do not depend on $\matr{\Lambda}$ and $\matr{\Psi}$, the last term can be ignored. Using Equation \eqref{eq:factor_analysis_x_given_y_dist}
+Because the marginal distribution of the latent variables does not depend on $\matr{\Lambda}$ and $\matr{\Psi}$, the last term can be ignored. Using Equation \eqref{eq:factor_analysis_x_given_y_dist}
 \begin{multline*}
-H = \expectation_{\vect{Y}|\vect{X}}\left[
-\sum_{i=1}^{n}\ln\left(\frac{1}{\|2\pi\matr{\Psi}\|^{1/2}}
+H = \sum_{i=1}^{n}\expectation\left[\ln\left(\frac{1}{\|2\pi\matr{\Psi}\|^{1/2}}
 \right.\right.
 \\
 \left.\left.
-\exp\left(-\frac{1}{2}\left(\vect{x}^{(i)}-\matr{\Lambda}\vect{Y}^{(i)}\right)\T\matr{\Psi}^{-1}\left(\vect{x}^{(i)}-\matr{\Lambda}\vect{Y}^{(i)}\right)\right)\right)
+\exp\left(-\frac{1}{2}\left(\vect{x}^{(i)}-\matr{\Lambda}\vect{Y}^{(i)}\right)\T\matr{\Psi}^{-1}\left(\vect{x}^{(i)}-\matr{\Lambda}\vect{Y}^{(i)}\right)\right)\right)\right|\left.\vect{X}^{(i)}=\vect{x}^{(i)}\vphantom{\frac{1}{1}}
 \right]
 +c_1
 \end{multline*}
 \begin{multline*}
-H = \expectation_{\vect{Y}|\vect{X}}\left[
-\sum_{i=1}^{n}\left(-\frac{1}{2}\ln{\|2\pi\matr{\Psi}\|}
+H = \sum_{i=1}^{n}\expectation\left[\left(-\frac{1}{2}\ln{\|2\pi\matr{\Psi}\|}
 \right.\right.
 \\
 \left.\left.
--\frac{1}{2}\left(\vect{x}^{(i)}-\matr{\Lambda}\vect{Y}^{(i)}\right)\T\matr{\Psi}^{-1}\left(\vect{x}^{(i)}-\matr{\Lambda}\vect{Y}^{(i)}\right)\right)
+-\frac{1}{2}\left(\vect{x}^{(i)}-\matr{\Lambda}\vect{Y}^{(i)}\right)\T\matr{\Psi}^{-1}\left(\vect{x}^{(i)}-\matr{\Lambda}\vect{Y}^{(i)}\right)\right)\right|\left.\vect{X}^{(i)}=\vect{x}^{(i)}\vphantom{\frac{1}{1}}
 \right]
 +c_1
 \end{multline*}
 \begin{multline*}
-H = -\frac{1}{2}\expectation_{\vect{Y}|\vect{X}}\left[
-\sum_{i=1}^{n}\left(\ln{\|2\pi\matr{\Psi}\|}+\left(\vect{x}^{(i)}\right)\T\matr{\Psi}^{-1}\matr{\Lambda}\vect{Y}^{(i)}
+H = -\frac{1}{2}
+\sum_{i=1}^{n}\expectation\left[\left(\ln{\|2\pi\matr{\Psi}\|}+\left(\vect{x}^{(i)}\right)\T\matr{\Psi}^{-1}\matr{\Lambda}\vect{Y}^{(i)}
 \right.\right.
 \\
 \left.\left.
--2\left(\vect{x}^{(i)}\right)\T\matr{\Psi}^{-1}\matr{\Lambda}\vect{Y}^{(i)}+\left(\vect{Y}^{(i)}\right)\T\matr{\Lambda}\T\matr{\Psi}^{-1}\matr{\Lambda}\vect{Y}^{(i)}\right)
+-2\left(\vect{x}^{(i)}\right)\T\matr{\Psi}^{-1}\matr{\Lambda}\vect{Y}^{(i)}+\left(\vect{Y}^{(i)}\right)\T\matr{\Lambda}\T\matr{\Psi}^{-1}\matr{\Lambda}\vect{Y}^{(i)}\right)\right|\left.\vect{X}^{(i)}=\vect{x}^{(i)}\vphantom{\frac{1}{1}}
 \right]
 +c_1
 \end{multline*}
 By defining
 \begin{equation}
-\expectation_{\vect{Y}|\vect{X}}\left[\vect{Y}^{(i)}|\vect{X}^{(i)}=\vect{x}^{(i)}\right]=\vect{y}^{(i)}
+\expectation\left[\vect{Y}^{(i)}|\vect{X}^{(i)}=\vect{x}^{(i)}\right]=\vect{y}^{(i)}
 \end{equation}
 and
 \begin{equation}
@@ -1423,7 +1431,7 @@ H = -\frac{n}{2}
 +c_2
 \end{multline*}
 
-Taking the derivative with respect to $\matr{\Lambda}$
+Taking the derivative with respect to $\matr{\Lambda}$, using the results from Appendix \ref{chapter:matrixCalculus},
 \begin{equation*}
 \matr{D}_{\matr{\Lambda}}H=
 \matr{D}_{\matr{\Lambda}}\left[
@@ -1499,7 +1507,7 @@ H = \frac{n}{2}
 -\sum_{i=1}^{n}\frac{1}{2}\trace\left(\matr{T}\matr{\Lambda}\left(\matr{\Sigma}_{\vect{Y}}+\vect{y}^{(i)}\left(\vect{y}^{(i)}\right)\T\right)\matr{\Lambda}\T\right)
 +c_2 \ .
 \end{multline*}
-Taking the derivative with respect to $\matr{\Psi}$
+Taking the derivative with respect to $\matr{\Psi}$, using the results from Appendix \ref{chapter:matrixCalculus},
 \begin{multline*}
 \matr{D}_{\matr{\Psi}}H = \frac{n}{2}\matr{T}^{-1}
 -\frac{1}{2}\sum_{i=1}^{n}\vect{x}^{(i)}\left(\vect{x}^{(i)}\right)\T
@@ -1787,39 +1795,43 @@ This shows that the joint probability density function is in the exponential fam
 \section{M Step for Compound Poisson Model}\label{chapter:mStep_compoundPoisson}
 In the M step the parameters $\nu_i,\mu_i,\sigma_i^2$ are estimated given the latent variables. This is done by maximising the conditional expectation of the log likelihood function, that is
 \begin{equation*}
-H_i=\sum_{j=1}^n\expectation_{Y_i|X_i}\left[\ln p_{X_i,Y_i}\left(x_i^{(j)},Y_i^{(j)}\right)\right]
+H_i=\sum_{j=1}^n\expectation\left[\ln p_{X_i,Y_i}\left(x_i^{(j)},Y_i^{(j)}\right)\right|\left.X_i^{(j)}=x_i^{(j)}\right]
 \end{equation*}
 \begin{multline*}
-H_i=\sum_{j=1}^n\expectation_{Y_i|X_i}\left[
+H_i=\sum_{j=1}^n\expectation\left[
 -\nu_i\tau+Y_i^{(j)}\ln(\nu_i\tau)-\frac{1}{2}\ln\left(\frac{\alpha^2\sigma_i^2}{\tau^2}Y_i^{(j)}\right)
-\right.
+\vphantom{-\frac{1}{2}\frac{\left(x_i^{(j)}-Y_i^{(j)}\mu_i\alpha/\tau\right)^2}{\alpha^2Y_i^{(j)}\sigma_i^2/\tau^2}}\right.
 \\
 \left.
--\frac{1}{2}\frac{\left(x_i^{(j)}-Y_i^{(j)}\mu_i\alpha/\tau\right)^2}{\alpha^2Y_i^{(j)}\sigma_i^2/\tau^2}
+-\frac{1}{2}\frac{\left(x_i^{(j)}-Y_i^{(j)}\mu_i\alpha/\tau\right)^2}{\alpha^2Y_i^{(j)}\sigma_i^2/\tau^2}\right|\left.X_i^{(j)}=x_i^{(j)}
+\vphantom{-\frac{1}{2}\frac{\left(x_i^{(j)}-Y_i^{(j)}\mu_i\alpha/\tau\right)^2}{\alpha^2Y_i^{(j)}\sigma_i^2/\tau^2}}
 \right] + c_1 \ .
 \end{multline*}
 \begin{multline*}
-H_i= -n\nu_i\tau+\ln(\nu_i\tau)\sum_{j=1}^n\expectation_{Y_i|X_i}\left[Y_i^{(j)}\right]-\frac{n}{2}\ln\left(\frac{\alpha^2\sigma_i^2}{\tau^2}\right)
+H_i= -n\nu_i\tau+\ln(\nu_i\tau)\sum_{j=1}^n\expectation\left[Y_i^{(j)}\right|\left.X_i^{(j)}=x_i^{(j)}\right]-\frac{n}{2}\ln\left(\frac{\alpha^2\sigma_i^2}{\tau^2}\right)
 \\
--\frac{1}{2}\sum_{j=1}^n\expectation_{Y_i|X_i}\left[\frac{\left(x_i^{(j)}-Y_i^{(j)}\mu_i\alpha/\tau\right)^2}{\alpha^2Y_i^{(j)}\sigma_i^2/\tau^2}\right]
+-\frac{1}{2}\sum_{j=1}^n\expectation\left[\frac{\left(x_i^{(j)}-Y_i^{(j)}\mu_i\alpha/\tau\right)^2}{\alpha^2Y_i^{(j)}\sigma_i^2/\tau^2}\right|\left.X_i^{(j)}=x_i^{(j)}
+\vphantom{-\frac{1}{2}\frac{\left(x_i^{(j)}-Y_i^{(j)}\mu_i\alpha/\tau\right)^2}{\alpha^2Y_i^{(j)}\sigma_i^2/\tau^2}}\right]
  + c_2 \ .
 \end{multline*}
 \begin{multline*}
-H_i= -n\nu_i\tau+\ln(\nu_i\tau)\sum_{j=1}^n\expectation_{Y_i|X_i}\left[Y_i^{(j)}\right]-\frac{n}{2}\ln\left(\frac{\alpha^2\sigma_i^2}{\tau^2}\right)
+H_i= -n\nu_i\tau+\ln(\nu_i\tau)\sum_{j=1}^n\expectation\left[Y_i^{(j)}\right|\left.X_i^{(j)}=x_i^{(j)}\right]-\frac{n}{2}\ln\left(\frac{\alpha^2\sigma_i^2}{\tau^2}\right)
 \\
--\frac{1}{2}\sum_{j=1}^n\expectation_{Y_i|X_i}\left[\frac{\left(x_i^{(j)}\right)^2-2x_i^{(j)}Y_i^{(j)}\mu_i\alpha/\tau+\left(Y_i^{(j)}\mu_i\alpha/\tau\right)^2}{\alpha^2Y_i^{(j)}\sigma_i^2/\tau^2}\right]
+-\frac{1}{2}\sum_{j=1}^n\expectation\left[\frac{\left(x_i^{(j)}\right)^2-2x_i^{(j)}Y_i^{(j)}\mu_i\alpha/\tau+\left(Y_i^{(j)}\mu_i\alpha/\tau\right)^2}{\alpha^2Y_i^{(j)}\sigma_i^2/\tau^2}\right|\left.X_i^{(j)}=x_i^{(j)}
+\vphantom{-\frac{1}{2}\frac{\left(x_i^{(j)}-Y_i^{(j)}\mu_i\alpha/\tau\right)^2}{\alpha^2Y_i^{(j)}\sigma_i^2/\tau^2}}\right]
  + c_2 \ .
 \end{multline*}
 \begin{multline}
-H_i= -n\nu_i\tau+\ln(\nu_i\tau)\sum_{j=1}^n\expectation_{Y_i|X_i}\left[Y_i^{(j)}\right]-\frac{n}{2}\ln\left(\frac{\alpha^2\sigma_i^2}{\tau^2}\right)
+H_i= -n\nu_i\tau+\ln(\nu_i\tau)\sum_{j=1}^n\expectation\left[Y_i^{(j)}\right|\left.X_i^{(j)}=x_i^{(j)}\right]-\frac{n}{2}\ln\left(\frac{\alpha^2\sigma_i^2}{\tau^2}\right)
 \\
--\frac{\tau^2}{2\alpha^2\sigma_i^2}\sum_{j=1}^n\left(x_i^{(j)}\right)^2\expectation_{Y_i|X_i}\left[1/Y_i^{(j)}\right]
+-\frac{\tau^2}{2\alpha^2\sigma_i^2}\sum_{j=1}^n\left(x_i^{(j)}\right)^2\expectation\left[1/Y_i^{(j)}\right|\left.X_i^{(j)}=x_i^{(j)}\right]
 + \frac{\tau\mu_i}{\alpha\sigma_i^2}\sum_{j=1}^nx_i^{(j)}
--\frac{\mu_i^2}{2\sigma_i^2}\sum_{j=1}^n\expectation_{Y_i|X_i}\left[Y_i^{(j)}\right]
+\\
+-\frac{\mu_i^2}{2\sigma_i^2}\sum_{j=1}^n\expectation\left[Y_i^{(j)}\right|\left.X_i^{(j)}=x_i^{(j)}\right]
 \ .
 \end{multline}
 
-Let $\expectation_{Y_i|X_i}\left[Y_i^{(j)}\right]=y_i^{(j)}$ and $\expectation_{Y_i|X_i}\left[1/Y_i^{(j)}\right]=\zeta_i^{(j)}$which was obtained from from the E step. Then
+Let $y_i^{(j)}=\expectation\left[Y_i^{(j)}\right|\left.X_i^{(j)}=x_i^{(j)}\right]$ and $\zeta_i^{(j)}=\expectation\left[1/Y_i^{(j)}\right|\left.X_i^{(j)}=x_i^{(j)}\right]$ which was obtained from from the E step. Then
 \begin{multline}
 H_i= -n\nu_i\tau+\ln(\nu_i\tau)\sum_{j=1}^ny_i^{(j)}-\frac{n}{2}\ln\left(\frac{\alpha^2\sigma_i^2}{\tau^2}\right)
 \\
@@ -1828,7 +1840,7 @@ H_i= -n\nu_i\tau+\ln(\nu_i\tau)\sum_{j=1}^ny_i^{(j)}-\frac{n}{2}\ln\left(\frac{\
 -\frac{\mu_i^2}{2\sigma_i^2}\sum_{j=1}^ny_i^{(j)}
 \ .
 \end{multline}
-This can be maximised by setting the partial differentials to zero with respect to $\nu_i$, $\mu_i$ and $\sigma_i^2$ and  to zero.
+This can be maximised by setting the partial differentials to zero with respect to $\nu_i$, $\mu_i$ and $\sigma_i^2$ to zero.
 
 Taking the partial derivative with respect to $\nu_i$
 \begin{equation}
@@ -1864,7 +1876,7 @@ and the estimator for $\sigma_i^2$ is
 +\mu_i^2\sum_{j=1}^ny_i^{(j)}
 \right] \ .
 \end{equation}
-Care should be taken because for $y_i^{(j)}=0$, $\zeta_i^{(j)}$ is undefined. For this special case it is easiest to just to $\zeta_i^{(j)}=0$ as though that data point was removed.
+Care should be taken because for $y_i^{(j)}=0$, $\zeta_i^{(j)}$ is undefined. For this special case it is easiest to just set $\zeta_i^{(j)}=0$ as though that data point was removed.
 
 
 \bibliographystyle{unsrt}
