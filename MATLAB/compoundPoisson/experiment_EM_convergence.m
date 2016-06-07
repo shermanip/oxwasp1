@@ -51,25 +51,31 @@ end
 figure('Position', [400, 400, 400, 300]);
 plot(m_array,'r');
 hold on;
-plot([0,n_EM],[mu_actual,mu_actual],'k--','LineWidth',2);
+se = 1/sqrt(rate_actual*time_exposure*n_sample/var_actual);
+plot([0,n_EM],[mu_actual+se,mu_actual+se],'k--','LineWidth',2);
+plot([0,n_EM],[mu_actual-se,mu_actual-se,],'k--','LineWidth',2);
 hold off;
 xlabel('Number of EM Steps');
 ylabel('Mean estimate (arb. unit)');
 
 %plot the variance parameter for each EM step
+se = sqrt(2/n_sample)*var_actual;
 figure('Position', [400, 400, 400, 300]);
 semilogy(v_array,'r');
 hold on;
-semilogy([0,n_EM],[var_actual,var_actual],'k--','LineWidth',2);
+semilogy([0,n_EM],[var_actual+se,var_actual+se],'k--','LineWidth',2);
+semilogy([0,n_EM],[var_actual-se,var_actual-se],'k--','LineWidth',2);
 hold off;
 xlabel('Number of EM Steps');
 ylabel('Variance estimate (arb. unit)');
 
 %plot the rate parameter for each EM step
+se = sqrt(rate_actual/(time_exposure*n_sample));
 figure('Position', [400, 400, 400, 300]);
 plot(rate_array,'r');
 hold on;
-plot([0,n_EM],[rate_actual,rate_actual],'k--','LineWidth',2);
+plot([0,n_EM],[rate_actual+se,rate_actual+se],'k--','LineWidth',2);
+plot([0,n_EM],[rate_actual-se,rate_actual-se],'k--','LineWidth',2);
 hold off;
 xlabel('Number of EM Steps');
 ylabel('Rate estimate (arb. unit)');
