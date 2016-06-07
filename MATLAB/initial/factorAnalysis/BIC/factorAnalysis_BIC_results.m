@@ -23,6 +23,7 @@ function factorAnalysis_BIC_results()
 
     %work out the BIC and plot it
     BIC = -2*lnL_array'+log(n)*area*((1:k_max)+1);
+    disp(find(min(BIC)==BIC));
     figure;
     plot(BIC);
     xlim([1,k_max]);
@@ -43,7 +44,7 @@ function factorAnalysis_BIC_results()
     end
     %place the colorbar
     hp4 = get(subplot(2,4,4),'Position');
-    colorbar('Position', [0.05  0.04  0.05  hp4(2)+hp4(3)*2.1]);
+    colorbar('Position', [0.07  0.04  0.05  hp4(2)+hp4(3)*2.1]);
 
     %plot the instrinic noise
     figure;
