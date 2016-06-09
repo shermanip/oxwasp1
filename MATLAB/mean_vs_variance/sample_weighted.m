@@ -23,7 +23,7 @@ folder_location = '/data/tinamou/sip/block_images/orginial'; %location of the da
 BIC_array = zeros(n_repeat,p_max);
 
 %do weighted least squares fit on the orginial data and get the BIC and plot the regression
-BIC = samplingDist_weighted_BIC(sample_mean,sample_var,1,p_max);
+BIC = samplingDist_weighted_BIC(sample_mean,sample_var,1,p_max,3000);
 %save the BIC in the array
 BIC_array(1,:) = BIC;
 
