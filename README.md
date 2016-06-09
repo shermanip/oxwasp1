@@ -61,7 +61,7 @@ Run this to do one run of EM for each $k$ where $k$ is the number of factors for
 Run this to display the figures and results.
 
 ###MATLAB/compoundPoisson/experiment_EMlocal_maxima.m
-Script for running the EM algorithm for the toy model with different initial values for a single simulated dataset. (Figure 5.7 p. 45)
+Script for running the EM algorithm for the toy compound Poisson example with different initial values for a single simulated dataset. (Figure 5.7 p. 45)
 
 ###MATLAB/compoundPoisson/experiment_EM_convergence.m
-Script for running the EM algorithm for the toy model for multiple simulated datasets. (Figure 5.8 p. 46)
+Script for running the EM algorithm for the toy compound Poisson example for multiple simulated datasets. (Figure 5.8 p. 46)
