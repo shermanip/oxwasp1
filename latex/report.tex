@@ -966,6 +966,7 @@ and
 \begin{equation}
 \variance[X_i] = \frac{\alpha^2\nu_i}{\tau}\left(\mu_i^2+\sigma_i^2\right)+\beta_i^2 \ .
 \end{equation}
+In this model, there are 3 sources of variance from the $\mu_i^2$,$\sigma_i^2$ and $\beta_i^2$ terms.
 
 This model can be made simpler by setting $\beta_i=0$ because by doing so the joint probability density function is in the form of an exponential family with sufficient statistics $X_i^2/Y_i,X_i$ and $Y_i$. This is proven in Appendix \ref{chapter:compoundPoisson_expFamily}. However by doing so the joint probability density function must consider the special case of $Y_i=0$ because such a case will drive the variance of $X_i|Y_i$ to zero. This can be dealt with by using the Dirac delta function \cite[pp.~439-443]{riley2006mathematical}
 \begin{equation*}
