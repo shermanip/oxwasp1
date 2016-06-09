@@ -36,3 +36,32 @@ Script for fitting mixture of linear regressions on a sample of sample mean-vari
 
 ###MATLAB/mean_vs_variance/distanceWeighted_ols.m
 Script for fitting Gaussian weighted linear regression. (Figure 4.9 p. 28)
+
+##Latent Variable Model
+
+###MATLAB/initial/eigenspectrum/covariance_eigen.m
+Script for conducting PCA on the data and on the bootstrapped data. (Figures 5.1 and 5.2 p. 32)
+
+###MATLAB/initial/factorAnalysis/BIC/
+Functions for conducting factor analysis on the data. (Figures 5.3, 5.4 and 5.5 pp. 36-37)
+####factorAnalysis_BIC_initalize.m
+Run this to initalize the EM algorithm variables.
+####factorAnalysis_BIC_learn.m
+Run this to do one run of EM for each $k$ where $k$ is the number of factors.
+####factorAnalysis_BIC_results.m
+Run this to display the figures.
+
+###MATLAB/initial/factorAnalysis/bootstrapBIC/
+Functions for obtaining the BIC when conducting factor analysis on bootstrapped data. (Figure 5.6 p. 38)
+####factorAnalysis_bootstrapBIC_initalize.m
+Run this to initalize the EM algorithm variables.
+####factorAnalysis_bootstrapBIC_learn.m
+Run this to do one run of EM for each $k$ where $k$ is the number of factors for a bootstrapped sample.
+####factorAnalysis_bootstrapBIC_results.m
+Run this to display the figures and results.
+
+###MATLAB/compoundPoisson/experiment_EMlocal_maxima.m
+Script for running the EM algorithm for the toy model with different initial values for a single simulated dataset. (Figure 5.7 p. 45)
+
+###MATLAB/compoundPoisson/experiment_EM_convergence.m
+Script for running the EM algorithm for the toy model for multiple simulated datasets. (Figure 5.8 p. 46)
