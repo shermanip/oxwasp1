@@ -77,7 +77,7 @@
 
 %======ABSTRACT=========
 \begin{abstract}
-X-ray computed tomography can be used to do quality control on 3D printed samples. However there are sources of error in the 3D printing, how the photons behave and in the X-ray detector. This project aims to find a relationship between the mean and variance of the grey values of each pixel in images obtained from the X-ray detector by fitting linear regressions. In addition, latent variable models such as principle component analysis, factor analysis and the compound Poisson were attempted to be fitted to find sources of variance.
+X-ray computed tomography can be used to do quality control on 3D printed samples. However there are sources of error in the 3D printing, how the photons behave and in the X-ray detector. This project aims to find a relationship between the sample mean and sample variance grey values in images obtained from the X-ray detector by fitting linear regressions. In addition, latent variable models such as principle component analysis, factor analysis and the compound Poisson were attempted to be fitted to find sources of variance.
 \end{abstract}
 
 %======ACKNOWLEDGEMENT=========
@@ -103,7 +103,7 @@ X-ray computed tomography can be used to do quality control on 3D printed sample
 
 The Inside-Out group at the University of Warwick aims to develop statistical methodology for using X-ray computed tomography to do quality control on 3D printing. Recent research include how the penumbra can be modelled \cite{kueh2014modelling}, simulating and detecting defects and on the behaviour of dead pixels \cite{brettschneider2014spatial}.
 
-Images of X-ray scans of a stationary 3D printed sample were obtained for this project. The aim of this specific project was to find a mean and variance relationship of the grey values in the pixels. This was done by fitting linear regressions. Separately, latent variable models were fitted to the images to find sources of variance. Latent variable models included principle component analysis, factor analysis and compound Poisson.
+Images of X-ray scans of a stationary 3D printed sample were obtained for this project. The aim of this specific project was to find a mean and variance relationship for the grey values. This was done by fitting linear regressions. Separately, latent variable models were fitted to the images to find sources of variance. Latent variable models included principle component analysis, factor analysis and compound Poisson.
 
 This report was written in a Master dissertation style and assumes knowledge up to graduate level in physics and statistics. The mathematics and statistics used can be reviewed in undergraduate textbooks \cite{riley2006mathematical} \cite{rice2009mathematical}, however complicated matrix calculus results will be stated without proof in Appendix \ref{chapter:matrixCalculus}.
 
@@ -211,7 +211,7 @@ E = Ve = 1.0\times10^{2}\text{ keV}
 where $e$ is the charge per electron.
 
 \section{Histogram}
-The distribution of the grey values of all the pixels in the dataset is shown in Figure \ref{fig:block_histogram}. It was observed that there were 3 distinct peaks in the histogram at grey values:
+The distribution of all the grey values from all pixels in the dataset is shown in Figure \ref{fig:block_histogram}. It was observed that there were 3 distinct peaks in the histogram at grey values:
 \begin{itemize}
 	\item$\sim2.4\times10^4$ arb.~unit
 	\item$\sim4.1\times10^4$ arb.~unit
@@ -222,7 +222,7 @@ By doing a threshold, as shown in Figure \ref{fig:block_threshold}, it was clear
 \begin{figure}[htp]
 \centering
 \includegraphics[width=0.75\textwidth]{figures/block_histogram.eps}
-\caption{Histogram of the grey values of all the pixels in the 100 images from the dataset. The grey values ranged from 18\,286 to 60\,045.}
+\caption{Histogram of all the grey values from all the pixels in the 100 images from the dataset. The grey values ranged from 18\,286 to 60\,045.}
 \label{fig:block_histogram}
 \end{figure}
 
@@ -261,12 +261,12 @@ For a given pixel, a Normal distribution was fitted on the 100 grey values (one 
 \end{figure}
 
 \section{Autocorrelation}
-The sample mean and standard error of the grey values for each of the 100 images were taken and plotted as a time series as shown in Figure \ref{fig:timeSeries}. There was evidence of dependence between samples by looking at the sample autocorrelation plots as shown in Figure \ref{fig:timeSeries_acf_pacf}. Because there was a peak at lag 1 in the sample partial autocorrelation plot, the time series could be modelled using an autoregressive model with one parameter. Despite this, the images were assumed to be i.i.d.~in this project.
+The sample mean and standard error grey value for each of the 100 images were taken and plotted as a time series as shown in Figure \ref{fig:timeSeries}. There was evidence of dependence between samples by looking at the sample autocorrelation plots as shown in Figure \ref{fig:timeSeries_acf_pacf}. Because there was a peak at lag 1 in the sample partial autocorrelation plot, the time series could be modelled using an autoregressive model with one parameter. Despite this, the images were assumed to be i.i.d.~in this project.
 
 \begin{figure}[p]
 	\centering
 	\includegraphics[width=0.75\textwidth]{figures/initial_timeSeries.eps}
-	\caption{The sample mean and standard error of all the grey values for each of the 100 images.}
+	\caption{The sample mean and standard error grey value for each of the 100 images.}
 	\label{fig:timeSeries}
 \end{figure}
 
@@ -280,7 +280,7 @@ The sample mean and standard error of the grey values for each of the 100 images
 		\includegraphics[width=1\textwidth]{figures/initial_pacf.eps}
 		\caption{Sample partial autocorrelation}
 	\end{subfigure}
-	\caption{Sample autocorrelation and partial autocorrelation of the mean grey values of each image as a time series.}
+	\caption{Sample autocorrelation and partial autocorrelation of the mean grey value for each image as a time series.}
 	\label{fig:timeSeries_acf_pacf}
 \end{figure}
 
@@ -290,12 +290,12 @@ The sample mean and standard error of the grey values for each of the 100 images
 
 The aim of this chapter was to do supervised learning on predicting the variance of a pixel's grey value given its sample mean. This was done by fitting a linear regression to obtain an explanatory model rather than using out of the box machine learning algorithms. Once a good model was found, a single CT scan can be used to quantify the uncertainty on each pixel's grey value. This uncertainty then can be carried forward when doing volumetric reconstruction.
 
-Figure \ref{fig:histogramHeatmap} shows the sample variance and sample mean of each pixel's grey values. It can be seen that for sample means of $(4.5\pm0.5)\times 10^4$, the range of sample variances increased. In addition, there were a few outliers with extremely large sample variances, one example can be seen in Figure \ref{fig:scatterMeanVar}. To take into consideration outliers, a simple weighted least squares regression was done to give less weight to outliers.
+Figure \ref{fig:histogramHeatmap} shows the sample variance and sample mean grey value for each pixel. It can be seen that for sample means of $(4.5\pm0.5)\times 10^4$, the range of sample variances increased. In addition, there were a few outliers with extremely large sample variances, one example can be seen in Figure \ref{fig:scatterMeanVar}. To take into consideration outliers, a simple weighted least squares regression was done to give less weight to outliers.
 
 \begin{figure}
 	\centering
 	\includegraphics[width=0.75\textwidth]{figures/meanVar/histogramHeatmap.eps}
-	\caption{Frequency density plot of the sample variance against sample mean of all $1\,996^2$ pixel's grey values.}
+	\caption{Frequency density plot of the sample variance against sample mean grey value for all $1\,996^2$ pixels.}
 	\label{fig:histogramHeatmap}
 \end{figure}
 
@@ -309,7 +309,7 @@ Figure \ref{fig:histogramHeatmap} shows the sample variance and sample mean of e
 		\includegraphics[width=1\textwidth]{figures/meanVar/scatter2.eps}
 		\caption{Another sample of 7\,968 points}
 	\end{subfigure}
-	\caption{Scatter plots of the sample variance-mean pairs of a sample of pixel's grey values.}
+	\caption{Scatter plots of the sample variance-mean grey value pairs for a sample of pixels.}
 	\label{fig:scatterMeanVar}
 \end{figure}
 
@@ -335,7 +335,7 @@ A good weight for pixel $i$, $w_i$, would be one which is proportional to the pr
 w_i \propto \frac{1}{\left(S_i^2\right)^2} \ .
 \end{equation}
 
-The weights can be introduced into the least squares problem. Let $Y_1,Y_2,\dotdotdot,Y_m$ and $x_1,x_2,\dotdotdot,x_m$ be the sample variance and sample mean of the grey values respectively. Let $\vect{x}_1,\vect{x}_2,\dotdotdot,\vect{x}_m$ be the $p$ length feature vectors of the sample mean of the grey values. For example the feature vectors can contain polynomials such that
+The weights can be introduced into the least squares problem. Let $Y_1,Y_2,\dotdotdot,Y_m$ and $x_1,x_2,\dotdotdot,x_m$ be the sample variance and sample mean grey value respectively. Let $\vect{x}_1,\vect{x}_2,\dotdotdot,\vect{x}_m$ be the $p$ length feature vectors of the sample mean grey values. For example the feature vectors can contain polynomials such that
 \begin{equation}
 \vect{x}_i=
 \begin{pmatrix}
@@ -439,7 +439,7 @@ The BIC, as shown in Figure \ref{fig:weightedLS_BIC}, favoured high order polyno
 		\includegraphics[width=\textwidth]{figures/meanVar/order6.eps}
 		\caption{Order 6}
 	\end{subfigure}
-	\caption{Frequency density of the sample mean-variance pairs of the grey values. Weighted least squares with different orders of polynomial features were fitted. The (red) dotted line represent the 95\% prediction interval.}
+	\caption{Frequency density of the sample mean-variance grey value pairs. Weighted least squares with different orders of polynomial features were fitted. The (red) dotted line represent the 95\% prediction interval.}
 	\label{fig:weightedLS_polynomials}
 \end{figure}
 
@@ -492,7 +492,7 @@ It was clear the mean-variance relationship is material dependent, this can be s
 		\includegraphics[width=\textwidth]{figures/meanVar/subsample_foam2.eps}
 		\caption{Foam - Order 2}
 	\end{subfigure}
-	\caption{Frequency density of the sample mean-variance pairs of the resampled grey values for each material. Weighted linear regression with polynomial features was fitted for each material. The (red) dotted line represent the 95\% prediction interval.}
+	\caption{Frequency density of the sample mean-variance grey value pairs for each resampled pixels. Weighted linear regression with polynomial features was fitted for each material. The (red) dotted line represent the 95\% prediction interval.}
 	\label{fig:subsample_meanVar}
 \end{figure}
 
@@ -590,7 +590,7 @@ To make the EM algorithm run properly without problems, a random sample of 10\,0
 \subsection{Results}
 It was verified that the EM algorithm always increased the log likelihood at every EM step, as can be seen in Figure \ref{fig:mixture_lnL}.
 
-In Figure \ref{fig:mixture_histogram}, the 3 regressions did not capture the 3 different materials in the same way resampling weighted least squares did. This was because the mixture probabilities, $\pi_1,\pi_2,\pi_3$, did not depend on the sample mean of the grey values and did not represent the fact that certain materials have certain grey values. For example, low grey values were more likely to be from the 3D printed sample.
+In Figure \ref{fig:mixture_histogram}, the 3 regressions did not capture the 3 different materials in the same way resampling weighted least squares did. This was because the mixture probabilities, $\pi_1,\pi_2,\pi_3$, did not depend on the sample mean grey value and did not represent the fact that certain materials have certain grey values. For example, low grey values were more likely to be from the 3D printed sample.
 
 \begin{figure}[p]
 	\centering	
@@ -615,7 +615,7 @@ w_i=\exp\left[-\frac{1}{2}\left(\frac{x_i-\mu_j}{\sigma}\right)^2\right] \ ,
 $\mu_j$ was found using $k$-means \cite[p.~446]{barber2012bayesian} in the sample-mean grey value space and $\sigma$ is a predefined constant, called the Gaussian width.
 
 \subsection{Results}
-The fitted model captured the 3D printed sample and foam well because the regression expressed the shape of the histogram, as shown in Figure \ref{fig:meanVar_distanceWeighted}. However for the background, the regression had a negative gradient as a result of being influenced by lower sample grey values from the foam and 3D printed sample. This did not capture the background in the same way resampled weighted least squares did.
+The fitted model captured the 3D printed sample and foam well because the regression expressed the shape of the histogram, as shown in Figure \ref{fig:meanVar_distanceWeighted}. However for the background, the regression had a negative gradient as a result of being influenced by lower sample mean grey values from the foam and 3D printed sample. This did not capture the background in the same way resampled weighted least squares did.
 
 For higher Gaussian widths, the regression became an ordinary least squares regression because all the data points have approximately equal weights.
 
@@ -642,10 +642,10 @@ For higher Gaussian widths, the regression became an ordinary least squares regr
 \end{figure}
 
 \chapter{Latent Variable Model}
-Probabilistic latent models was used to model the pixel's grey values. These latent variables can be used to describe the underlining structure, and perhaps sources of variance. In this chapter, principal component analysis and factor analysis was conducted on the 100 images. At the end, the compound Poisson model will be presented with a toy example.
+Probabilistic latent models was used to model the grey values for each pixel. These latent variables can be used to describe the underlining structure, and perhaps sources of variance. In this chapter, principal component analysis and factor analysis was conducted on the 100 images. At the end, the compound Poisson model will be presented with a toy example.
 
 \section{Principal Component Analysis}
-Each pixel has a grey value which was treated as a random variable. By estimating the covariance matrix of the pixel's grey values, sources of (orthgonal) variance was estimated. This was done by investigating the eigendecomposition representation of the sample covariance matrix. Such a technique is called principal component analysis \cite[pp.~329-330]{barber2012bayesian}.
+Each pixel has a grey value which was treated as a random variable. By estimating the covariance matrix sources of (orthogonal) variance was estimated. This was done by investigating the eigendecomposition representation of the sample covariance matrix. Such a technique is called principal component analysis \cite[pp.~329-330]{barber2012bayesian}.
 
 \subsection{Theory}
 Suppose the $m\times m$ covariance matrix $\matr{\Sigma}$ has eigenvalues $\lambda_i$ and eigenvectors $\vectGreek{\phi}_i$ for $i=1,2,\dotdotdot,m$. Then the eigenvectors and eigenvalues are related by
@@ -732,7 +732,7 @@ This is a weighted sum of the outer products of the eigenvectors, therefore the 
 Because this is a weighted sum, the eigenvectors with the biggest eigenvalue will be most responsible for the covariance matrix. $\vectGreek{\phi}_i$ are called the principle components.
 
 \subsection{Methods}
-The 100 images were shrunk with averaging to a size of $100\times100$ pixels using ImageJ \cite{schindelin2012fiji}. The sample covariance matrix, of the pixel's grey values, was calculated using the maximum log likelihood estimator so that the 6 eigenvectors with the biggest eigenvalues were obtained. Using 1\,600 bootstrapped samples \cite{efron1992bootstrap}, the sampling distribution of the 6 largest eigenvalues were sampled.
+The 100 images were shrunk with averaging to a size of $100\times100$ pixels using ImageJ \cite{schindelin2012fiji}. The sample covariance matrix was calculated using the maximum log likelihood estimator so that the 6 eigenvectors with the biggest eigenvalues were obtained. Using 1\,600 bootstrapped samples \cite{efron1992bootstrap}, the sampling distribution of the 6 largest eigenvalues were sampled.
 
 \subsection{Results}
 Figure \ref{fig:initial_PCvariance} shows the first 6 of the diagonal of the outer product of the individual principle components, they represent the normalised main sources of variance. It was observed that on the first and second principle components, there were sources of variance on the bottom right and top right of the image. This could imply that the sources of variance in the background were not uniformly distributed in space.
@@ -753,7 +753,7 @@ The sampling distribution of the eigenvalues are shown in Figure \ref{fig:initia
 \end{figure}
 
 \section{Factor Analysis}
-In factor analysis, each pixel's grey value were modelled as Normally distributed using Normally distributed latent variables. Sources of variance from this model  were then isolated and investigated.
+In factor analysis, grey values for each pixel were modelled as Normally distributed using Normally distributed latent variables. Sources of variance from this model  were then isolated and investigated.
 
 \subsection{Theory}
 Let $\vect{Y}$ be a random vector containing $k$ latent variables, called factors, and
@@ -896,7 +896,7 @@ The uncertainty of model selection was assessed by investigating how the BIC and
 \end{figure}
 
 \section{Compound Poisson}
-Consider photons emitted from an X-ray tube as a Poisson process. There has been Poisson latent models developed to consider such behaviour. For example the number of photons detected can be modelled as $Y\sim\poisson(\lambda)$ and then the grey value can be modelled as $X|Y\sim\normal(\alpha Y,\beta)$ \cite{jin2014investigating}. Such a model explains that there is a linear relationship between the mean and variance of the grey values \cite{jin2014investigating}. However this does not consider that these photons have a board energy spectrum as a result of bremsstrahlung and characteristic radiation. It can be shown that a compound Poisson model performs better \cite{whiting2006properties} because it considers the board energy spectrum of the photons. However fitting the model is very difficult using the EM algorithm and approximations have to be made \cite{xie2008x}.
+Consider photons emitted from an X-ray tube as a Poisson process. There has been Poisson latent models developed to consider such behaviour. For example the number of photons detected can be modelled as $Y\sim\poisson(\lambda)$ and then the grey value can be modelled as $X|Y\sim\normal(\alpha Y,\beta)$ \cite{jin2014investigating}. Such a model explains that there is a linear relationship between the mean and variance grey value \cite{jin2014investigating}. However this does not consider that these photons have a board energy spectrum as a result of bremsstrahlung and characteristic radiation. It can be shown that a compound Poisson model performs better \cite{whiting2006properties} because it considers the board energy spectrum of the photons. However fitting the model is very difficult using the EM algorithm and approximations have to be made \cite{xie2008x}.
 
 \subsection{Theory}
 Suppose an image has $m$ pixels and each pixel has a corresponding grey value $X_i$ for $i=1,2,\dotdotdot,m$. Let $Y_i$ be the number of photons detected in pixel $i$ and each photon has energy randomly distributed with mean $\mu_i$ and variance $\sigma_i^2$. The number of photons detected can be modelled as a Poisson process such that
@@ -1154,7 +1154,7 @@ For high $\nu\tau$, problems arises as more and more terms were needed in the tr
 \chapter{Conclusion}
 
 \section{Mean and Variance Relationship}
-The relationship between the sample mean and sample variance of each pixel's grey values was modelled by fitting a weighted linear regression. Less weights were given to bigger sample variances as a simple method for robust regression. It was found that the mean and variance relationship depended on the different materials: the 3D printed sample, the background and the foam holder. To take into account the different mean and variance relationships, a mixture of linear regression was fitted but it failed to capture the different behaviours from the different materials. Weighted linear regression, where the weights depended on the difference between the sample mean grey value and some $k$ mean sample mean grey value, was fitted and only captured 2 out of the 3 material mean variance relationships.
+The relationship between the sample mean and sample variance grey value was modelled by fitting a weighted linear regression. Less weights were given to bigger sample variances as a simple method for robust regression. It was found that the mean and variance relationship depended on the different materials: the 3D printed sample, the background and the foam holder. To take into account the different mean and variance relationships, a mixture of linear regression was fitted but it failed to capture the different behaviours from the different materials. Weighted linear regression, where the weights depended on the difference between the sample mean grey value and some $k$ mean sample mean grey value, was fitted and only captured 2 out of the 3 material mean variance relationships.
 
 There is further work to do in the mean and variance relationship. Firstly it should be investigated whenever transforming the variance will produce a more linear model. For example the log variance or the standard deviation could be used. Furthermore, more features than just polynomials should be used for the sample mean grey values. Lastly, it was established that the sample variance has a scaled $\chi^2$ distribution. Because the $\chi^2$ distribution is in the exponential family, generalised linear models \cite{mccullagh1989generalized} should be used to open up more possibilities to model the relationship between the mean and variance.
 
