@@ -58,6 +58,7 @@
 \frametitle{3D Printing}
 \begin{itemize}
 	\item Quality control
+	\pause
 	\item X-ray Computed Tomography
 \end{itemize}
 \begin{figure}
@@ -112,6 +113,7 @@
 			\item Supervised Learning
 			\item Quantify uncertainty given a single CT scan
 		\end{itemize}
+	\pause
 	\item Latent Variable Models
 		\begin{itemize}
 			\item Unsupervised Learning
@@ -251,14 +253,17 @@ $\vect{Y}$ is latent
 \begin{equation}
 \vect{Y}\sim\normal\left(\vect{0},\matr{1}\right)
 \end{equation}
+\pause
 $\vect{e}$ is some uncorrelated random noise
 \begin{equation}
 \vect{e}\sim\normal\left(\vect{0},\matr{\Psi}\right)
 \end{equation}
+\pause
 $\vect{X}$ is the observed grey values
 \begin{equation}
 \vect{X}=\matr{\Lambda}\vect{Y}+\vect{e}
 \end{equation}
+\pause
 Fit using EM algorithm on shrunken 100$\times$100 images.
 \end{frame}
 
@@ -284,12 +289,14 @@ $Y$ is the number of photons detected in a pixel
 \begin{equation}
 Y\sim\poisson(\nu \tau)
 \end{equation}
+\pause
 $U$ is the total amount of energy recorded in a pixel
 \begin{equation}
 U|Y\sim\normal\left(
 Y\mu,Y\sigma^2
 \right)
 \end{equation}
+\pause
 $X$ is the intensity recorded in a pixel
 \begin{equation}
 X|U\sim\normal\left(
@@ -301,6 +308,7 @@ X|U\sim\normal\left(
 \begin{frame}
 \frametitle{Compound Poisson}
 Marginalise over $U$ to get a one layer latent model
+\pause
 \begin{equation}
 Y\sim\poisson(\nu\tau)
 \end{equation}
@@ -309,12 +317,14 @@ X|Y\sim\normal\left(
 \frac{\alpha\mu}{\tau}Y,\frac{\alpha^2\sigma^2}{\tau^2}Y+\beta^2
 \right)
 \end{equation}
+\pause
 \begin{block}{Remark}
 There are 3 sources of variance
 \begin{equation}
 \variance[X] = \frac{\alpha^2\nu}{\tau}\left(\mu^2+\sigma^2\right)+\beta^2
 \end{equation}
 \end{block}
+\pause
 Fit using EM algorithm.
 \end{frame}
 
